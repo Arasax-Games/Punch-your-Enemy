@@ -9,6 +9,7 @@ extends SceneTree
 ## in den günstigsten Knoten des Lorbeer-Baums gesteckt.
 
 var hours := 24.0
+var challenge := ""
 var _run_start := 0.0
 
 var gs: Node
@@ -21,9 +22,18 @@ func _initialize() -> void:
 	var days_at := args.find("--days")
 	if days_at >= 0 and days_at + 1 < args.size():
 		hours = float(args[days_at + 1]) * 24.0
+	var ch_at := args.find("--challenge")
+	if ch_at >= 0 and ch_at + 1 < args.size():
+		challenge = args[ch_at + 1]
 	gs = load("res://scripts/core/game_state.gd").new()
 	gs.persist = false
 	gs.load_data()
+	if challenge != "":
+		# Typische Lage: nach dem ersten Neuanfang mit 1 Lorbeer
+		gs.stats["prestiges"] = 1
+		gs.laurels_total = 1
+		gs.start_challenge(challenge)
+		_log.append("Herausforderung: %s (Ziel %s Wumms)" % [challenge, Num.fmt(float(gs.challenge_def(challenge).goal_wumms))])
 	var t := 0.0
 	var next_report := [60.0, 600.0, 3600.0, 4 * 3600.0, 12 * 3600.0]
 	for d in range(1, int(ceil(hours / 24.0)) + 1):
@@ -39,6 +49,9 @@ func _initialize() -> void:
 		t += step
 		_buy_greedy(t)
 		gs.check_achievements()
+		if challenge != "" and gs.challenges_done.has(challenge):
+			_log.append("  → Herausforderung geschafft nach %s" % Num.duration(t))
+			challenge = ""
 		if multi_day and gs.can_prestige() and gs.prestige_gain() >= maxi(1, gs.laurels_total):
 			var gain: int = gs.perform_prestige()
 			_run_start = t
@@ -84,19 +97,21 @@ func _buy_greedy(t: float) -> void:
 		if best.is_empty() or gs.wumms < best.cost:
 			return
 		if best.kind == "device":
-			gs.buy_device(best.id, 1)
+			if not gs.buy_device(best.id, 1):
+				return
 			if not _first_owned.has(best.id):
 				_first_owned[best.id] = t
-		else:
-			gs.buy_upgrade(best.id)
+		elif not gs.buy_upgrade(best.id):
+			return
 
 
 func _best_option() -> Dictionary:
 	var base := _income()
 	var best := {}
 	var best_score := INF
+	var rules: Dictionary = gs.challenge_rules()
 	for i in gs.device_defs.size():
-		if not gs.is_device_visible(i):
+		if rules.get("no_devices", false) or not gs.is_device_visible(i):
 			continue
 		var id: String = gs.device_defs[i].id
 		var cost: float = gs.device_cost(id, 1)
@@ -105,7 +120,7 @@ func _best_option() -> Dictionary:
 		if score < best_score:
 			best_score = score
 			best = {"kind": "device", "id": id, "cost": cost}
-	for u in gs.visible_upgrades():
+	for u in ([] if rules.get("no_upgrades", false) else gs.visible_upgrades()):
 		var cost := float(u.cost)
 		gs.upgrades[u.id] = true
 		var gain := _income() - base

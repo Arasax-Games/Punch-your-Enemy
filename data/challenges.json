@@ -1,0 +1,32 @@
+[
+	{
+		"id": "nur_faeuste",
+		"name": "Nur Fäuste",
+		"description": "Keine Geräte erlaubt – nur deine Klicks zählen.",
+		"rules": {
+			"no_devices": true
+		},
+		"goal_wumms": 1000000.0,
+		"reward_laurels": 1
+	},
+	{
+		"id": "ohne_upgrades",
+		"name": "Ohne Upgrades",
+		"description": "Kein einziges Upgrade. Nur Geräte, so wie sie aus der Fabrik kommen.",
+		"rules": {
+			"no_upgrades": true
+		},
+		"goal_wumms": 1000000000.0,
+		"reward_laurels": 2
+	},
+	{
+		"id": "inflation",
+		"name": "Inflation",
+		"description": "Alle Geräte kosten das Dreifache.",
+		"rules": {
+			"device_cost_mult": 3
+		},
+		"goal_wumms": 100000000000.0,
+		"reward_laurels": 2
+	}
+]

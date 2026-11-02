@@ -5,6 +5,7 @@ extends Node
 
 const RATE := 22050
 const VOICES := 12
+const PACK_PREFIX := {"retro": "retro_", "kampfsport": "kampf_"}
 
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
@@ -33,13 +34,19 @@ func _ready() -> void:
 	_streams["retro_buy"] = [_make_square(660.0, 1320.0, 0.12, 0.25)]
 	_streams["retro_boing"] = [_make_square(300.0, 600.0, 0.2, 0.2)]
 	_streams["retro_squeak"] = [_make_square(1200.0, 1600.0, 0.08, 0.15)]
+	# Kampfsport-Paket (Kosmetik-Laden): Wusch und Zack, beim Kaufen ein Gong
+	_streams["kampf_punch"] = [_make_whoosh(0.16, 900.0), _make_whoosh(0.13, 1300.0), _make_whoosh(0.18, 700.0)]
+	_streams["kampf_crit"] = [_make_whoosh(0.3, 500.0)]
+	_streams["kampf_buy"] = [_make_gong()]
+	_streams["kampf_boing"] = [_make_whoosh(0.22, 1600.0)]
 
 
 func play(sound: String, pitch_spread: float = 0.1, volume_db: float = 0.0) -> void:
 	if not GameState.sound_on or not _streams.has(sound):
 		return
-	if GameState.sound_pack == "retro" and _streams.has("retro_" + sound):
-		sound = "retro_" + sound
+	var prefix: String = PACK_PREFIX.get(GameState.sound_pack, "")
+	if prefix != "" and _streams.has(prefix + sound):
+		sound = prefix + sound
 	var p := _players[_next]
 	_next = (_next + 1) % _players.size()
 	var variants: Array = _streams[sound]
@@ -134,6 +141,31 @@ func _make_arpeggio(notes: Array, note_length: float, volume: float) -> AudioStr
 			if env < 0.001:
 				break
 			s[i] += (sin(TAU * freq * t) + 0.25 * sin(TAU * freq * 2.0 * t)) * env * volume
+	return _to_wav(s)
+
+
+## Luftzug ("Wusch") mit anschließendem Klatscher – gefiltertes Rauschen.
+func _make_whoosh(duration: float, brightness: float) -> AudioStreamWAV:
+	var s := _buffer(duration + 0.08)
+	var low := 0.0
+	var smoothing := clampf(brightness / RATE * TAU, 0.01, 0.9)
+	for i in s.size():
+		var t := float(i) / RATE
+		var noise := randf() * 2.0 - 1.0
+		low += (noise - low) * smoothing
+		var swell := sin(clampf(t / duration, 0.0, 1.0) * PI) * 0.5
+		var slap := (randf() * 2.0 - 1.0) * exp(-(t - duration) * 60.0) if t >= duration else 0.0
+		s[i] = (low * swell * 2.0 + slap * 0.8) * 0.8
+	return _to_wav(s)
+
+
+## Gong mit langem Ausklingen.
+func _make_gong() -> AudioStreamWAV:
+	var s := _buffer(1.2)
+	for i in s.size():
+		var t := float(i) / RATE
+		var env := exp(-t * 3.0)
+		s[i] = (sin(TAU * 220.0 * t) + 0.6 * sin(TAU * 331.0 * t) + 0.4 * sin(TAU * 523.0 * t)) * env * 0.25
 	return _to_wav(s)
 
 

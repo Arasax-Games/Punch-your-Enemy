@@ -1,0 +1,130 @@
+[
+	{
+		"id": "fist_standard",
+		"slot": "fist",
+		"value": "standard",
+		"name": "Faust",
+		"description": "Die gute alte Faust.",
+		"source": "default"
+	},
+	{
+		"id": "fist_gold",
+		"slot": "fist",
+		"value": "gold",
+		"name": "Goldene Faust",
+		"description": "Aus purem Gold. Fast.",
+		"source": "laurel"
+	},
+	{
+		"id": "fist_gummihandschuh",
+		"slot": "fist",
+		"value": "gummihandschuh",
+		"name": "Gummihandschuh",
+		"description": "Für die gründliche Grundreinigung.",
+		"source": "shop",
+		"cost": 4
+	},
+	{
+		"id": "fist_boxhandschuh",
+		"slot": "fist",
+		"value": "boxhandschuh",
+		"name": "Boxhandschuh",
+		"description": "Zwölf Unzen reines Selbstbewusstsein.",
+		"source": "shop",
+		"cost": 6
+	},
+	{
+		"id": "fist_schaumstoff",
+		"slot": "fist",
+		"value": "schaumstoff",
+		"name": "Schaumstoff-Hand",
+		"description": "Wir sind die Nummer eins! Glaubt die Hand.",
+		"source": "shop",
+		"cost": 8
+	},
+	{
+		"id": "fist_pfote",
+		"slot": "fist",
+		"value": "pfote",
+		"name": "Pfote",
+		"description": "Samtpfote mit Krallen eingefahren. Meistens.",
+		"source": "shop",
+		"cost": 10
+	},
+	{
+		"id": "fist_keule",
+		"slot": "fist",
+		"value": "keule",
+		"name": "Brathähnchenkeule",
+		"description": "Knusprig, saftig, durchschlagend.",
+		"source": "shop",
+		"cost": 12
+	},
+	{
+		"id": "bg_standard",
+		"slot": "background",
+		"value": "standard",
+		"name": "Standard",
+		"description": "Warm und gemütlich.",
+		"source": "default"
+	},
+	{
+		"id": "bg_zirkus",
+		"slot": "background",
+		"value": "zirkus",
+		"name": "Zirkuszelt",
+		"description": "Manege frei!",
+		"source": "laurel"
+	},
+	{
+		"id": "bg_weltraum",
+		"slot": "background",
+		"value": "weltraum",
+		"name": "Weltraum",
+		"description": "Backpfeifen in der Schwerelosigkeit.",
+		"source": "laurel"
+	},
+	{
+		"id": "bg_wohnzimmer",
+		"slot": "background",
+		"value": "wohnzimmer",
+		"name": "Wohnzimmer",
+		"description": "Tapete, Sofa, Stehlampe. Bitte nicht auf den Teppich.",
+		"source": "shop",
+		"cost": 6
+	},
+	{
+		"id": "bg_arena",
+		"slot": "background",
+		"value": "arena",
+		"name": "Arena",
+		"description": "Seile, Scheinwerfer, tosender Applaus.",
+		"source": "shop",
+		"cost": 8
+	},
+	{
+		"id": "sound_standard",
+		"slot": "sound",
+		"value": "standard",
+		"name": "Comic",
+		"description": "Boing, Klatsch, Quietsch.",
+		"source": "default"
+	},
+	{
+		"id": "sound_retro",
+		"slot": "sound",
+		"value": "retro",
+		"name": "Retro-Arcade",
+		"description": "Piep, Bump, Bling.",
+		"source": "laurel"
+	},
+	{
+		"id": "sound_kampfsport",
+		"slot": "sound",
+		"value": "kampfsport",
+		"name": "Kampfsport",
+		"description": "Wusch! Zack! Gong!",
+		"source": "shop",
+		"cost": 8
+	}
+]

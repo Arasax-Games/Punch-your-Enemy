@@ -684,5 +684,55 @@
 			"value": 1
 		},
 		"hidden": true
+	},
+	{
+		"id": "herausforderer",
+		"name": "Herausforderer",
+		"description": "Eine Herausforderung gemeistert.",
+		"condition": {
+			"type": "stat",
+			"stat": "challenges_done",
+			"value": 1
+		}
+	},
+	{
+		"id": "alle_pruefungen",
+		"name": "Alle Prüfungen bestanden",
+		"description": "Alle drei Herausforderungen gemeistert.",
+		"condition": {
+			"type": "stat",
+			"stat": "challenges_done",
+			"value": 3
+		}
+	},
+	{
+		"id": "boersenhai",
+		"name": "Börsenhai",
+		"description": "10 Mal mit Gewinn an der Beulen-Börse verkauft.",
+		"condition": {
+			"type": "stat",
+			"stat": "market_wins",
+			"value": 10
+		}
+	},
+	{
+		"id": "modebewusst",
+		"name": "Modebewusst",
+		"description": "Etwas im Kosmetik-Laden gekauft.",
+		"condition": {
+			"type": "stat",
+			"stat": "cosmetics_bought",
+			"value": 1
+		}
+	},
+	{
+		"id": "promi_galerie",
+		"name": "Promi-Galerie",
+		"description": "Jeden mitgelieferten Bösewicht mindestens 100 Mal gehauen.",
+		"condition": {
+			"type": "figures_hit",
+			"value": 100
+		},
+		"hidden": true
 	}
 ]

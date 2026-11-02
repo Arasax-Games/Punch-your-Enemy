@@ -70,3 +70,8 @@ DOJO_MEISTER;Dojo-Meister;40 Punkte im Reaktions-Dojo.;nein
 TORTENKOENIG;Tortenkönig;60 Punkte in der Tortenwurf-Schießbude.;nein
 SAISONARBEITER;Saisonarbeiter;Ein Saison-Event abgeschlossen.;nein
 ERINNERUNGSFOTO;Erinnerungsfoto;Ein Foto gespeichert. Für die Enkel.;ja
+HERAUSFORDERER;Herausforderer;Eine Herausforderung gemeistert.;nein
+ALLE_PRUEFUNGEN;Alle Prüfungen bestanden;Alle drei Herausforderungen gemeistert.;nein
+BOERSENHAI;Börsenhai;10 Mal mit Gewinn an der Beulen-Börse verkauft.;nein
+MODEBEWUSST;Modebewusst;Etwas im Kosmetik-Laden gekauft.;nein
+PROMI_GALERIE;Promi-Galerie;Jeden mitgelieferten Bösewicht mindestens 100 Mal gehauen.;ja

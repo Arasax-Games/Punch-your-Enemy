@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Baron von Blamage – fiktiver aufgeblasener Adliger mit Monokel (genervt) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="640" viewBox="0 0 560 640">
+  <g stroke="#2b2118" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Samtjacke mit Rüschen -->
+    <path d="M40 640 C50 540 130 492 210 484 L350 484 C430 492 510 540 520 640 Z" fill="#862e9c"/>
+    <path d="M236 484 C220 520 250 560 280 590 C310 560 340 520 324 484 Z" fill="#ffffff"/>
+    <path d="M250 510 Q280 530 310 510 M246 540 Q280 560 314 540" fill="none" stroke-width="4"/>
+    <circle cx="380" cy="560" r="14" fill="#fcc419" stroke-width="4"/>
+    <!-- Koteletten -->
+    <path d="M140 300 C130 380 150 430 186 450 C176 400 178 350 182 300 Z" fill="#a0522d"/>
+    <path d="M420 300 C430 380 410 430 374 450 C384 400 382 350 378 300 Z" fill="#a0522d"/>
+    <rect x="236" y="440" width="88" height="54" rx="18" fill="#f8d0c0"/>
+    <ellipse cx="136" cy="340" rx="28" ry="40" fill="#f8d0c0"/>
+    <ellipse cx="424" cy="340" rx="28" ry="40" fill="#f8d0c0"/>
+    <ellipse cx="280" cy="340" rx="142" ry="140" fill="#f8d0c0"/>
+    <ellipse cx="224" cy="310" rx="28" ry="25" fill="#ffffff"/>
+    <ellipse cx="336" cy="310" rx="28" ry="25" fill="#ffffff"/>
+    <circle cx="229" cy="314" r="11" fill="#2b2118"/>
+    <circle cx="331" cy="314" r="11" fill="#2b2118"/>
+    <path d="M194 306 Q224 282 254 306 Z" fill="#f8d0c0" stroke-width="5"/>
+    <path d="M306 306 Q336 282 366 306 Z" fill="#f8d0c0" stroke-width="5"/>
+    <path d="M182 252 L264 286" stroke="#5c3d2e" stroke-width="16"/>
+    <path d="M378 252 L296 286" stroke="#5c3d2e" stroke-width="16"/>
+    <path d="M268 330 C250 380 262 392 290 388 C304 386 300 360 290 330 Z" fill="#f4b8a8"/>
+    <!-- Pausbacken -->
+    <ellipse cx="196" cy="380" rx="34" ry="24" fill="#ffa8a8" stroke="none" opacity="0.8"/>
+    <ellipse cx="364" cy="380" rx="34" ry="24" fill="#ffa8a8" stroke="none" opacity="0.8"/>
+    <!-- Monokel -->
+    <circle cx="336" cy="310" r="36" fill="none" stroke="#fab005" stroke-width="8"/>
+    <path d="M370 324 C400 380 380 440 404 480" fill="none" stroke="#fab005" stroke-width="4"/>
+    <path d="M244 424 Q256 412 268 424 Q280 436 292 424 Q304 412 316 424" fill="none" stroke-width="7"/>
+    <path d="M410 246 C402 262 398 272 406 280 C414 288 426 280 424 268 C422 260 416 254 410 246 Z" fill="#74c0fc" stroke-width="4"/>
+    <g transform="rotate(-4 280 200)">
+    <!-- Zylinder -->
+    <path d="M150 230 C200 216 360 216 410 230 C400 248 160 248 150 230 Z" fill="#212529"/>
+    <rect x="190" y="40" width="180" height="186" rx="10" fill="#212529"/>
+    <rect x="190" y="180" width="180" height="30" fill="#862e9c"/>
+    </g>
+  </g>
+</svg>

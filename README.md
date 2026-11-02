@@ -23,7 +23,14 @@ Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 | Strg+V | Bild aus der Zwischenablage als neues Opfer |
 | Bild ins Fenster ziehen | Neues Opfer |
 
-## Stand: Phase 4 (Steam & Langzeit)
+## Stand: Phase 5 (Inhalt & Feinschliff)
+
+**Phase 5**
+- **Drei neue Standardfiguren** mit je 3 Mimik-Stufen: Dr. Doomsday Dieter (mit Katze), Baron von Blamage (mit Monokel) und Sir Fiesling der Dritte (Stummfilm-Schurke in Schwarz-Weiß)
+- **Kosmetik-Laden** für Beulen-Marken: Faust-Skins (Gummihandschuh, Boxhandschuh, Schaumstoff-Hand, Pfote, Brathähnchenkeule), Hintergründe Wohnzimmer und Arena, Sound-Pack Kampfsport – alles jederzeit wechselbar
+- **Herausforderungen** nach dem ersten Neuanfang: „Nur Fäuste“, „Ohne Upgrades“, „Inflation“ – bringen Extra-Lorbeeren
+- **Börse für Beulen**: Pflaster, Eisbeutel, Sahnetorten und Gummienten billig kaufen, teuer verkaufen
+- **Zeitlupe** als neuer Effekt des Goldenen Schuhs
 
 **Phase 4**
 - **Boss-Kämpfe** alle 100.000 Treffer: Lebensleiste, 30 Sekunden, wandernde Schwachstelle (×5) und harmlose Gimmicks (Wegducken, Pappschild, Gummiente). Belohnung: Pokal und Beulen-Marken

@@ -5,10 +5,7 @@ extends Control
 
 signal hit(uv: Vector2)
 
-const CURSORS := {
-	"standard": [preload("res://assets/cursor/fist_open.svg"), preload("res://assets/cursor/fist_hit.svg")],
-	"gold": [preload("res://assets/cursor/fist_open_gold.svg"), preload("res://assets/cursor/fist_hit_gold.svg")],
-}
+const CURSOR_DIR := "res://assets/cursor"
 const CURSOR_HOTSPOT := Vector2(30, 26)
 const ALPHA_THRESHOLD := 0.1
 
@@ -153,8 +150,20 @@ func _punch_cursor() -> void:
 	_cursor_timer = 0.09
 
 
+var _cursor_cache: Dictionary = {}
+
+
+## Faust-Skin-Texturen: fist_open[_skin].svg und fist_hit[_skin].svg.
 func _cursor(frame: int) -> Texture2D:
-	return CURSORS.get(GameState.fist_skin, CURSORS.standard)[frame]
+	var skin := GameState.fist_skin
+	if not _cursor_cache.has(skin):
+		var suffix := "" if skin == "standard" else "_" + skin
+		var open_path := "%s/fist_open%s.svg" % [CURSOR_DIR, suffix]
+		if not ResourceLoader.exists(open_path):
+			suffix = ""
+			open_path = "%s/fist_open.svg" % CURSOR_DIR
+		_cursor_cache[skin] = [load(open_path), load("%s/fist_hit%s.svg" % [CURSOR_DIR, suffix])]
+	return _cursor_cache[skin][frame]
 
 
 func refresh_cursor() -> void:

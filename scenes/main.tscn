@@ -65,7 +65,7 @@ layout_mode = 2
 focus_mode = 0
 tooltip_text = "Bild von der Festplatte laden. Du kannst Bilder auch ins Fenster ziehen oder mit Strg+V einfügen.
 Nimm Bilder, bei denen alle Beteiligten Spaß verstehen."
-text = "Neues Opfer wählen …"
+text = "Neues Opfer …"
 
 [node name="GalleryButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
@@ -94,6 +94,13 @@ layout_mode = 2
 focus_mode = 0
 tooltip_text = "Tagesaufträge, Login-Serie, Saison-Event und deine Pokale."
 text = "Aufträge"
+
+[node name="ShopButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Kosmetik-Laden: Faust-Skins, Hintergründe und Sounds für Beulen-Marken."
+text = "Laden"
 
 [node name="GamesButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true

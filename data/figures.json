@@ -43,6 +43,135 @@
 		}
 	},
 	{
+		"id": "dieter",
+		"name": "Dr. Doomsday Dieter",
+		"moods": [
+			"res://assets/figures/dieter.svg",
+			"res://assets/figures/dieter_genervt.svg",
+			"res://assets/figures/dieter_am_ende.svg"
+		],
+		"anchors": {
+			"eye_left": [
+				0.4,
+				0.484
+			],
+			"eye_right": [
+				0.6,
+				0.484
+			],
+			"cheek": [
+				0.33,
+				0.62
+			],
+			"head_top": [
+				0.64,
+				0.3
+			],
+			"ear_left": [
+				0.24,
+				0.53
+			],
+			"ear_right": [
+				0.76,
+				0.53
+			],
+			"crown": [
+				0.5,
+				0.2
+			],
+			"forehead": [
+				0.5,
+				0.42
+			]
+		}
+	},
+	{
+		"id": "baron",
+		"name": "Baron von Blamage",
+		"moods": [
+			"res://assets/figures/baron.svg",
+			"res://assets/figures/baron_genervt.svg",
+			"res://assets/figures/baron_am_ende.svg"
+		],
+		"anchors": {
+			"eye_left": [
+				0.4,
+				0.484
+			],
+			"eye_right": [
+				0.6,
+				0.484
+			],
+			"cheek": [
+				0.33,
+				0.62
+			],
+			"head_top": [
+				0.66,
+				0.36
+			],
+			"ear_left": [
+				0.24,
+				0.53
+			],
+			"ear_right": [
+				0.76,
+				0.53
+			],
+			"crown": [
+				0.5,
+				0.06
+			],
+			"forehead": [
+				0.5,
+				0.42
+			]
+		}
+	},
+	{
+		"id": "fiesling",
+		"name": "Sir Fiesling der Dritte",
+		"moods": [
+			"res://assets/figures/fiesling.svg",
+			"res://assets/figures/fiesling_genervt.svg",
+			"res://assets/figures/fiesling_am_ende.svg"
+		],
+		"anchors": {
+			"eye_left": [
+				0.4,
+				0.484
+			],
+			"eye_right": [
+				0.6,
+				0.484
+			],
+			"cheek": [
+				0.33,
+				0.64
+			],
+			"head_top": [
+				0.66,
+				0.36
+			],
+			"ear_left": [
+				0.24,
+				0.53
+			],
+			"ear_right": [
+				0.76,
+				0.53
+			],
+			"crown": [
+				0.5,
+				0.05
+			],
+			"forehead": [
+				0.5,
+				0.42
+			]
+		}
+	},
+	{
 		"id": "hexe",
 		"name": "Halloween-Hexe Hildegard",
 		"moods": [
