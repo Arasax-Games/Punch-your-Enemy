@@ -221,6 +221,8 @@ Jede Lorbeere gibt dauerhaft +1 % WPS und +1 % Klickwert.
 - **Komfort:** Offline-Fortschritt besser, automatischer Kauf.
 - **Show:** Neue Effekte, Skins, Sounds.
 
+**Umsetzungsentscheidung:** Der Zweig „Show“ wird mit **Beulen-Marken** bezahlt, die anderen drei mit Lorbeeren. Beulen-Marken gibt es für jeden Erfolg, jedes Beulen-Level und den Pech-Schuh. So haben die Marken früh einen Nutzen, und der Lorbeer-Baum ist nach einer Woche etwa zur Hälfte gefüllt (geprüft mit `tests/simulate.gd -- --days 7`).
+
 Nach dem ersten Neuanfang: optionaler „Zeitraffer“-Modus (Spiel läuft 2× schneller). Herausforderungen (nur Klicks, keine Upgrades) belohnen Extra-Lorbeeren.
 
 ## 10. Idle- und Offline-Mechanik

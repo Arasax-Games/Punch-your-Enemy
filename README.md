@@ -17,12 +17,22 @@ Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 |---|---|
 | Klick auf das Bild / Leertaste | Hauen |
 | Maus gedrückt halten | Dauerfeuer (nach Upgrade) |
+| R | Wutmodus entfesseln (wenn die Wut-Leiste voll ist) |
 | 1–9 | Gerät kaufen |
 | Goldener Schuh / Silberner Pantoffel anklicken | Bonus (Segen, Raserei, Klick-Raserei, Kettenreaktion … oder Pech) |
 | Strg+V | Bild aus der Zwischenablage als neues Opfer |
 | Bild ins Fenster ziehen | Neues Opfer |
 
-## Stand: Phase 2 (Clicker-Kern)
+## Stand: Phase 3 (Tiefe)
+
+**Phase 3**
+- **Neuanfang (Prestige)** ab 1 Billion Wumms: Lorbeeren = ∛(Wumms ÷ 1 Billion), je Lorbeer +1 % auf alles
+- **Lorbeer-Baum** mit 4 Zweigen: Handwerk (Rabatte, Startgeräte), Glück (Schuhe, Krits), Komfort (Offline, Dauerfeuer, Autokauf) und Show (goldene Faust, Hintergründe, Retro-Sounds, Konfetti – bezahlt mit Beulen-Marken)
+- **Combo** (bis ×2 Klick-Wert) und **Wutmodus** (Leiste füllen, mit R entfesseln: 10 s alles ×3, keine Goldenen Schuhe)
+- **Beulen-Level** 1–10 pro Opfer (alle 1.000 Treffer): Pflaster, Veilchen, Kopfverband, rauchende Ohren, Vögelchen – Bombastus wird ab Level 4 genervt und ab Level 8 ist er am Ende
+- **Galerie**: Opfer wechseln, umbenennen, löschen
+- **Zeitraffer** nach dem ersten Neuanfang (Menü)
+- Ton- und Effekt-Einstellungen sind ins Menü gewandert
 
 **Phase 2**
 - Alle 12 Geräte, je 3 Geräte-Upgrades, 6 Synergie-Upgrades, globale Upgrades (Wutmilch, Fanclub, Kamerateam …) – insgesamt 54 Upgrades
@@ -46,6 +56,7 @@ Das komplette Design steht in [`docs/konzept.md`](docs/konzept.md).
 ```bash
 godot --headless --path . --script res://tests/run_tests.gd   # Tests
 godot --headless --path . --script res://tests/simulate.gd    # Balancing-Simulation (24 h)
+godot --headless --path . --script res://tests/simulate.gd -- --days 7   # eine Woche mit Neuanfängen
 ```
 
 ## Für Steam exportieren
