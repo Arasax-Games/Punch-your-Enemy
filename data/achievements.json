@@ -1,0 +1,491 @@
+[
+	{
+		"id": "erstes_aua",
+		"name": "Erstes Aua",
+		"description": "Der erste Treffer. Es wird nicht der letzte sein.",
+		"condition": {
+			"type": "hits",
+			"value": 1
+		}
+	},
+	{
+		"id": "warm_up",
+		"name": "Aufwärmen",
+		"description": "100 Treffer. Die Faust ist jetzt warm.",
+		"condition": {
+			"type": "hits",
+			"value": 100
+		}
+	},
+	{
+		"id": "zappelphilipp",
+		"name": "Zappelphilipp",
+		"description": "1.000 Treffer. Stillsitzen ist überbewertet.",
+		"condition": {
+			"type": "hits",
+			"value": 1000
+		}
+	},
+	{
+		"id": "fingerfertig",
+		"name": "Fingerfertig",
+		"description": "10.000 Treffer. Deine Maus braucht Urlaub.",
+		"condition": {
+			"type": "hits",
+			"value": 10000
+		}
+	},
+	{
+		"id": "sehnenscheide",
+		"name": "Sehnenscheidenentzündung",
+		"description": "100.000 Treffer. Bitte mach mal eine Pause.",
+		"condition": {
+			"type": "hits",
+			"value": 100000
+		}
+	},
+	{
+		"id": "klick_legende",
+		"name": "Klick-Legende",
+		"description": "1 Million Treffer. Man erzählt sich Geschichten über dich.",
+		"condition": {
+			"type": "hits",
+			"value": 1000000
+		}
+	},
+	{
+		"id": "taschengeld",
+		"name": "Taschengeld",
+		"description": "1.000 Wumms insgesamt erzeugt.",
+		"condition": {
+			"type": "total_wumms",
+			"value": 1000.0
+		}
+	},
+	{
+		"id": "sparschwein",
+		"name": "Sparschwein",
+		"description": "100.000 Wumms insgesamt erzeugt.",
+		"condition": {
+			"type": "total_wumms",
+			"value": 100000.0
+		}
+	},
+	{
+		"id": "wumms_millionaer",
+		"name": "Wumms-Millionär",
+		"description": "1 Million Wumms insgesamt erzeugt.",
+		"condition": {
+			"type": "total_wumms",
+			"value": 1000000.0
+		}
+	},
+	{
+		"id": "wumms_milliardaer",
+		"name": "Wumms-Milliardär",
+		"description": "1 Milliarde Wumms insgesamt erzeugt.",
+		"condition": {
+			"type": "total_wumms",
+			"value": 1000000000.0
+		}
+	},
+	{
+		"id": "wumms_billionaer",
+		"name": "Wumms-Billionär",
+		"description": "1 Billion Wumms insgesamt erzeugt.",
+		"condition": {
+			"type": "total_wumms",
+			"value": 1000000000000.0
+		}
+	},
+	{
+		"id": "wumms_billiardaer",
+		"name": "Wumms-Billiardär",
+		"description": "1 Billiarde Wumms. Die Zahl hat jetzt ein e.",
+		"condition": {
+			"type": "total_wumms",
+			"value": 1000000000000000.0
+		}
+	},
+	{
+		"id": "laeuft_von_allein",
+		"name": "Läuft von allein",
+		"description": "1 Wumms pro Sekunde.",
+		"condition": {
+			"type": "wps",
+			"value": 1
+		}
+	},
+	{
+		"id": "fliessbandarbeit",
+		"name": "Fließbandarbeit",
+		"description": "100 Wumms pro Sekunde.",
+		"condition": {
+			"type": "wps",
+			"value": 100
+		}
+	},
+	{
+		"id": "industrielle_revolution",
+		"name": "Industrielle Revolution",
+		"description": "10.000 Wumms pro Sekunde.",
+		"condition": {
+			"type": "wps",
+			"value": 10000.0
+		}
+	},
+	{
+		"id": "ohrfeigen_konzern",
+		"name": "Ohrfeigen-Konzern",
+		"description": "1 Million Wumms pro Sekunde.",
+		"condition": {
+			"type": "wps",
+			"value": 1000000.0
+		}
+	},
+	{
+		"id": "galaktisch",
+		"name": "Galaktisch",
+		"description": "1 Milliarde Wumms pro Sekunde.",
+		"condition": {
+			"type": "wps",
+			"value": 1000000000.0
+		}
+	},
+	{
+		"id": "faust_club",
+		"name": "Faust-Club",
+		"description": "100 Fäuste. Die erste Regel: Wir reden nicht drüber.",
+		"condition": {
+			"type": "device",
+			"device": "faust",
+			"value": 100
+		}
+	},
+	{
+		"id": "pantoffel_armee",
+		"name": "Pantoffel-Armee",
+		"description": "100 Pantoffel. Oma ist stolz.",
+		"condition": {
+			"type": "device",
+			"device": "pantoffel",
+			"value": 100
+		}
+	},
+	{
+		"id": "quietsch_orchester",
+		"name": "Quietsch-Orchester",
+		"description": "50 Gummihämmer in perfekter Harmonie.",
+		"condition": {
+			"type": "device",
+			"device": "gummihammer",
+			"value": 50
+		}
+	},
+	{
+		"id": "sahneschnitte",
+		"name": "Sahneschnitte",
+		"description": "50 Tortenwurf-Kanonen. Der Konditor weint vor Glück.",
+		"condition": {
+			"type": "device",
+			"device": "tortenkanone",
+			"value": 50
+		}
+	},
+	{
+		"id": "robo_liga",
+		"name": "Robo-Liga",
+		"description": "25 Boxroboter. Keiner von ihnen lacht.",
+		"condition": {
+			"type": "device",
+			"device": "boxroboter",
+			"value": 25
+		}
+	},
+	{
+		"id": "mond_manager",
+		"name": "Mond-Manager",
+		"description": "Dein erstes Mond-Katapult.",
+		"condition": {
+			"type": "device",
+			"device": "mondkatapult",
+			"value": 1
+		}
+	},
+	{
+		"id": "zeitreisender",
+		"name": "Zeitreisender",
+		"description": "Deine erste Zeitreise-Backpfeife. Du hattest sie schon gestern.",
+		"condition": {
+			"type": "device",
+			"device": "zeitreise",
+			"value": 1
+		}
+	},
+	{
+		"id": "multiversal",
+		"name": "Multiversal",
+		"description": "Die Universelle Backpfeife gehört dir.",
+		"condition": {
+			"type": "device",
+			"device": "universell",
+			"value": 1
+		}
+	},
+	{
+		"id": "werkstatt",
+		"name": "Werkstatt",
+		"description": "10 Geräte insgesamt.",
+		"condition": {
+			"type": "devices_total",
+			"value": 10
+		}
+	},
+	{
+		"id": "fabrikhalle",
+		"name": "Fabrikhalle",
+		"description": "100 Geräte insgesamt.",
+		"condition": {
+			"type": "devices_total",
+			"value": 100
+		}
+	},
+	{
+		"id": "imperium",
+		"name": "Imperium der Watschen",
+		"description": "500 Geräte insgesamt.",
+		"condition": {
+			"type": "devices_total",
+			"value": 500
+		}
+	},
+	{
+		"id": "komplettset",
+		"name": "Komplettset",
+		"description": "Von jedem Gerät mindestens eins.",
+		"condition": {
+			"type": "device_types",
+			"value": 12
+		}
+	},
+	{
+		"id": "aufgeruestet",
+		"name": "Aufgerüstet",
+		"description": "Dein erstes Upgrade.",
+		"condition": {
+			"type": "upgrades",
+			"value": 1
+		}
+	},
+	{
+		"id": "shopping_queen",
+		"name": "Shopping-Queen",
+		"description": "10 Upgrades gekauft.",
+		"condition": {
+			"type": "upgrades",
+			"value": 10
+		}
+	},
+	{
+		"id": "alles_gekauft",
+		"name": "Alles gekauft?",
+		"description": "40 Upgrades gekauft. Fast.",
+		"condition": {
+			"type": "upgrades",
+			"value": 40
+		}
+	},
+	{
+		"id": "volltreffer",
+		"name": "Volltreffer",
+		"description": "Dein erster kritischer Treffer.",
+		"condition": {
+			"type": "stat",
+			"stat": "crits",
+			"value": 1
+		}
+	},
+	{
+		"id": "praezisionsarbeit",
+		"name": "Präzisionsarbeit",
+		"description": "100 kritische Treffer.",
+		"condition": {
+			"type": "stat",
+			"stat": "crits",
+			"value": 100
+		}
+	},
+	{
+		"id": "gluckspilz",
+		"name": "Glückspilz",
+		"description": "Deinen ersten Goldenen Schuh gefangen.",
+		"condition": {
+			"type": "stat",
+			"stat": "golden_shoes",
+			"value": 1
+		}
+	},
+	{
+		"id": "schuh_sammler",
+		"name": "Schuh-Sammler",
+		"description": "10 Goldene Schuhe gefangen.",
+		"condition": {
+			"type": "stat",
+			"stat": "golden_shoes",
+			"value": 10
+		}
+	},
+	{
+		"id": "goldener_finger",
+		"name": "Goldener Finger",
+		"description": "50 Goldene Schuhe gefangen.",
+		"condition": {
+			"type": "stat",
+			"stat": "golden_shoes",
+			"value": 50
+		}
+	},
+	{
+		"id": "pantoffelheld",
+		"name": "Pantoffelheld",
+		"description": "10 Silberne Pantoffel gefangen.",
+		"condition": {
+			"type": "stat",
+			"stat": "silver_slippers",
+			"value": 10
+		}
+	},
+	{
+		"id": "raserei_reiter",
+		"name": "Raserei-Reiter",
+		"description": "5 Mal Raserei ausgelöst.",
+		"condition": {
+			"type": "stat",
+			"stat": "frenzies",
+			"value": 5
+		}
+	},
+	{
+		"id": "pechvogel",
+		"name": "Pechvogel",
+		"description": "Ein Pech-Schuh. Immerhin gab es Beulen-Marken.",
+		"condition": {
+			"type": "stat",
+			"stat": "bad_luck",
+			"value": 1
+		}
+	},
+	{
+		"id": "fotograf",
+		"name": "Fotograf",
+		"description": "Dein erstes eigenes Bild importiert.",
+		"condition": {
+			"type": "stat",
+			"stat": "images_imported",
+			"value": 1
+		}
+	},
+	{
+		"id": "sammler",
+		"name": "Sammler",
+		"description": "10 eigene Bilder importiert.",
+		"condition": {
+			"type": "stat",
+			"stat": "images_imported",
+			"value": 10
+		}
+	},
+	{
+		"id": "eine_stunde",
+		"name": "Eine Stunde Backpfeife",
+		"description": "Eine Stunde Spielzeit.",
+		"condition": {
+			"type": "stat",
+			"stat": "play_time",
+			"value": 3600
+		}
+	},
+	{
+		"id": "ein_tag",
+		"name": "Ein Tag Backpfeife",
+		"description": "24 Stunden Spielzeit.",
+		"condition": {
+			"type": "stat",
+			"stat": "play_time",
+			"value": 86400
+		}
+	},
+	{
+		"id": "ein_jahr",
+		"name": "Ein Jahr Backpfeife",
+		"description": "Ein Jahr Spielzeit. Wir sind sprachlos.",
+		"condition": {
+			"type": "stat",
+			"stat": "play_time",
+			"value": 31536000
+		}
+	},
+	{
+		"id": "nachtschicht",
+		"name": "Nachtschicht",
+		"description": "Zwischen 2 und 4 Uhr nachts gespielt.",
+		"condition": {
+			"type": "night"
+		},
+		"hidden": true
+	},
+	{
+		"id": "pazifist",
+		"name": "Pazifist",
+		"description": "10 Minuten lang nichts gehauen. Respekt.",
+		"condition": {
+			"type": "idle",
+			"value": 600
+		},
+		"hidden": true
+	},
+	{
+		"id": "wieder_zuhause",
+		"name": "Wieder zuhause",
+		"description": "Nach über 24 Stunden zurückgekehrt.",
+		"condition": {
+			"type": "stat",
+			"stat": "long_return",
+			"value": 1
+		},
+		"hidden": true
+	},
+	{
+		"id": "frisch_geduscht",
+		"name": "Frisch geduscht",
+		"description": "Das Opfer einmal abgeduscht.",
+		"condition": {
+			"type": "stat",
+			"stat": "showers",
+			"value": 1
+		},
+		"hidden": true
+	},
+	{
+		"id": "ausverkauf",
+		"name": "Ausverkauf",
+		"description": "Ein Gerät verkauft. Warum auch immer.",
+		"condition": {
+			"type": "stat",
+			"stat": "devices_sold",
+			"value": 1
+		},
+		"hidden": true
+	},
+	{
+		"id": "bombastus_fan",
+		"name": "Bombastus-Stammkunde",
+		"description": "1.000 Treffer auf Generalissimo Bombastus.",
+		"condition": {
+			"type": "target_hits",
+			"target": "bombastus",
+			"value": 1000
+		},
+		"hidden": true
+	}
+]

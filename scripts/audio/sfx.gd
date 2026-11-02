@@ -21,6 +21,10 @@ func _ready() -> void:
 	_streams["boing"] = [_make_boing()]
 	_streams["squeak"] = [_make_squeak()]
 	_streams["buy"] = [_make_bling()]
+	_streams["golden"] = [_make_arpeggio([784.0, 988.0, 1175.0, 1568.0], 0.07, 0.35)]
+	_streams["achievement"] = [_make_arpeggio([523.0, 659.0, 784.0, 1047.0], 0.11, 0.4)]
+	_streams["bad"] = [_make_arpeggio([392.0, 370.0, 349.0, 262.0], 0.16, 0.35)]
+	_streams["shoe_appear"] = [_make_arpeggio([1319.0, 1760.0], 0.06, 0.25)]
 
 
 func play(sound: String, pitch_spread: float = 0.1, volume_db: float = 0.0) -> void:
@@ -105,6 +109,21 @@ func _make_squeak() -> AudioStreamWAV:
 		phase += TAU * f / RATE
 		var env := sin(t / 0.14 * PI)
 		s[i] = (sin(phase) + 0.3 * sin(phase * 2.0)) * env * 0.35
+	return _to_wav(s)
+
+
+## Tonfolge (Glockenspiel-artig), z. B. für Goldene Schuhe und Erfolge.
+func _make_arpeggio(notes: Array, note_length: float, volume: float) -> AudioStreamWAV:
+	var s := _buffer(note_length * notes.size() + 0.25)
+	for n in notes.size():
+		var start := int(n * note_length * RATE)
+		var freq: float = notes[n]
+		for i in range(start, s.size()):
+			var t := float(i - start) / RATE
+			var env := exp(-t * 7.0)
+			if env < 0.001:
+				break
+			s[i] += (sin(TAU * freq * t) + 0.25 * sin(TAU * freq * 2.0 * t)) * env * volume
 	return _to_wav(s)
 
 

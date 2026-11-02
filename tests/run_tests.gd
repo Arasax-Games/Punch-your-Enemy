@@ -11,7 +11,12 @@ func _initialize() -> void:
 	test_number_format()
 	test_game_state()
 	test_save_roundtrip()
+	test_save_migration()
 	test_data_files()
+	test_synergy_and_global()
+	test_achievements()
+	test_shoes_and_buffs()
+	test_offline()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -53,6 +58,14 @@ func test_balance() -> void:
 	check_eq(Balance.laurels_for(1e12), 1, "1 Billion = 1 Lorbeer")
 	check_eq(Balance.laurels_for(8e12), 2, "8 Billionen = 2 Lorbeeren")
 	check_eq(Balance.laurels_for(5e11), 0, "unter 1 Billion = 0")
+	check_eq(Balance.golden_interval(0.0, 1.0), 300.0, "Goldener Schuh frühestens nach 300 s")
+	check_eq(Balance.golden_interval(1.0, 1.0), 600.0, "Goldener Schuh spätestens nach 600 s")
+	check_eq(Balance.golden_interval(0.0, 1.2), 250.0, "Kamerateam verkürzt das Intervall")
+	check_eq(Balance.blessing(10.0, 1e9, 15.0, 0.15, 13.0), 9013.0, "Segen = 15 min WPS + 13")
+	check_eq(Balance.blessing(1e6, 1000.0, 15.0, 0.15, 13.0), 163.0, "Segen max. 15 % des Guthabens")
+	check_eq(Balance.offline_gain(10.0, 3600.0), 18000.0, "Offline: halbe WPS")
+	check_eq(Balance.offline_gain(10.0, 20.0 * 3600.0), 144000.0, "Offline: max. 8 Stunden")
+	check_eq(Balance.synergy_bonus(25, 0.05, 10), 1.1, "Synergie: +5 % je 10")
 
 
 func test_number_format() -> void:
@@ -136,8 +149,22 @@ func test_save_roundtrip() -> void:
 func test_data_files() -> void:
 	print("Daten")
 	var gs := new_state()
-	check_eq(gs.device_defs.size(), 5, "5 Geräte im MVP")
-	check_eq(gs.upgrade_defs.size(), 10, "10 Upgrades im MVP")
+	check_eq(gs.device_defs.size(), 12, "12 Geräte")
+	check(gs.upgrade_defs.size() >= 50, "mindestens 50 Upgrades")
+	check(gs.achievement_defs.size() >= 50, "mindestens 50 Erfolge")
+	for d in gs.device_defs:
+		var tiers := 0
+		for u in gs.upgrade_defs:
+			if u.effect.type == "device_mult" and u.effect.device == d.id:
+				tiers += 1
+		check_eq(tiers, 3, "3 Geräte-Upgrades für %s" % d.id)
+	var ach_ids := {}
+	for a in gs.achievement_defs:
+		check(not ach_ids.has(a.id), "Erfolg-ID eindeutig: %s" % a.id)
+		ach_ids[a.id] = true
+		check(gs.condition_progress(a.condition).y > 0.0, "Bedingung lesbar: %s" % a.id)
+		if a.condition.type == "device":
+			check(not gs.device_def(a.condition.device).is_empty(), "Gerät existiert: %s" % a.id)
 	var ids := {}
 	for u in gs.upgrade_defs:
 		check(not ids.has(u.id), "Upgrade-ID eindeutig: %s" % u.id)
@@ -148,4 +175,117 @@ func test_data_files() -> void:
 			check(not gs.device_def(req.device).is_empty(), "Voraussetzung existiert: %s" % u.id)
 		if req.has("upgrade"):
 			check(not gs.upgrade_def(req.upgrade).is_empty(), "Voraussetzung existiert: %s" % u.id)
+		if req.has("devices"):
+			for id in req.devices:
+				check(not gs.device_def(id).is_empty(), "Voraussetzung existiert: %s" % u.id)
+	gs.free()
+
+
+func test_save_migration() -> void:
+	print("Migration v1 → v2")
+	var gs := new_state()
+	var v1 := {"version": 1, "wumms": 500.0, "total_wumms": 2000.0, "total_hits": 1200,
+		"devices": {"faust": 2}, "upgrades": ["boxhandschuh_training"], "revealed_upgrades": [],
+		"target_id": "bombastus", "target_names": {}, "target_hits": {"bombastus": 1200},
+		"settings": {"reduced_effects": false, "sound_on": true}}
+	gs.from_dict(v1)
+	check_eq(gs.wumms, 500.0, "v1-Wumms übernommen")
+	check_eq(gs.achievement_count(), 0, "noch keine Erfolge")
+	check_eq(int(gs.stats.crits), 0, "Statistik angelegt")
+	gs.check_achievements()
+	check(gs.achievements.has("zappelphilipp"), "Erfolge rückwirkend vergeben")
+	check_eq(gs.to_dict().version, 2, "wird als v2 gespeichert")
+	var code: String = gs.export_save_code()
+	var other := new_state()
+	check(other.import_save_code(code), "Import ausgeführt")
+	check_eq(other.total_hits, 1200, "Textcode-Export und -Import")
+	check(not other.import_save_code("kein gültiger code"), "Ungültiger Code wird abgelehnt")
+	gs.free()
+	other.free()
+
+
+func test_synergy_and_global() -> void:
+	print("Synergien und globale Upgrades")
+	var gs := new_state()
+	gs.devices = {"faust": 20, "pantoffel": 20}
+	var before: float = gs.device_unit_wps("faust")
+	gs.upgrades["fuss_hand_koordination"] = true
+	check(is_equal_approx(gs.device_unit_wps("faust"), before * 1.1), "20 Pantoffel: Faust +10 %")
+	gs.upgrades["milchtuete_der_wut"] = true
+	for i in 10:
+		gs.achievements["test_%d" % i] = true
+	check(is_equal_approx(gs.global_multiplier(), 1.05), "Wutmilch: 10 Erfolge = +5 %")
+	gs.upgrades["fanclub"] = true
+	check(is_equal_approx(gs.global_multiplier(), 1.05 * 1.05), "Fanclub: +5 % je 10 Erfolge")
+	gs.upgrades["kamerateam"] = true
+	check(is_equal_approx(gs.golden_luck(), 1.2), "Kamerateam: Glück ×1,2")
+	var syn: Dictionary = gs.upgrade_def("fuss_hand_koordination")
+	gs.devices = {"faust": 20, "pantoffel": 5}
+	check(not gs.upgrade_requirement_met(syn), "Synergie braucht 15 von beiden")
+	gs.free()
+
+
+func test_achievements() -> void:
+	print("Erfolge")
+	var gs := new_state()
+	var unlocked: Array[String] = []
+	gs.achievement_unlocked.connect(func(id: String) -> void: unlocked.append(id))
+	gs.hit()
+	gs.check_achievements()
+	check(gs.achievements.has("erstes_aua"), "Erstes Aua nach dem ersten Treffer")
+	check(unlocked.has("erstes_aua"), "Signal gesendet")
+	var count_before: int = unlocked.size()
+	gs.check_achievements()
+	check_eq(unlocked.size(), count_before, "Erfolge nur einmal")
+	gs.idle_time = 601.0
+	gs.check_achievements()
+	check(gs.achievements.has("pazifist"), "Pazifist nach 10 Minuten Pause")
+	gs.wumms = 1e15
+	for d in gs.device_defs:
+		gs.buy_device(d.id, 1)
+	gs.check_achievements()
+	check(gs.achievements.has("komplettset"), "Komplettset mit allen 12 Geräten")
+	check(gs.achievements.has("multiversal"), "Erfolg für ein bestimmtes Gerät")
+	gs.free()
+
+
+func test_shoes_and_buffs() -> void:
+	print("Goldener Schuh und Buffs")
+	var gs := new_state()
+	gs.devices = {"pantoffel": 10}
+	gs.wumms = 1e9
+	var base: float = gs.wps()
+	var r: Dictionary = gs.claim_shoe("golden", 0.6)
+	check_eq(r.title, "Raserei!", "Roll 0,6 = Raserei")
+	check(is_equal_approx(gs.wps(), base * 7.0), "Raserei: WPS ×7")
+	gs.tick(78.0)
+	check(is_equal_approx(gs.wps(), base), "Raserei endet nach 77 s")
+	var before: float = gs.wumms
+	r = gs.claim_shoe("golden", 0.3)
+	check_eq(r.title, "Wumms-Segen!", "Roll 0,3 = Segen")
+	check(is_equal_approx(gs.wumms - before, base * 900.0 + 13.0), "Segen = 15 min WPS + 13")
+	r = gs.claim_shoe("golden", 0.01)
+	check(not r.good, "Roll 0,01 = Pech-Schuh")
+	check_eq(gs.beulen_marken, 3, "Pech-Schuh gibt Beulen-Marken")
+	check(is_equal_approx(gs.wps(), base * 0.5), "Pech-Schuh halbiert WPS")
+	gs.tick(67.0)
+	r = gs.claim_shoe("golden", 0.85)
+	check(is_equal_approx(gs.click_value(), 777.0), "Klick-Raserei ×777")
+	check_eq(int(gs.stat("golden_shoes")), 4, "Goldene Schuhe gezählt")
+	check_eq(int(gs.stat("frenzies")), 2, "Rasereien gezählt")
+	r = gs.claim_shoe("silver", 0.9)
+	check_eq(int(gs.stat("silver_slippers")), 1, "Silberne Pantoffel gezählt")
+	gs.free()
+
+
+func test_offline() -> void:
+	print("Offline-Fortschritt")
+	var gs := new_state()
+	gs.devices = {"pantoffel": 10}
+	var gain: float = gs.apply_offline_progress(3600.0)
+	check(is_equal_approx(gain, 10.0 * 0.5 * 3600.0), "1 h offline = halbe Produktion")
+	check_eq(gs.pending_offline.is_empty(), false, "Willkommen-Dialog vorgemerkt")
+	check_eq(gs.apply_offline_progress(30.0), 0.0, "Unter einer Minute zählt nicht")
+	gs.apply_offline_progress(90000.0)
+	check_eq(int(gs.stat("long_return")), 1, "Wieder zuhause nach 24 h")
 	gs.free()
