@@ -487,5 +487,111 @@
 			"value": 1000
 		},
 		"hidden": true
+	},
+	{
+		"id": "neuanfang",
+		"name": "Neuanfang",
+		"description": "Zum ersten Mal neu angefangen. Bombastus hatte gerade die Beulen auskuriert.",
+		"condition": {
+			"type": "stat",
+			"stat": "prestiges",
+			"value": 1
+		}
+	},
+	{
+		"id": "wiedergeburt",
+		"name": "Wiedergeburt",
+		"description": "5 Mal neu angefangen.",
+		"condition": {
+			"type": "stat",
+			"stat": "prestiges",
+			"value": 5
+		}
+	},
+	{
+		"id": "lorbeerkranz",
+		"name": "Lorbeerkranz",
+		"description": "10 Lorbeeren gesammelt.",
+		"condition": {
+			"type": "laurels",
+			"value": 10
+		}
+	},
+	{
+		"id": "erster_zweig",
+		"name": "Erster Zweig",
+		"description": "Den ersten Teil des Lorbeer-Baums freigeschaltet.",
+		"condition": {
+			"type": "laurel_nodes",
+			"value": 1
+		}
+	},
+	{
+		"id": "gaertner",
+		"name": "Gärtner",
+		"description": "10 Teile des Lorbeer-Baums freigeschaltet.",
+		"condition": {
+			"type": "laurel_nodes",
+			"value": 10
+		}
+	},
+	{
+		"id": "combo_koenig",
+		"name": "Combo-König",
+		"description": "Combo 100 erreicht. Deine Finger sind ein Schatten.",
+		"condition": {
+			"type": "stat",
+			"stat": "max_combo",
+			"value": 100
+		}
+	},
+	{
+		"id": "wutbuerger",
+		"name": "Wutbürger",
+		"description": "Zum ersten Mal den Wutmodus entfesselt.",
+		"condition": {
+			"type": "stat",
+			"stat": "rages",
+			"value": 1
+		}
+	},
+	{
+		"id": "wutentbrannt",
+		"name": "Wutentbrannt",
+		"description": "25 Mal den Wutmodus entfesselt.",
+		"condition": {
+			"type": "stat",
+			"stat": "rages",
+			"value": 25
+		}
+	},
+	{
+		"id": "gut_verbeult",
+		"name": "Gut verbeult",
+		"description": "Beulen-Level 5 bei einem Opfer.",
+		"condition": {
+			"type": "bump_level",
+			"value": 5
+		}
+	},
+	{
+		"id": "voll_verbeult",
+		"name": "Voll verbeult",
+		"description": "Beulen-Level 10 bei einem Opfer. Mehr Beulen passen nicht drauf.",
+		"condition": {
+			"type": "bump_level",
+			"value": 10
+		}
+	},
+	{
+		"id": "galerist",
+		"name": "Galerist",
+		"description": "Ein Bild in der Galerie umbenannt.",
+		"condition": {
+			"type": "stat",
+			"stat": "renames",
+			"value": 1
+		},
+		"hidden": true
 	}
 ]

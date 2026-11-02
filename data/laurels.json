@@ -1,0 +1,289 @@
+[
+	{
+		"id": "werkzeugkiste",
+		"name": "Werkzeugkiste",
+		"branch": "handwerk",
+		"cost": 1,
+		"currency": "laurels",
+		"description": "Geräte kosten 5 % weniger.",
+		"effect": {
+			"type": "device_cost",
+			"factor": 0.95
+		}
+	},
+	{
+		"id": "starthilfe",
+		"name": "Starthilfe",
+		"branch": "handwerk",
+		"cost": 1,
+		"currency": "laurels",
+		"description": "Nach jedem Neuanfang stehen 10 Fäuste bereit.",
+		"effect": {
+			"type": "start_devices",
+			"devices": {
+				"faust": 10
+			}
+		},
+		"requires": [
+			"werkzeugkiste"
+		]
+	},
+	{
+		"id": "grosseinkauf",
+		"name": "Großeinkauf",
+		"branch": "handwerk",
+		"cost": 2,
+		"currency": "laurels",
+		"description": "Geräte kosten weitere 5 % weniger.",
+		"effect": {
+			"type": "device_cost",
+			"factor": 0.95
+		},
+		"requires": [
+			"werkzeugkiste"
+		]
+	},
+	{
+		"id": "startpaket",
+		"name": "Startpaket",
+		"branch": "handwerk",
+		"cost": 3,
+		"currency": "laurels",
+		"description": "Nach jedem Neuanfang: zusätzlich 10 Pantoffel und 5 Gummihämmer.",
+		"effect": {
+			"type": "start_devices",
+			"devices": {
+				"pantoffel": 10,
+				"gummihammer": 5
+			}
+		},
+		"requires": [
+			"starthilfe"
+		]
+	},
+	{
+		"id": "meisterwerkstatt",
+		"name": "Meisterwerkstatt",
+		"branch": "handwerk",
+		"cost": 5,
+		"currency": "laurels",
+		"description": "Geräte kosten weitere 10 % weniger.",
+		"effect": {
+			"type": "device_cost",
+			"factor": 0.9
+		},
+		"requires": [
+			"grosseinkauf"
+		]
+	},
+	{
+		"id": "gluecksklee",
+		"name": "Glücksklee",
+		"branch": "glueck",
+		"cost": 1,
+		"currency": "laurels",
+		"description": "Goldene Schuhe und Silberne Pantoffel erscheinen 10 % häufiger.",
+		"effect": {
+			"type": "golden_luck",
+			"factor": 1.1
+		}
+	},
+	{
+		"id": "langer_atem",
+		"name": "Langer Atem",
+		"branch": "glueck",
+		"cost": 1,
+		"currency": "laurels",
+		"description": "Schuhe bleiben 50 % länger sichtbar.",
+		"effect": {
+			"type": "shoe_lifetime",
+			"factor": 1.5
+		},
+		"requires": [
+			"gluecksklee"
+		]
+	},
+	{
+		"id": "hufeisen",
+		"name": "Hufeisen",
+		"branch": "glueck",
+		"cost": 2,
+		"currency": "laurels",
+		"description": "Goldene Schuhe erscheinen 15 % häufiger.",
+		"effect": {
+			"type": "golden_luck",
+			"factor": 1.15
+		},
+		"requires": [
+			"gluecksklee"
+		]
+	},
+	{
+		"id": "goldrausch",
+		"name": "Goldrausch",
+		"branch": "glueck",
+		"cost": 3,
+		"currency": "laurels",
+		"description": "Raserei und andere Effekte halten 50 % länger.",
+		"effect": {
+			"type": "buff_duration",
+			"factor": 1.5
+		},
+		"requires": [
+			"langer_atem"
+		]
+	},
+	{
+		"id": "gluecksinstinkt",
+		"name": "Glücksinstinkt",
+		"branch": "glueck",
+		"cost": 5,
+		"currency": "laurels",
+		"description": "+3 % Chance auf kritische Treffer (×10), auch ohne Upgrade.",
+		"effect": {
+			"type": "crit_chance",
+			"chance": 0.03
+		},
+		"requires": [
+			"hufeisen"
+		]
+	},
+	{
+		"id": "nachtwaechter",
+		"name": "Nachtwächter",
+		"branch": "komfort",
+		"cost": 1,
+		"currency": "laurels",
+		"description": "Offline arbeiten die Geräte mit 75 % statt 50 %.",
+		"effect": {
+			"type": "offline_rate",
+			"rate": 0.75
+		}
+	},
+	{
+		"id": "dauerfeuer_abo",
+		"name": "Dauerfeuer-Abo",
+		"branch": "komfort",
+		"cost": 1,
+		"currency": "laurels",
+		"description": "Dauerfeuer ist von Anfang an freigeschaltet.",
+		"effect": {
+			"type": "autofire",
+			"rate": 10
+		},
+		"requires": [
+			"nachtwaechter"
+		]
+	},
+	{
+		"id": "langschlaefer",
+		"name": "Langschläfer",
+		"branch": "komfort",
+		"cost": 2,
+		"currency": "laurels",
+		"description": "Offline-Fortschritt bis zu 24 statt 8 Stunden.",
+		"effect": {
+			"type": "offline_cap",
+			"hours": 24
+		},
+		"requires": [
+			"nachtwaechter"
+		]
+	},
+	{
+		"id": "autokauf",
+		"name": "Automatischer Einkauf",
+		"branch": "komfort",
+		"cost": 3,
+		"currency": "laurels",
+		"description": "Kauft bezahlbare Upgrades automatisch (im Menü abschaltbar).",
+		"effect": {
+			"type": "autobuy_upgrades"
+		},
+		"requires": [
+			"dauerfeuer_abo"
+		]
+	},
+	{
+		"id": "volle_schicht",
+		"name": "Volle Schicht",
+		"branch": "komfort",
+		"cost": 5,
+		"currency": "laurels",
+		"description": "Offline: 100 % Produktion, bis zu 48 Stunden.",
+		"effect": {
+			"type": "offline_full",
+			"rate": 1.0,
+			"hours": 48
+		},
+		"requires": [
+			"langschlaefer"
+		]
+	},
+	{
+		"id": "goldene_faust",
+		"name": "Goldene Faust",
+		"branch": "show",
+		"cost": 3,
+		"currency": "marken",
+		"description": "Ein Mauszeiger aus purem Gold. Fast.",
+		"effect": {
+			"type": "cosmetic",
+			"id": "fist_gold"
+		}
+	},
+	{
+		"id": "zirkuszelt",
+		"name": "Zirkuszelt",
+		"branch": "show",
+		"cost": 4,
+		"currency": "marken",
+		"description": "Hintergrund: Manege frei!",
+		"effect": {
+			"type": "cosmetic",
+			"id": "bg_zirkus"
+		}
+	},
+	{
+		"id": "retro_sounds",
+		"name": "Retro-Sounds",
+		"branch": "show",
+		"cost": 4,
+		"currency": "marken",
+		"description": "Piep, Bump, Bling – wie am Spielautomaten.",
+		"effect": {
+			"type": "cosmetic",
+			"id": "sound_retro"
+		}
+	},
+	{
+		"id": "weltraum",
+		"name": "Weltraum",
+		"branch": "show",
+		"cost": 6,
+		"currency": "marken",
+		"description": "Hintergrund: Backpfeifen in der Schwerelosigkeit.",
+		"effect": {
+			"type": "cosmetic",
+			"id": "bg_weltraum"
+		},
+		"requires": [
+			"zirkuszelt"
+		]
+	},
+	{
+		"id": "konfetti_kanone",
+		"name": "Konfetti-Kanone",
+		"branch": "show",
+		"cost": 8,
+		"currency": "marken",
+		"description": "Jeder kritische Treffer feuert Konfetti.",
+		"effect": {
+			"type": "cosmetic",
+			"id": "confetti_crits"
+		},
+		"requires": [
+			"goldene_faust"
+		]
+	}
+]

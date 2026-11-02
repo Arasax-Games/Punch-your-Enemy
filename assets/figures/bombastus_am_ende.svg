@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Bombastus (am Ende) – fiktive Comicfigur, keine reale Person. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="640" viewBox="0 0 560 640">
+  <g stroke="#2b2118" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Uniform -->
+    <path d="M40 640 C40 540 120 488 200 478 L360 478 C440 488 520 540 520 640 Z" fill="#4263eb"/>
+    <path d="M232 478 L280 560 L328 478" fill="#f8f9fa"/>
+    <!-- Schärpe -->
+    <path d="M150 500 L430 640 L370 640 L118 520 Z" fill="#e03131"/>
+    <!-- Epauletten -->
+    <ellipse cx="118" cy="508" rx="78" ry="30" fill="#fcc419"/>
+    <ellipse cx="442" cy="508" rx="78" ry="30" fill="#fcc419"/>
+    <g fill="none" stroke-width="5">
+      <path d="M58 524 l-6 36 M78 532 l-3 38 M98 536 l0 38 M118 538 l0 38 M138 536 l2 38 M158 532 l4 36 M176 526 l6 32"/>
+      <path d="M384 526 l-6 32 M402 532 l-4 36 M422 536 l-2 38 M442 538 l0 38 M462 536 l0 38 M482 532 l3 38 M502 524 l6 36"/>
+    </g>
+    <!-- Viel zu viele Orden -->
+    <g stroke-width="4">
+      <rect x="306" y="560" width="22" height="16" fill="#e03131"/>
+      <rect x="332" y="560" width="22" height="16" fill="#37b24d"/>
+      <rect x="358" y="560" width="22" height="16" fill="#fcc419"/>
+      <rect x="384" y="560" width="22" height="16" fill="#7048e8"/>
+      <circle cx="317" cy="592" r="11" fill="#fcc419"/>
+      <circle cx="343" cy="592" r="11" fill="#ced4da"/>
+      <circle cx="369" cy="592" r="11" fill="#fcc419"/>
+      <circle cx="395" cy="592" r="11" fill="#e8590c"/>
+      <rect x="318" y="610" width="22" height="16" fill="#1c7ed6"/>
+      <rect x="344" y="610" width="22" height="16" fill="#f783ac"/>
+      <rect x="370" y="610" width="22" height="16" fill="#fcc419"/>
+      <circle cx="420" cy="600" r="13" fill="#fcc419"/>
+    </g>
+    <!-- Hals -->
+    <rect x="228" y="430" width="104" height="60" rx="20" fill="#f4b183"/>
+    <!-- Ohren -->
+    <ellipse cx="132" cy="330" rx="30" ry="42" fill="#f4b183"/>
+    <ellipse cx="428" cy="330" rx="30" ry="42" fill="#f4b183"/>
+    <!-- Kopf -->
+    <ellipse cx="280" cy="330" rx="150" ry="150" fill="#f6c39b"/>
+    <!-- Doppelkinn -->
+    <path d="M200 446 Q280 486 360 446" fill="none" stroke-width="5"/>
+    <!-- Augen -->
+    <ellipse cx="226" cy="298" rx="30" ry="26" fill="#ffffff"/>
+    <ellipse cx="334" cy="298" rx="30" ry="26" fill="#ffffff"/>
+    <path d="M226 298 m-2 0 a4 4 0 1 1 6 2 a9 9 0 1 1 -14 -6 a15 15 0 1 1 22 12" fill="none" stroke-width="4"/>
+    <path d="M334 298 m-2 0 a4 4 0 1 1 6 2 a9 9 0 1 1 -14 -6 a15 15 0 1 1 22 12" fill="none" stroke-width="4"/>
+    <!-- Wütende Augenbrauen -->
+    <path d="M190 262 Q226 246 262 266" stroke-width="12" fill="none"/>
+    <path d="M370 262 Q334 246 298 266" stroke-width="12" fill="none"/>
+    <!-- Knollennase -->
+    <ellipse cx="280" cy="350" rx="38" ry="32" fill="#f08c8c"/>
+    <ellipse cx="268" cy="340" rx="10" ry="7" fill="#ffffff" stroke="none" opacity="0.6"/>
+    <!-- Riesiger Zwirbelbart -->
+    <path d="M280 378
+             C250 362 210 372 180 392
+             C150 410 112 404 96 376
+             C84 354 104 334 122 346
+             C110 356 116 372 132 372
+             C160 372 200 340 248 352
+             C262 356 272 362 280 368
+             C288 362 298 356 312 352
+             C360 340 400 372 428 372
+             C444 372 450 356 438 346
+             C456 334 476 354 464 376
+             C448 404 410 410 380 392
+             C350 372 310 362 280 378 Z" fill="#6b3d1f"/>
+    <!-- Schmollmund -->
+    <path d="M246 418 Q280 432 314 418" fill="none" stroke-width="7"/>
+    <path d="M270 424 Q268 452 282 452 Q296 452 292 424" fill="#f783ac" stroke-width="5"/>
+    <g transform="rotate(-11 280 210) translate(-6 6)">
+    <!-- Mütze -->
+    <path d="M96 214 C80 120 170 52 280 52 C390 52 480 120 464 214 Z" fill="#4263eb"/>
+    <rect x="112" y="192" width="336" height="44" rx="10" fill="#e03131"/>
+    <path d="M100 232 C170 272 390 272 460 232 C470 256 450 280 280 284 C110 280 90 256 100 232 Z" fill="#212529"/>
+    <!-- Mützenwappen -->
+    <path d="M280 104 L318 120 L312 168 L280 190 L248 168 L242 120 Z" fill="#fcc419"/>
+    <circle cx="280" cy="146" r="22" fill="#e03131" stroke-width="4"/>
+    <path d="M280 130 L285 141 L297 142 L288 150 L291 162 L280 156 L269 162 L272 150 L263 142 L275 141 Z" fill="#fcc419" stroke-width="2"/>
+    <!-- Federbusch -->
+    <path d="M292 60 C300 10 350 -2 380 20 C350 18 330 30 318 58 C340 30 380 30 400 50 C370 46 340 54 312 70 Z" fill="#f783ac"/>
+    </g>
+  </g>
+</svg>

@@ -10,8 +10,12 @@ signal target_changed
 signal achievement_unlocked(id: String)
 signal shoe_spawned(kind: String)
 signal buffs_changed
+signal prestiged(gain: int)
+signal rage_changed(active: bool)
+signal bump_level_up(target: String, level: int)
+signal laurel_node_bought(id: String)
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const SAVE_PATH := "user://savegame.json"
 const BACKUP_PATH := "user://savegame.bak.json"
 const IMAGE_DIR := "user://images"
@@ -24,6 +28,9 @@ const DEFAULT_TEXTURE_PATH := "res://assets/figures/bombastus.svg"
 const DEVICES_PATH := "res://data/devices.json"
 const UPGRADES_PATH := "res://data/upgrades.json"
 const ACHIEVEMENTS_PATH := "res://data/achievements.json"
+const LAURELS_PATH := "res://data/laurels.json"
+const FIGURES_PATH := "res://data/figures.json"
+const CUSTOM_FIGURE := "_custom"
 
 const SHOE_GOLDEN := "golden"
 const SHOE_SILVER := "silver"
@@ -33,23 +40,41 @@ const OFFLINE_RATE := 0.5
 const OFFLINE_CAP := 8.0 * 3600.0
 const OFFLINE_MIN_SECONDS := 60.0
 const CHAIN_MAX := 7
+const COMBO_MAX := 100.0
+const COMBO_STEP := 2.0
+const COMBO_GRACE := 2.0
+const COMBO_DECAY := 40.0
+const RAGE_MAX := 150.0
+const RAGE_DURATION := 10.0
+const RAGE_MULT := 3.0
+const AUTOBUY_INTERVAL := 1.0
+const TIME_WARP_FACTOR := 2.0
 
 const STAT_KEYS: Array[String] = [
 	"crits", "golden_shoes", "silver_slippers", "frenzies", "bad_luck",
 	"images_imported", "play_time", "showers", "devices_sold", "long_return",
+	"prestiges", "rages", "max_combo", "renames",
 ]
 
 # --- Daten (aus JSON) ---
 var device_defs: Array[Dictionary] = []
 var upgrade_defs: Array[Dictionary] = []
 var achievement_defs: Array[Dictionary] = []
+var laurel_defs: Array[Dictionary] = []
+var figure_defs: Array[Dictionary] = []
 var _device_by_id: Dictionary = {}
 var _upgrade_by_id: Dictionary = {}
 var _achievement_by_id: Dictionary = {}
+var _laurel_by_id: Dictionary = {}
+var _figure_by_id: Dictionary = {}
 
 # --- Spielstand ---
 var wumms: float = 0.0
-var total_wumms: float = 0.0
+var total_wumms: float = 0.0            # in diesem Durchlauf (seit dem letzten Neuanfang)
+var lifetime_wumms: float = 0.0         # über alle Durchläufe
+var laurels_total: int = 0              # je Lorbeer +1 % WPS und Klick, bleibt beim Ausgeben erhalten
+var laurels_spent: int = 0
+var laurel_nodes: Dictionary = {}       # id -> true
 var total_hits: int = 0
 var beulen_marken: int = 0
 var devices: Dictionary = {}            # id -> Anzahl
@@ -62,6 +87,11 @@ var target_names: Dictionary = {}       # target_id -> Anzeigename
 var target_hits: Dictionary = {}        # target_id -> Treffer
 var reduced_effects: bool = false
 var sound_on: bool = true
+var autobuy_enabled: bool = true
+var time_warp: bool = false
+var background: String = "standard"
+var fist_skin: String = "standard"
+var sound_pack: String = "standard"
 
 # --- Laufzeit (wird nicht gespeichert) ---
 var buffs: Array = []       # {id, name, remaining, duration, wps_mult, click_mult}
@@ -70,7 +100,13 @@ var pending_offline: Dictionary = {}    # {seconds, gain} für den Willkommen-zu
 var _shoe_timers: Dictionary = {}       # kind -> Sekunden bis zum Erscheinen
 var _shoe_active: Dictionary = {}       # kind -> true, solange ein Schuh sichtbar ist
 var _chain_count: int = 0
+var combo: float = 0.0
+var rage_meter: float = 0.0
+var rage_time: float = 0.0
+var _autobuy_timer: float = 0.0
 var _autosave_timer: float = 0.0
+## false in Tests und Simulationen, damit der echte Spielstand nie überschrieben wird.
+var persist: bool = true
 var _achievement_timer: float = 0.0
 var _rng := RandomNumberGenerator.new()
 
@@ -116,6 +152,12 @@ func load_data() -> void:
 		upgrade_defs.append(u)
 	for a in _read_json_array(ACHIEVEMENTS_PATH):
 		achievement_defs.append(a)
+	laurel_defs.clear()
+	for n in _read_json_array(LAURELS_PATH):
+		laurel_defs.append(n)
+	figure_defs.clear()
+	for f in _read_json_array(FIGURES_PATH):
+		figure_defs.append(f)
 	_device_by_id.clear()
 	for d in device_defs:
 		_device_by_id[d.id] = d
@@ -125,6 +167,12 @@ func load_data() -> void:
 	_achievement_by_id.clear()
 	for a in achievement_defs:
 		_achievement_by_id[a.id] = a
+	_laurel_by_id.clear()
+	for n in laurel_defs:
+		_laurel_by_id[n.id] = n
+	_figure_by_id.clear()
+	for f in figure_defs:
+		_figure_by_id[f.id] = f
 
 
 func _read_json_array(path: String) -> Array:
@@ -148,6 +196,14 @@ func achievement_def(id: String) -> Dictionary:
 	return _achievement_by_id.get(id, {})
 
 
+func laurel_def(id: String) -> Dictionary:
+	return _laurel_by_id.get(id, {})
+
+
+func figure_def(id: String) -> Dictionary:
+	return _figure_by_id.get(id, _figure_by_id.get(CUSTOM_FIGURE, {}))
+
+
 func _reset_stats() -> void:
 	stats.clear()
 	for key in STAT_KEYS:
@@ -159,7 +215,9 @@ func stat(key: String) -> float:
 
 
 func add_stat(key: String, amount: float = 1.0) -> void:
-	if key == "play_time":
+	if key == "max_combo":
+		stats[key] = maxi(int(stats.get(key, 0)), int(amount))
+	elif key == "play_time":
 		stats[key] = stat(key) + amount
 	else:
 		stats[key] = int(stats.get(key, 0)) + int(amount)
@@ -170,10 +228,14 @@ func add_stat(key: String, amount: float = 1.0) -> void:
 # =====================================================================
 
 func tick(delta: float) -> void:
-	earn(wps() * delta)
+	var production_delta := delta * (TIME_WARP_FACTOR if time_warp_active() else 1.0)
+	earn(wps() * production_delta)
 	add_stat("play_time", delta)
 	idle_time += delta
 	_update_buffs(delta)
+	_update_combo(delta)
+	_update_rage(delta)
+	_update_autobuy(delta)
 
 
 func earn(amount: float) -> void:
@@ -181,6 +243,7 @@ func earn(amount: float) -> void:
 		return
 	wumms += amount
 	total_wumms += amount
+	lifetime_wumms += amount
 
 
 func device_count(id: String) -> int:
@@ -240,7 +303,7 @@ func global_multiplier() -> float:
 		m *= 1.0 + float(e.percent) * ach
 	for e in _owned_effects("fanclub"):
 		m *= 1.0 + float(e.percent) * floorf(float(ach) / float(e.per))
-	return m
+	return m * Balance.laurel_bonus(laurels_total)
 
 
 ## Produktion eines einzelnen Geräts dieses Typs pro Sekunde (ohne Buffs).
@@ -265,7 +328,7 @@ func base_wps() -> float:
 
 ## Aktuelle Produktion inklusive Buffs.
 func wps() -> float:
-	return base_wps() * buff_wps_multiplier()
+	return base_wps() * buff_wps_multiplier() * rage_multiplier()
 
 
 func click_multiplier() -> float:
@@ -282,38 +345,46 @@ func click_wps_percent() -> float:
 	return p
 
 
+## Klick-Wert ohne Combo (z. B. für die Anzeige "pro Klick" und die Simulation).
+func base_click_value() -> float:
+	return (1.0 * click_multiplier() * Balance.laurel_bonus(laurels_total) + wps() * click_wps_percent()) \
+		* buff_click_multiplier() * rage_multiplier()
+
+
 func click_value() -> float:
-	return (1.0 * click_multiplier() + wps() * click_wps_percent()) * buff_click_multiplier()
+	return base_click_value() * Balance.combo_multiplier(combo)
 
 
 func crit_chance() -> float:
 	var c := 0.0
 	for e in _owned_effects("crit"):
 		c += float(e.chance)
+	for e in _laurel_effects("crit_chance"):
+		c += float(e.chance)
 	return c
 
 
 func crit_factor() -> float:
-	var f := 1.0
+	var f := 10.0 if not _laurel_effects("crit_chance").is_empty() else 1.0
 	for e in _owned_effects("crit"):
 		f = maxf(f, float(e.factor))
 	return f
 
 
 func has_autofire() -> bool:
-	return not _owned_effects("autofire").is_empty()
+	return autofire_rate() > 0.0
 
 
 func autofire_rate() -> float:
 	var r := 0.0
-	for e in _owned_effects("autofire"):
+	for e in _owned_effects("autofire") + _laurel_effects("autofire"):
 		r = maxf(r, float(e.rate))
 	return r
 
 
 func golden_luck() -> float:
 	var l := 1.0
-	for e in _owned_effects("golden_luck"):
+	for e in _owned_effects("golden_luck") + _laurel_effects("golden_luck"):
 		l *= float(e.factor)
 	return l
 
@@ -328,8 +399,66 @@ func hit() -> Dictionary:
 	earn(value)
 	total_hits += 1
 	idle_time = 0.0
+	combo = minf(COMBO_MAX, combo + COMBO_STEP)
+	add_stat("max_combo", combo)
+	if not rage_active():
+		rage_meter = minf(RAGE_MAX, rage_meter + 1.0)
+	var level_before := current_bump_level()
 	target_hits[target_id] = int(target_hits.get(target_id, 0)) + 1
+	var level_after := current_bump_level()
+	if level_after > level_before:
+		beulen_marken += 1
+		bump_level_up.emit(target_id, level_after)
 	return {"value": value, "crit": crit}
+
+
+# =====================================================================
+# Combo und Wutmodus
+# =====================================================================
+
+func _update_combo(delta: float) -> void:
+	if combo > 0.0 and idle_time > COMBO_GRACE:
+		combo = maxf(0.0, combo - COMBO_DECAY * delta)
+
+
+func rage_active() -> bool:
+	return rage_time > 0.0
+
+
+func rage_ready() -> bool:
+	return not rage_active() and rage_meter >= RAGE_MAX
+
+
+func rage_multiplier() -> float:
+	return RAGE_MULT if rage_active() else 1.0
+
+
+## Entfesselt den Wutmodus, wenn die Leiste voll ist: 10 s lang alles ×3, aber keine Goldenen Schuhe.
+func start_rage() -> bool:
+	if not rage_ready():
+		return false
+	rage_time = RAGE_DURATION
+	rage_meter = 0.0
+	add_stat("rages")
+	rage_changed.emit(true)
+	return true
+
+
+func _update_rage(delta: float) -> void:
+	if rage_time <= 0.0:
+		return
+	rage_time -= delta
+	if rage_time <= 0.0:
+		rage_time = 0.0
+		rage_changed.emit(false)
+
+
+func time_warp_unlocked() -> bool:
+	return stat("prestiges") > 0
+
+
+func time_warp_active() -> bool:
+	return time_warp and time_warp_unlocked()
 
 
 # =====================================================================
@@ -337,6 +466,9 @@ func hit() -> Dictionary:
 # =====================================================================
 
 func add_buff(id: String, buff_name: String, duration: float, wps_mult: float = 1.0, click_mult: float = 1.0) -> void:
+	if wps_mult >= 1.0 and click_mult >= 1.0:
+		for e in _laurel_effects("buff_duration"):
+			duration *= float(e.factor)
 	for b in buffs:
 		if b.id == id:
 			b.remaining = duration
@@ -385,6 +517,8 @@ func reset_shoe_timers() -> void:
 
 
 func _update_shoes(delta: float) -> void:
+	if rage_active():
+		return
 	for kind in [SHOE_GOLDEN, SHOE_SILVER]:
 		if _shoe_active.get(kind, false):
 			continue
@@ -395,7 +529,10 @@ func _update_shoes(delta: float) -> void:
 
 
 func shoe_lifetime(kind: String) -> float:
-	return GOLDEN_LIFETIME if kind == SHOE_GOLDEN else SILVER_LIFETIME
+	var life := GOLDEN_LIFETIME if kind == SHOE_GOLDEN else SILVER_LIFETIME
+	for e in _laurel_effects("shoe_lifetime"):
+		life *= float(e.factor)
+	return life
 
 
 ## Der Schuh ist ungeklickt verschwunden.
@@ -484,15 +621,28 @@ func _silver_effect(roll: float) -> Dictionary:
 func amount_for_mode(id: String, mode: int) -> int:
 	if mode > 0:
 		return mode
-	var d := device_def(id)
-	return Balance.max_affordable(float(d.base_cost), device_count(id), wumms)
+	return Balance.max_affordable(device_base_cost(id), device_count(id), wumms)
 
 
-func device_cost(id: String, amount: int) -> float:
+## Grundpreis eines Geräts inklusive Rabatten aus dem Lorbeer-Baum.
+func device_base_cost(id: String) -> float:
 	var d := device_def(id)
 	if d.is_empty():
 		return INF
-	return Balance.bulk_cost(float(d.base_cost), device_count(id), maxi(amount, 1))
+	return float(d.base_cost) * device_cost_factor()
+
+
+func device_cost_factor() -> float:
+	var f := 1.0
+	for e in _laurel_effects("device_cost"):
+		f *= float(e.factor)
+	return f
+
+
+func device_cost(id: String, amount: int) -> float:
+	if device_def(id).is_empty():
+		return INF
+	return Balance.bulk_cost(device_base_cost(id), device_count(id), maxi(amount, 1))
 
 
 func buy_device(id: String, amount: int) -> bool:
@@ -511,8 +661,7 @@ func sell_device(id: String) -> bool:
 	var owned := device_count(id)
 	if owned <= 0:
 		return false
-	var d := device_def(id)
-	wumms += Balance.sell_refund(float(d.base_cost), owned)
+	wumms += Balance.sell_refund(device_base_cost(id), owned)
 	devices[id] = owned - 1
 	add_stat("devices_sold")
 	device_sold.emit(id)
@@ -619,6 +768,164 @@ func _device_name(id: String) -> String:
 
 
 # =====================================================================
+# Neuanfang (Prestige) und Lorbeer-Baum
+# =====================================================================
+
+func prestige_gain() -> int:
+	return Balance.laurel_gain(lifetime_wumms, laurels_total)
+
+
+func can_prestige() -> bool:
+	return lifetime_wumms >= Balance.PRESTIGE_THRESHOLD and prestige_gain() >= 1
+
+
+## Setzt den Durchlauf zurück und schreibt Lorbeeren gut. Erfolge, Statistiken, Bilder,
+## Lorbeer-Baum und Beulen-Marken bleiben erhalten.
+func perform_prestige() -> int:
+	if not can_prestige():
+		return 0
+	var gain := prestige_gain()
+	laurels_total += gain
+	add_stat("prestiges")
+	wumms = 0.0
+	total_wumms = 0.0
+	devices.clear()
+	upgrades.clear()
+	revealed_upgrades.clear()
+	buffs.clear()
+	combo = 0.0
+	rage_meter = 0.0
+	rage_time = 0.0
+	_apply_start_devices()
+	reset_shoe_timers()
+	prestiged.emit(gain)
+	save_game()
+	return gain
+
+
+func _apply_start_devices() -> void:
+	for e in _laurel_effects("start_devices"):
+		for id in e.devices:
+			devices[id] = device_count(id) + int(e.devices[id])
+
+
+func laurels_available() -> int:
+	return laurels_total - laurels_spent
+
+
+func has_laurel_node(id: String) -> bool:
+	return laurel_nodes.has(id)
+
+
+func _laurel_effects(type: String) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for n in laurel_defs:
+		if laurel_nodes.has(n.id) and n.effect.type == type:
+			out.append(n.effect)
+	return out
+
+
+func laurel_requirements_met(n: Dictionary) -> bool:
+	for req in n.get("requires", []):
+		if not has_laurel_node(req):
+			return false
+	return true
+
+
+func can_afford_laurel_node(n: Dictionary) -> bool:
+	if n.get("currency", "laurels") == "marken":
+		return beulen_marken >= int(n.cost)
+	return laurels_available() >= int(n.cost)
+
+
+func buy_laurel_node(id: String) -> bool:
+	var n := laurel_def(id)
+	if n.is_empty() or has_laurel_node(id) or not laurel_requirements_met(n) or not can_afford_laurel_node(n):
+		return false
+	if n.get("currency", "laurels") == "marken":
+		beulen_marken -= int(n.cost)
+	else:
+		laurels_spent += int(n.cost)
+	laurel_nodes[id] = true
+	var e: Dictionary = n.effect
+	if e.type == "start_devices" and stat("prestiges") > 0 and total_wumms <= 0.0:
+		for dev in e.devices:
+			devices[dev] = device_count(dev) + int(e.devices[dev])
+	if e.type == "cosmetic":
+		apply_cosmetic(String(e.id))
+	laurel_node_bought.emit(id)
+	return true
+
+
+func laurel_tree_unlocked() -> bool:
+	return laurels_total > 0 or beulen_marken > 0 or not laurel_nodes.is_empty()
+
+
+func offline_rate() -> float:
+	var r := OFFLINE_RATE
+	for e in _laurel_effects("offline_rate") + _laurel_effects("offline_full"):
+		r = maxf(r, float(e.rate))
+	return r
+
+
+func offline_cap() -> float:
+	var hours := OFFLINE_CAP / 3600.0
+	for e in _laurel_effects("offline_cap") + _laurel_effects("offline_full"):
+		hours = maxf(hours, float(e.hours))
+	return hours * 3600.0
+
+
+func has_autobuy() -> bool:
+	return not _laurel_effects("autobuy_upgrades").is_empty()
+
+
+func _update_autobuy(delta: float) -> void:
+	if not has_autobuy() or not autobuy_enabled:
+		return
+	_autobuy_timer += delta
+	if _autobuy_timer < AUTOBUY_INTERVAL:
+		return
+	_autobuy_timer = 0.0
+	for u in visible_upgrades():
+		if wumms >= float(u.cost):
+			buy_upgrade(u.id)
+			return
+
+
+## Lesbare Wirkung eines Lorbeer-Knotens.
+func laurel_cost_text(n: Dictionary) -> String:
+	var unit := "Beulen-Marken" if n.get("currency", "laurels") == "marken" else ("Lorbeer" if int(n.cost) == 1 else "Lorbeeren")
+	return "%d %s" % [int(n.cost), unit]
+
+
+# --- Kosmetik ---
+
+func has_cosmetic(id: String) -> bool:
+	for e in _laurel_effects("cosmetic"):
+		if e.id == id:
+			return true
+	return false
+
+
+## Neu gekaufte Kosmetik direkt anlegen.
+func apply_cosmetic(id: String) -> void:
+	if id.begins_with("bg_"):
+		background = id.trim_prefix("bg_")
+	elif id == "fist_gold":
+		fist_skin = "gold"
+	elif id == "sound_retro":
+		sound_pack = "retro"
+
+
+func available_backgrounds() -> Array[String]:
+	var out: Array[String] = ["standard"]
+	for id in ["zirkus", "weltraum"]:
+		if has_cosmetic("bg_" + id):
+			out.append(id)
+	return out
+
+
+# =====================================================================
 # Erfolge (Achievements)
 # =====================================================================
 
@@ -629,7 +936,7 @@ func condition_progress(cond: Dictionary) -> Vector2:
 		"hits":
 			return Vector2(total_hits, target)
 		"total_wumms":
-			return Vector2(total_wumms, target)
+			return Vector2(lifetime_wumms, target)
 		"wps":
 			return Vector2(base_wps(), target)
 		"device":
@@ -646,6 +953,15 @@ func condition_progress(cond: Dictionary) -> Vector2:
 			return Vector2(int(target_hits.get(cond.target, 0)), target)
 		"idle":
 			return Vector2(idle_time, target)
+		"laurels":
+			return Vector2(laurels_total, target)
+		"laurel_nodes":
+			return Vector2(laurel_nodes.size(), target)
+		"bump_level":
+			var best := 0
+			for id in target_hits:
+				best = maxi(best, Balance.bump_level(int(target_hits[id])))
+			return Vector2(best, target)
 		"night":
 			var hour := int(Time.get_time_dict_from_system().hour)
 			return Vector2(1.0 if hour >= 2 and hour < 4 else 0.0, 1.0)
@@ -667,6 +983,7 @@ func unlock_achievement(id: String) -> void:
 	if achievements.has(id) or achievement_def(id).is_empty():
 		return
 	achievements[id] = true
+	beulen_marken += 1
 	achievement_unlocked.emit(id)
 
 
@@ -684,7 +1001,28 @@ func current_target_hits() -> int:
 	return int(target_hits.get(target_id, 0))
 
 
+func current_bump_level() -> int:
+	return Balance.bump_level(current_target_hits())
+
+
+func bump_level_of(id: String) -> int:
+	return Balance.bump_level(int(target_hits.get(id, 0)))
+
+
+## Mimik-Stufe der Standardfigur: 0 = gelassen, 1 = genervt (ab Level 4), 2 = am Ende (ab Level 8).
+func mood_index(level: int) -> int:
+	return 2 if level >= 8 else (1 if level >= 4 else 0)
+
+
+func target_figure() -> Dictionary:
+	return figure_def(target_id if _figure_by_id.has(target_id) else CUSTOM_FIGURE)
+
+
 func target_texture() -> Texture2D:
+	if target_id == DEFAULT_TARGET:
+		var moods: Array = target_figure().get("moods", [])
+		if not moods.is_empty():
+			return load(moods[mini(mood_index(current_bump_level()), moods.size() - 1)]) as Texture2D
 	if target_id != DEFAULT_TARGET:
 		var img := Image.load_from_file(_image_path(target_id))
 		if img != null and not img.is_empty():
@@ -695,8 +1033,56 @@ func target_texture() -> Texture2D:
 
 
 func use_default_target() -> void:
-	target_id = DEFAULT_TARGET
+	select_target(DEFAULT_TARGET)
+
+
+func select_target(id: String) -> void:
+	if id != DEFAULT_TARGET and not FileAccess.file_exists(_image_path(id)):
+		return
+	target_id = id
 	target_changed.emit()
+
+
+## Alle Opfer für die Galerie: Standardfigur zuerst, dann eigene Bilder (neueste zuerst).
+func gallery_entries() -> Array[Dictionary]:
+	var out: Array[Dictionary] = [{"id": DEFAULT_TARGET, "name": DEFAULT_TARGET_NAME,
+		"hits": int(target_hits.get(DEFAULT_TARGET, 0)), "level": bump_level_of(DEFAULT_TARGET), "custom": false}]
+	var ids: Array = target_names.keys()
+	ids.sort()
+	ids.reverse()
+	for id in ids:
+		if FileAccess.file_exists(_image_path(id)):
+			out.append({"id": id, "name": String(target_names[id]), "hits": int(target_hits.get(id, 0)),
+				"level": bump_level_of(id), "custom": true})
+	return out
+
+
+func gallery_image(id: String) -> Image:
+	if id == DEFAULT_TARGET:
+		return null
+	return Image.load_from_file(_image_path(id))
+
+
+func rename_target(id: String, new_name: String) -> bool:
+	new_name = new_name.strip_edges()
+	if id == DEFAULT_TARGET or new_name == "" or not target_names.has(id):
+		return false
+	target_names[id] = new_name.left(40)
+	add_stat("renames")
+	return true
+
+
+func delete_target(id: String) -> bool:
+	if id == DEFAULT_TARGET or not target_names.has(id):
+		return false
+	DirAccess.remove_absolute(_image_path(id))
+	target_names.erase(id)
+	target_hits.erase(id)
+	if target_id == id:
+		target_id = DEFAULT_TARGET
+		target_changed.emit()
+	save_game()
+	return true
 
 
 ## Übernimmt ein Bild als neues Ziel: verkleinert es auf max. 1024 px und speichert eine Kopie lokal.
@@ -748,7 +1134,7 @@ func apply_offline_progress(seconds: float) -> float:
 		return 0.0
 	if seconds >= 86400.0:
 		stats["long_return"] = 1
-	var gain := Balance.offline_gain(base_wps(), seconds, OFFLINE_RATE, OFFLINE_CAP)
+	var gain := Balance.offline_gain(base_wps(), seconds, offline_rate(), offline_cap())
 	earn(gain)
 	pending_offline = {"seconds": seconds, "gain": gain}
 	return gain
@@ -774,6 +1160,10 @@ func to_dict() -> Dictionary:
 		"saved_at": Time.get_unix_time_from_system(),
 		"wumms": wumms,
 		"total_wumms": total_wumms,
+		"lifetime_wumms": lifetime_wumms,
+		"laurels_total": laurels_total,
+		"laurels_spent": laurels_spent,
+		"laurel_nodes": laurel_nodes.keys(),
 		"total_hits": total_hits,
 		"beulen_marken": beulen_marken,
 		"devices": devices.duplicate(),
@@ -784,8 +1174,13 @@ func to_dict() -> Dictionary:
 		"target_id": target_id,
 		"target_names": target_names.duplicate(),
 		"target_hits": target_hits.duplicate(),
-		"settings": {"reduced_effects": reduced_effects, "sound_on": sound_on},
+		"settings": _settings_dict(),
 	}
+
+
+func _settings_dict() -> Dictionary:
+	return {"reduced_effects": reduced_effects, "sound_on": sound_on, "autobuy_enabled": autobuy_enabled,
+		"time_warp": time_warp, "background": background, "fist_skin": fist_skin, "sound_pack": sound_pack}
 
 
 func from_dict(data: Dictionary) -> void:
@@ -793,6 +1188,10 @@ func from_dict(data: Dictionary) -> void:
 	_last_loaded = data
 	wumms = float(data.get("wumms", 0.0))
 	total_wumms = float(data.get("total_wumms", 0.0))
+	lifetime_wumms = float(data.get("lifetime_wumms", total_wumms))
+	laurels_total = int(data.get("laurels_total", 0))
+	laurels_spent = int(data.get("laurels_spent", 0))
+	laurel_nodes = _key_set(data.get("laurel_nodes", []))
 	total_hits = int(data.get("total_hits", 0))
 	beulen_marken = int(data.get("beulen_marken", 0))
 	devices.clear()
@@ -815,8 +1214,16 @@ func from_dict(data: Dictionary) -> void:
 	var settings: Dictionary = data.get("settings", {})
 	reduced_effects = bool(settings.get("reduced_effects", false))
 	sound_on = bool(settings.get("sound_on", true))
+	autobuy_enabled = bool(settings.get("autobuy_enabled", true))
+	time_warp = bool(settings.get("time_warp", false))
+	background = String(settings.get("background", "standard"))
+	fist_skin = String(settings.get("fist_skin", "standard"))
+	sound_pack = String(settings.get("sound_pack", "standard"))
 	buffs.clear()
 	idle_time = 0.0
+	combo = 0.0
+	rage_meter = 0.0
+	rage_time = 0.0
 
 
 func _key_set(list: Array) -> Dictionary:
@@ -835,11 +1242,21 @@ func _migrate(data: Dictionary) -> Dictionary:
 		data["achievements"] = data.get("achievements", [])
 		data["stats"] = data.get("stats", {})
 		data["beulen_marken"] = data.get("beulen_marken", 0)
+	if version < 3:
+		# v2 → v3: Lorbeeren und Lebenszeit-Wumms sind neu. Erfolge geben jetzt je eine
+		# Beulen-Marke – bereits verdiente werden nachträglich gutgeschrieben.
+		data["lifetime_wumms"] = data.get("lifetime_wumms", data.get("total_wumms", 0.0))
+		data["laurels_total"] = data.get("laurels_total", 0)
+		data["laurels_spent"] = data.get("laurels_spent", 0)
+		data["laurel_nodes"] = data.get("laurel_nodes", [])
+		data["beulen_marken"] = int(data.get("beulen_marken", 0)) + (data.get("achievements", []) as Array).size()
 	data["version"] = maxi(version, SAVE_VERSION)
 	return data
 
 
 func save_game() -> bool:
+	if not persist:
+		return true
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.copy_absolute(SAVE_PATH, BACKUP_PATH)
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
