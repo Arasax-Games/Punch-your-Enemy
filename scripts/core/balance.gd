@@ -92,7 +92,27 @@ static func bump_level(hits: int) -> int:
 	return mini(10, int(hits / 1000))
 
 
-## Lorbeeren für den Neuanfang (Phase 3): floor(∛(Gesamt-Wumms ÷ 1 Billion)).
+## Lebenspunkte des n-ten Bosses (n = bisher besiegte Bosse): 100 × 2^n Klick-Äquivalente.
+static func boss_hp(defeated: int, base_hp: float = 100.0) -> float:
+	return base_hp * pow(2.0, defeated)
+
+
+## Belohnung eines Mini-Spiels in Beulen-Marken (höchstens `cap` pro Spiel und Tag).
+static func minigame_reward(score: int, points_per_marke: int, cap: int = 5) -> int:
+	return clampi(score / maxi(points_per_marke, 1), 0, cap)
+
+
+## Login-Serie: Tag 1–7 im Kreis, Belohnung = Tag in Beulen-Marken (Tag 7: +3 extra).
+static func login_day(streak: int) -> int:
+	return ((maxi(streak, 1) - 1) % 7) + 1
+
+
+static func login_marken(streak: int) -> int:
+	var day := login_day(streak)
+	return day + (3 if day == 7 else 0)
+
+
+## Lorbeeren für den Neuanfang: floor(∛(Gesamt-Wumms ÷ 1 Billion)).
 static func laurels_for(total_wumms: float) -> int:
 	if total_wumms <= 0.0:
 		return 0

@@ -1,0 +1,90 @@
+[
+	{
+		"id": "hits",
+		"text": "Verhaue %s Mal ein Opfer",
+		"metric": "hits",
+		"amounts": [
+			1000,
+			3000,
+			8000
+		],
+		"reward": 2
+	},
+	{
+		"id": "devices",
+		"text": "Kaufe %s Geräte",
+		"metric": "devices_bought",
+		"amounts": [
+			10,
+			25,
+			60
+		],
+		"reward": 2
+	},
+	{
+		"id": "upgrades",
+		"text": "Kaufe %s Upgrades",
+		"metric": "upgrades_bought",
+		"amounts": [
+			2,
+			4,
+			8
+		],
+		"reward": 2
+	},
+	{
+		"id": "golden",
+		"text": "Fange %s Goldene Schuhe",
+		"metric": "golden_shoes",
+		"amounts": [
+			1,
+			2,
+			3
+		],
+		"reward": 3
+	},
+	{
+		"id": "rage",
+		"text": "Entfessle %s Mal den Wutmodus",
+		"metric": "rages",
+		"amounts": [
+			1,
+			2,
+			4
+		],
+		"reward": 2
+	},
+	{
+		"id": "combo",
+		"text": "Erreiche %s Mal Combo 100",
+		"metric": "combo_maxed",
+		"amounts": [
+			1,
+			2,
+			3
+		],
+		"reward": 2
+	},
+	{
+		"id": "crits",
+		"text": "Lande %s kritische Treffer",
+		"metric": "crits",
+		"amounts": [
+			5,
+			15,
+			40
+		],
+		"reward": 2
+	},
+	{
+		"id": "minigame",
+		"text": "Spiele %s Mini-Spiel(e)",
+		"metric": "minigames_played",
+		"amounts": [
+			1,
+			2,
+			3
+		],
+		"reward": 2
+	}
+]

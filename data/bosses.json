@@ -1,0 +1,36 @@
+{
+	"interval_hits": 100000,
+	"retry_hits": 10000,
+	"time_limit": 30,
+	"base_hp": 100,
+	"weak_spot_mult": 5,
+	"reward_marken_base": 5,
+	"reward_marken_per_boss": 2,
+	"gimmicks": [
+		{
+			"id": "ducken",
+			"name": "Wegducken",
+			"text": "Er duckt sich immer wieder weg – Timing!"
+		},
+		{
+			"id": "pappschild",
+			"name": "Schild aus Pappe",
+			"text": "Ein Pappschild blockt eine Seite. Hau auf die andere!"
+		},
+		{
+			"id": "gummiente",
+			"name": "Gummiente",
+			"text": "Eine Gummiente lenkt ab. Nicht auf die Ente hauen!"
+		}
+	],
+	"trophies": [
+		"Pappschild-Pokal",
+		"Goldene Gummiente",
+		"Verbeulter Kochtopf-Helm",
+		"Orden für Tapferkeit (aus Pappe)",
+		"Silberner Pantoffel am Bande",
+		"Kristall-Pflaster",
+		"Die Goldene Beule",
+		"Großes Ehrenveilchen"
+	]
+}

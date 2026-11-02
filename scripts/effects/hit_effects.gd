@@ -65,6 +65,11 @@ func add_hit(uv: Vector2, value: float, crit: bool) -> void:
 	queue_redraw()
 
 
+## Kurzer Text an einer Stelle (z. B. "Geblockt!" im Boss-Kampf).
+func popup_text(text: String, pos: Vector2, color: Color) -> void:
+	_popup(text, pos, 34, color, 0.8, true)
+
+
 ## "Duschen": entfernt alle Spuren, Fortschritt bleibt.
 func clear() -> void:
 	_marks.clear()

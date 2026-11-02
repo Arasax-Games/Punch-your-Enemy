@@ -593,5 +593,96 @@
 			"value": 1
 		},
 		"hidden": true
+	},
+	{
+		"id": "bossbezwinger",
+		"name": "Bossbezwinger",
+		"description": "Den ersten Boss-Kampf gewonnen.",
+		"condition": {
+			"type": "stat",
+			"stat": "bosses_defeated",
+			"value": 1
+		}
+	},
+	{
+		"id": "boss_experte",
+		"name": "Endgegner-Experte",
+		"description": "5 Boss-Kämpfe gewonnen.",
+		"condition": {
+			"type": "stat",
+			"stat": "bosses_defeated",
+			"value": 5
+		}
+	},
+	{
+		"id": "auftragnehmer",
+		"name": "Auftragnehmer",
+		"description": "Den ersten Tagesauftrag erledigt.",
+		"condition": {
+			"type": "stat",
+			"stat": "quests_done",
+			"value": 1
+		}
+	},
+	{
+		"id": "fleissig",
+		"name": "Fleißiges Bienchen",
+		"description": "25 Tagesaufträge erledigt.",
+		"condition": {
+			"type": "stat",
+			"stat": "quests_done",
+			"value": 25
+		}
+	},
+	{
+		"id": "treue_seele",
+		"name": "Treue Seele",
+		"description": "7 Tage in Folge vorbeigeschaut.",
+		"condition": {
+			"type": "stat",
+			"stat": "best_streak",
+			"value": 7
+		}
+	},
+	{
+		"id": "dojo_meister",
+		"name": "Dojo-Meister",
+		"description": "40 Punkte im Reaktions-Dojo.",
+		"condition": {
+			"type": "stat",
+			"stat": "dojo_best",
+			"value": 40
+		}
+	},
+	{
+		"id": "tortenkoenig",
+		"name": "Tortenkönig",
+		"description": "60 Punkte in der Tortenwurf-Schießbude.",
+		"condition": {
+			"type": "stat",
+			"stat": "pie_best",
+			"value": 60
+		}
+	},
+	{
+		"id": "saisonarbeiter",
+		"name": "Saisonarbeiter",
+		"description": "Ein Saison-Event abgeschlossen.",
+		"condition": {
+			"type": "stat",
+			"stat": "events_done",
+			"value": 1
+		}
+	},
+	{
+		"id": "erinnerungsfoto",
+		"name": "Erinnerungsfoto",
+		"description": "Ein Foto gespeichert. Für die Enkel.",
+		"condition": {
+			"type": "stat",
+			"stat": "screenshots",
+			"value": 1
+		},
+		"hidden": true
 	}
 ]

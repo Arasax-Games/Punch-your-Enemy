@@ -23,7 +23,15 @@ Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 | Strg+V | Bild aus der Zwischenablage als neues Opfer |
 | Bild ins Fenster ziehen | Neues Opfer |
 
-## Stand: Phase 3 (Tiefe)
+## Stand: Phase 4 (Steam & Langzeit)
+
+**Phase 4**
+- **Boss-Kämpfe** alle 100.000 Treffer: Lebensleiste, 30 Sekunden, wandernde Schwachstelle (×5) und harmlose Gimmicks (Wegducken, Pappschild, Gummiente). Belohnung: Pokal und Beulen-Marken
+- **Tagesaufträge** (3 pro Tag) und **Login-Serie** (Tag 1–7, steigende Belohnung)
+- **Saison-Events** mit eigener Figur: Halloween-Hexe Hildegard (24.10.–7.11.) und Weihnachtsmuffel Gustav (1.–26.12.)
+- **Mini-Spiele**: Reaktions-Dojo und Tortenwurf-Schießbude (bis zu 5 Beulen-Marken pro Spiel und Tag)
+- **Vitrine** für Pokale, **Foto speichern** mit Wasserzeichen (bleibt lokal)
+- **Steam vorbereitet**: Erfolge werden über GodotSteam gemeldet, Spielstand für Steam Cloud – Anleitung in [`docs/steam.md`](docs/steam.md)
 
 **Phase 3**
 - **Neuanfang (Prestige)** ab 1 Billion Wumms: Lorbeeren = ∛(Wumms ÷ 1 Billion), je Lorbeer +1 % auf alles
@@ -61,10 +69,7 @@ godot --headless --path . --script res://tests/simulate.gd -- --days 7   # eine 
 
 ## Für Steam exportieren
 
-1. In Godot: **Editor → Export-Vorlagen verwalten → Herunterladen und installieren**.
-2. **Projekt → Exportieren**: Die Vorlagen für Windows, Linux und macOS sind schon angelegt.
-3. Für Steam-Funktionen (Achievements, Cloud, Overlay) später [GodotSteam](https://godotsteam.com/) als GDExtension einbinden.
-4. Hochladen über Steamworks (SteamPipe) – dafür brauchst du einen Steamworks-Partner-Account und eine App-ID.
+Schritt-für-Schritt-Anleitung (Steamworks, GodotSteam, Erfolge, Steam Cloud, Upload): **[`docs/steam.md`](docs/steam.md)**.
 
 ## Mitarbeit (Menschen und KI)
 

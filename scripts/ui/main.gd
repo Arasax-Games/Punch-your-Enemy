@@ -28,6 +28,7 @@ const MENU_SAVE := 0
 const MENU_EXPORT := 1
 const MENU_IMPORT := 2
 const MENU_RESET := 3
+const MENU_PHOTO := 4
 const MENU_SOUND := 10
 const MENU_EFFECTS := 11
 const MENU_TIME_WARP := 12
@@ -56,6 +57,7 @@ const BRANCHES := [["handwerk", "Handwerk"], ["glueck", "Glück"], ["komfort", "
 @onready var toast: Label = %Toast
 @onready var shoe_layer: Control = %ShoeLayer
 @onready var achievement_toasts: VBoxContainer = %AchievementToasts
+@onready var boss: BossFight = %BossFight
 
 var _buy_mode := 1
 var _device_rows: Dictionary = {}       # id -> {panel, info, buy, sell, index}
@@ -74,6 +76,7 @@ var _prestige_button: Button
 var _laurel_label: Label
 var _rage_tint: ColorRect
 var _rage_tween: Tween
+var _ticker_override := ""
 
 
 func _ready() -> void:
@@ -97,6 +100,11 @@ func _ready() -> void:
 	GameState.rage_changed.connect(_on_rage_changed)
 	GameState.bump_level_up.connect(_on_bump_level_up)
 	GameState.laurel_node_bought.connect(func(_id: String) -> void: _apply_cosmetics())
+	GameState.boss_started.connect(_on_boss_started)
+	GameState.boss_finished.connect(_on_boss_finished)
+	GameState.event_completed.connect(_on_event_completed)
+	%QuestsButton.pressed.connect(_show_quests)
+	%GamesButton.pressed.connect(_show_games)
 	get_window().files_dropped.connect(_on_files_dropped)
 
 	_apply_cosmetics()
@@ -104,11 +112,15 @@ func _ready() -> void:
 	_refresh()
 	_ticker_index = randi() % TICKER_LINES.size()
 	_show_ticker()
-	if not GameState.pending_offline.is_empty():
-		_show_welcome_back.call_deferred(GameState.pending_offline)
-		GameState.pending_offline = {}
+	if not GameState.pending_offline.is_empty() or (not GameState.pending_login.is_empty() and GameState.total_hits > 0):
+		_show_welcome_back.call_deferred(GameState.pending_offline, GameState.pending_login)
 	elif GameState.total_hits == 0:
 		show_toast("Hau drauf! Klicken oder Leertaste.")
+	GameState.pending_offline = {}
+	GameState.pending_login = {}
+	var event := GameState.active_event()
+	if not event.is_empty() and not GameState.events_done.has(GameState.event_key(event)):
+		_ticker_override = "Saison-Event: %s – zu finden in der Galerie!" % event.name
 
 
 func _process(delta: float) -> void:
@@ -338,6 +350,7 @@ func _fill_menu() -> void:
 		popup.add_check_item("Retro-Sounds", MENU_RETRO)
 		popup.set_item_checked(popup.get_item_index(MENU_RETRO), GameState.sound_pack == "retro")
 	popup.add_separator()
+	popup.add_item("Foto speichern", MENU_PHOTO)
 	popup.add_item("Speichern", MENU_SAVE)
 	popup.add_item("Spielstand exportieren (Textcode)", MENU_EXPORT)
 	popup.add_item("Spielstand importieren …", MENU_IMPORT)
@@ -439,6 +452,9 @@ func _refresh() -> void:
 	hits_label.text = "Treffer gesamt: %s" % Num.whole(GameState.total_hits)
 	%AchievementsButton.text = "Erfolge %d/%d" % [GameState.achievement_count(), GameState.achievement_defs.size()]
 	%LaurelButton.visible = GameState.laurel_tree_unlocked()
+	var claimable := GameState.claimable_quests()
+	%QuestsButton.text = "Aufträge (%d!)" % claimable if claimable > 0 else "Aufträge"
+	%GamesButton.visible = GameState.minigame_unlocked("dojo") or GameState.minigame_unlocked("pie")
 	_refresh_progress_widgets()
 	_refresh_buffs()
 	_refresh_devices()
@@ -568,6 +584,9 @@ func _upgrade_color(u: Dictionary) -> Color:
 
 
 func _show_ticker() -> void:
+	if _ticker_override != "" and _ticker_index % 3 == 0:
+		ticker_label.text = "+++ %s +++" % _ticker_override
+		return
 	ticker_label.text = "+++ %s +++" % TICKER_LINES[_ticker_index % TICKER_LINES.size()]
 
 
@@ -593,7 +612,16 @@ func _buy(id: String) -> void:
 
 
 func _on_target_hit(uv: Vector2) -> void:
+	var boss_mult := boss.filter_hit(uv) if GameState.boss_active else 1.0
+	if boss_mult < 0.0:
+		target_area.effects.popup_text("Geblockt!", target_area.uv_to_local(uv), Color("adb5bd"))
+		Sfx.play("squeak", 0.2, -6.0)
+		return
 	var result := GameState.hit()
+	if GameState.boss_active:
+		GameState.boss_damage(boss_mult)
+		if boss_mult > 1.0:
+			target_area.effects.popup_text("SCHWACHSTELLE! ×%d" % int(boss_mult), target_area.uv_to_local(uv) + Vector2(0, -60), Color("ff922b"))
 	target_area.effects.add_hit(uv, result.value, result.crit)
 	target_area.squash()
 	Sfx.play_hit(result.crit)
@@ -819,6 +847,8 @@ func _on_menu(id: int) -> void:
 		MENU_SAVE:
 			if GameState.save_game():
 				show_toast("Gespeichert.")
+		MENU_PHOTO:
+			_take_photo()
 		MENU_EXPORT:
 			var code := GameState.export_save_code()
 			DisplayServer.clipboard_set(code)
@@ -870,13 +900,19 @@ func _column(texts: Array, extra: Control = null) -> VBoxContainer:
 	return box
 
 
-func _show_welcome_back(info: Dictionary) -> void:
-	var seconds := float(info.seconds)
-	var capped := seconds > GameState.OFFLINE_CAP
-	var text := "Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Wumms\nerwirtschaftet." % [
-		Num.duration(seconds), Num.whole(float(info.gain))]
-	if capped:
-		text += "\n\n(Ohne Aufsicht arbeiten sie höchstens 8 Stunden – und nur halb so fleißig.)"
+func _show_welcome_back(info: Dictionary, login: Dictionary = {}) -> void:
+	var text := ""
+	if not info.is_empty():
+		var seconds := float(info.seconds)
+		text = "Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Wumms\nerwirtschaftet." % [
+			Num.duration(seconds), Num.whole(float(info.gain))]
+		if seconds > GameState.offline_cap():
+			text += "\n\n(Ohne Aufsicht arbeiten sie höchstens %s.)" % Num.duration(GameState.offline_cap())
+	if not login.is_empty():
+		if text != "":
+			text += "\n\n"
+		text += "Login-Serie: Tag %d von 7%s\nTagesbonus: +%s Wumms und +%d Beulen-Marken" % [
+			int(login.day), " – Hauptgewinn!" if int(login.day) == 7 else "", Num.whole(float(login.wumms)), int(login.marken)]
 	Modal.open(self, "Willkommen zurück!", text, ["Weiter hauen!"])
 
 
@@ -1106,3 +1142,213 @@ func _delete_dialog(id: String, gallery_ref: Array) -> void:
 		if index == 0 and GameState.delete_target(id):
 			gallery_ref[0].close()
 			_show_gallery())
+
+
+# =====================================================================
+# Boss-Kämpfe
+# =====================================================================
+
+func _on_boss_started() -> void:
+	boss.start()
+	Sfx.play("rage", 0.0, 0.0)
+	show_toast("BOSS-KAMPF! %s" % GameState.boss_gimmick.get("text", ""))
+	target_area.shake()
+
+
+func _on_boss_finished(won: bool, reward: Dictionary) -> void:
+	boss.stop()
+	if won:
+		Sfx.play("prestige", 0.0, -2.0)
+		if not GameState.reduced_effects:
+			Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
+		Modal.open(self, "Boss besiegt!", "Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Beulen-Marken" % [
+			reward.trophy, int(reward.marken)], ["Hurra!"])
+	else:
+		Sfx.play("bad", 0.0, -2.0)
+		show_toast("Der Boss ist entkommen! In %s Treffern kommt er wieder." % Num.whole(GameState.next_boss_at - GameState.total_hits))
+
+
+# =====================================================================
+# Aufträge, Login-Serie, Event, Vitrine
+# =====================================================================
+
+func _show_quests() -> void:
+	GameState.check_new_day()
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 12)
+	var modal_ref: Array = []
+	content.add_child(_section_title("Tagesaufträge"))
+	for i in GameState.quests.size():
+		var q: Dictionary = GameState.quests[i]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		var col := VBoxContainer.new()
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var label := Label.new()
+		label.text = GameState.quest_text(q)
+		col.add_child(label)
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 12)
+		bar.max_value = float(q.amount)
+		bar.value = GameState.quest_progress(q)
+		col.add_child(bar)
+		row.add_child(col)
+		var b := Button.new()
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(170, 0)
+		var index := i
+		if q.claimed:
+			b.text = "Erledigt ✓"
+			b.disabled = true
+		elif GameState.quest_done(q):
+			b.text = "Abholen: %d Marken" % int(q.reward)
+			b.pressed.connect(func() -> void:
+				var gain := GameState.claim_quest(index)
+				if gain > 0:
+					Sfx.play("achievement", 0.0, -4.0)
+					show_toast("+%d Beulen-Marken" % gain)
+				modal_ref[0].close()
+				_show_quests())
+		else:
+			b.text = "%s / %s · %d Marken" % [Num.whole(GameState.quest_progress(q)), Num.whole(float(q.amount)), int(q.reward)]
+			b.disabled = true
+		row.add_child(b)
+		content.add_child(row)
+	var streak := Label.new()
+	streak.text = "Login-Serie: %d Tag%s in Folge · Morgen gibt es %d Beulen-Marken" % [GameState.login_streak,
+		"" if GameState.login_streak == 1 else "e", Balance.login_marken(GameState.login_streak + 1)]
+	streak.add_theme_color_override("font_color", Color(INK, 0.7))
+	content.add_child(streak)
+
+	var event := GameState.active_event()
+	if not event.is_empty():
+		content.add_child(_section_title("Saison-Event: %s" % event.name))
+		var key := GameState.event_key(event)
+		var done := GameState.events_done.has(key)
+		var info := Label.new()
+		info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		info.custom_minimum_size = Vector2(640, 0)
+		info.text = "Geschafft! %s gehört dir." % event.trophy if done else String(event.intro)
+		content.add_child(info)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		var bar := ProgressBar.new()
+		bar.show_percentage = false
+		bar.custom_minimum_size = Vector2(0, 14)
+		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		bar.max_value = float(event.goal_hits)
+		bar.value = GameState.event_hits(event)
+		row.add_child(bar)
+		var go := Button.new()
+		go.focus_mode = Control.FOCUS_NONE
+		go.text = "Zur Figur!" if GameState.target_id != event.figure else "Ist aktiv"
+		go.disabled = GameState.target_id == event.figure
+		var fig: String = event.figure
+		go.pressed.connect(func() -> void:
+			GameState.select_target(fig)
+			modal_ref[0].close())
+		row.add_child(go)
+		content.add_child(row)
+
+	content.add_child(_section_title("Vitrine"))
+	var shelf := Label.new()
+	shelf.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	shelf.custom_minimum_size = Vector2(640, 0)
+	shelf.text = "Noch leer. Pokale gibt es für Boss-Kämpfe (alle 100.000 Treffer) und Saison-Events." \
+		if GameState.trophies.is_empty() else "🏆 " + " · ".join(GameState.trophies)
+	content.add_child(shelf)
+	var next_boss := Label.new()
+	next_boss.add_theme_color_override("font_color", Color(INK, 0.7))
+	next_boss.text = "Nächster Boss in %s Treffern." % Num.whole(maxf(0.0, GameState.next_boss_at - GameState.total_hits))
+	content.add_child(next_boss)
+	modal_ref.append(Modal.open(self, "Aufträge", content, ["Schließen"], 720.0))
+
+
+func _section_title(text: String) -> Label:
+	var l := Label.new()
+	l.text = text
+	_comic(l, 22, Color("3bc9db"))
+	return l
+
+
+func _on_event_completed(event: Dictionary) -> void:
+	Sfx.play("prestige", 0.0, -2.0)
+	if not GameState.reduced_effects:
+		Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
+	_ticker_override = ""
+	Modal.open(self, "Event geschafft!", "%s gibt auf!\n\nPokal: %s\n+%d Beulen-Marken\n\nDie Figur bleibt für immer in deiner Galerie." % [
+		event.name, event.trophy, int(event.reward_marken)], ["Hurra!"])
+
+
+# =====================================================================
+# Mini-Spiele
+# =====================================================================
+
+func _show_games() -> void:
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 12)
+	var modal_ref: Array = []
+	for game in ["dojo", "pie"]:
+		var info: Dictionary = GameState.MINIGAMES[game]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		var col := VBoxContainer.new()
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var title := Label.new()
+		title.text = info.name
+		title.add_theme_font_size_override("font_size", 20)
+		col.add_child(title)
+		var desc := Label.new()
+		desc.add_theme_font_size_override("font_size", 14)
+		desc.add_theme_color_override("font_color", Color(INK, 0.7))
+		var today_marken := int(GameState.minigame_rewards_today.get(game, 0))
+		desc.text = "Rekord: %d Punkte · heute verdient: %d/5 Beulen-Marken (je %d Punkte eine)" % [
+			int(GameState.stat(info.stat)), today_marken, int(info.points_per_marke)]
+		col.add_child(desc)
+		row.add_child(col)
+		var b := Button.new()
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(180, 0)
+		var unlocked := GameState.minigame_unlocked(game)
+		b.text = "Spielen!" if unlocked else GameState.minigame_unlock_text(game)
+		b.disabled = not unlocked
+		var which: String = game
+		b.pressed.connect(func() -> void:
+			modal_ref[0].close()
+			MiniGame.open(self, which))
+		row.add_child(b)
+		content.add_child(row)
+	modal_ref.append(Modal.open(self, "Mini-Spiele", content, ["Schließen"], 680.0))
+
+
+# =====================================================================
+# Foto mit Wasserzeichen
+# =====================================================================
+
+func _take_photo() -> void:
+	var mark := Label.new()
+	mark.text = "Punch your Enemy"
+	_comic(mark, 30, Color("ff6fae"))
+	mark.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	mark.position = size - Vector2(330, 70)
+	add_child(mark)
+	toast.visible = false
+	await RenderingServer.frame_post_draw
+	var img := get_viewport().get_texture().get_image()
+	mark.queue_free()
+	var dir := "user://screenshots"
+	DirAccess.make_dir_recursive_absolute(dir)
+	var stamp := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
+	var path := "%s/punch_%s.png" % [dir, stamp]
+	if img.save_png(path) != OK:
+		show_toast("Foto konnte nicht gespeichert werden.")
+		return
+	GameState.add_stat("screenshots")
+	Sfx.play("buy", 0.0, -4.0)
+	var m := Modal.open(self, "Foto gespeichert!", "Gespeichert als\n%s\n\nDas Foto bleibt auf deinem Rechner – teilen kannst du es, wenn alle Abgebildeten einverstanden sind." % path.get_file(),
+		["Ordner öffnen", "OK"])
+	m.closed.connect(func(index: int) -> void:
+		if index == 0:
+			OS.shell_open(ProjectSettings.globalize_path(dir)))

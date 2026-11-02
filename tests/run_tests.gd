@@ -22,6 +22,11 @@ func _initialize() -> void:
 	test_combo_and_rage()
 	test_bump_levels_and_gallery()
 	test_migration_v3()
+	test_bosses()
+	test_quests_and_login()
+	test_events()
+	test_minigames()
+	test_migration_v4()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -80,6 +85,12 @@ func test_balance() -> void:
 	check_eq(Balance.bump_level(999), 0, "Beulen-Level 0 unter 1.000")
 	check_eq(Balance.bump_level(3500), 3, "Beulen-Level 3")
 	check_eq(Balance.bump_level(50000), 10, "Beulen-Level max. 10")
+	check_eq(Balance.boss_hp(0), 100.0, "Erster Boss: 100 Treffer")
+	check_eq(Balance.boss_hp(3), 800.0, "Vierter Boss: 800 Treffer")
+	check_eq(Balance.minigame_reward(23, 8), 2, "Mini-Spiel: je 8 Punkte eine Marke")
+	check_eq(Balance.minigame_reward(500, 8), 5, "Mini-Spiel: max. 5 Marken")
+	check_eq(Balance.login_day(8), 1, "Login-Serie beginnt nach Tag 7 von vorn")
+	check_eq(Balance.login_marken(7), 10, "Tag 7: Hauptgewinn")
 
 
 func test_number_format() -> void:
@@ -210,7 +221,7 @@ func test_save_migration() -> void:
 	check_eq(int(gs.stats.crits), 0, "Statistik angelegt")
 	gs.check_achievements()
 	check(gs.achievements.has("zappelphilipp"), "Erfolge rückwirkend vergeben")
-	check_eq(gs.to_dict().version, 3, "wird als aktuelle Version gespeichert")
+	check_eq(gs.to_dict().version, gs.SAVE_VERSION, "wird als aktuelle Version gespeichert")
 	var code: String = gs.export_save_code()
 	var other := new_state()
 	check(other.import_save_code(code), "Import ausgeführt")
@@ -443,5 +454,134 @@ func test_migration_v3() -> void:
 	var again := new_state()
 	again.from_dict(JSON.parse_string(JSON.stringify(gs.to_dict())))
 	check_eq(again.beulen_marken, 5, "v3-Spielstand wird nicht doppelt migriert")
+	gs.free()
+	again.free()
+
+
+func test_bosses() -> void:
+	print("Boss-Kämpfe")
+	var gs := new_state()
+	var results: Array = []
+	gs.boss_finished.connect(func(won: bool, reward: Dictionary) -> void: results.append([won, reward]))
+	gs.total_hits = 99999
+	check(not gs.boss_active, "Kein Boss vor 100.000 Treffern")
+	gs.hit()
+	check(gs.boss_active, "Boss bei 100.000 Treffern")
+	check_eq(gs.boss_max_hp, 100.0, "Erster Boss hat 100 Lebenspunkte")
+	check_eq(gs.boss_gimmick.id, "ducken", "Erster Boss duckt sich")
+	for i in 19:
+		gs.boss_damage(5.0)
+	check(gs.boss_active, "Boss lebt nach 95 Schaden noch")
+	gs.boss_damage(5.0)
+	check(not gs.boss_active, "Boss besiegt")
+	check(results[0][0], "Sieg gemeldet")
+	check_eq(results[0][1].marken, 5, "Erster Boss: 5 Beulen-Marken")
+	check_eq(gs.trophies.size(), 1, "Pokal in der Vitrine")
+	check_eq(gs.next_boss_at, gs.total_hits + 100000, "Nächster Boss in 100.000 Treffern")
+	gs.total_hits = gs.next_boss_at - 1
+	gs.hit()
+	check_eq(gs.boss_max_hp, 200.0, "Zweiter Boss: doppelte Lebenspunkte")
+	check_eq(gs.boss_gimmick.id, "pappschild", "Zweiter Boss hat ein Pappschild")
+	gs.tick(31.0)
+	check(not gs.boss_active, "Boss entkommt nach 30 s")
+	check(not results[1][0], "Niederlage gemeldet")
+	check_eq(gs.next_boss_at, gs.total_hits + 10000, "Neuer Versuch in 10.000 Treffern")
+	gs.free()
+
+
+func test_quests_and_login() -> void:
+	print("Tagesaufträge und Login-Serie")
+	check_eq(load("res://scripts/core/game_state.gd").previous_day("2026-03-01"), "2026-02-28", "Vortag über Monatsgrenze")
+	var gs := new_state()
+	gs._today_override = "2026-11-02"
+	gs.check_new_day()
+	check_eq(gs.quests.size(), 3, "3 Aufträge pro Tag")
+	var first: Array = gs.quests.map(func(q: Dictionary) -> String: return q.id)
+	var other := new_state()
+	other._today_override = "2026-11-02"
+	other.check_new_day()
+	check_eq(other.quests.map(func(q: Dictionary) -> String: return q.id), first, "Gleicher Tag = gleiche Aufträge")
+	check_eq(gs.login_streak, 1, "Erster Login")
+	check_eq(gs.beulen_marken, 1, "Tag 1: eine Marke")
+	gs._today_override = "2026-11-03"
+	gs.check_new_day()
+	check_eq(gs.login_streak, 2, "Login am Folgetag zählt weiter")
+	gs._today_override = "2026-11-06"
+	gs.check_new_day()
+	check_eq(gs.login_streak, 1, "Lücke setzt die Serie zurück")
+	check_eq(int(gs.stat("best_streak")), 2, "Beste Serie gemerkt")
+	# Auftrag erfüllen
+	gs.quests = [{"id": "hits", "amount": 10, "reward": 2, "start": gs.total_hits, "claimed": false}]
+	check_eq(gs.claim_quest(0), 0, "Unerledigt nicht abholbar")
+	for i in 10:
+		gs.hit()
+	check(gs.quest_done(gs.quests[0]), "Nach 10 Treffern erledigt")
+	check_eq(gs.claimable_quests(), 1, "Ein Auftrag abholbar")
+	var marken: int = gs.beulen_marken
+	check_eq(gs.claim_quest(0), 2, "Belohnung abgeholt")
+	check_eq(gs.beulen_marken, marken + 2, "Marken gutgeschrieben")
+	check_eq(gs.claim_quest(0), 0, "Nur einmal abholbar")
+	check_eq(gs.quest_text(gs.quests[0]), "Verhaue 10 Mal ein Opfer", "Auftragstext")
+	gs.free()
+	other.free()
+
+
+func test_events() -> void:
+	print("Saison-Events")
+	var gs := new_state()
+	gs._today_override = "2026-11-02"
+	check_eq(gs.active_event().get("id", ""), "halloween", "Anfang November: Halloween")
+	check(gs.figure_available("hexe"), "Hexe während des Events verfügbar")
+	check(not gs.figure_available("muffel"), "Weihnachtsmuffel noch nicht")
+	var ids: Array = gs.gallery_entries().map(func(e: Dictionary) -> String: return e.id)
+	check(ids.has("hexe"), "Hexe in der Galerie")
+	gs.select_target("hexe")
+	check_eq(gs.target_id, "hexe", "Hexe auswählbar")
+	check_eq(gs.target_name(), "Halloween-Hexe Hildegard", "Name der Hexe")
+	gs.event_progress[gs.event_key(gs.active_event())] = 4999
+	var done: Array = []
+	gs.event_completed.connect(func(e: Dictionary) -> void: done.append(e.id))
+	gs.hit()
+	check_eq(done, ["halloween"], "Event nach 5.000 Treffern geschafft")
+	check(gs.trophies.has("Kürbis-Pokal"), "Kürbis-Pokal in der Vitrine")
+	gs._today_override = "2026-12-24"
+	check_eq(gs.active_event().get("id", ""), "weihnachten", "Heiligabend: Weihnachtsmuffel")
+	check(gs.figure_available("hexe"), "Geschaffte Event-Figur bleibt verfügbar")
+	gs._today_override = "2026-07-01"
+	check(gs.active_event().is_empty(), "Im Juli kein Event")
+	check(not gs.figure_available("muffel"), "Muffel außerhalb des Events weg")
+	gs.free()
+
+
+func test_minigames() -> void:
+	print("Mini-Spiele")
+	var gs := new_state()
+	gs._today_override = "2026-11-02"
+	check(not gs.minigame_unlocked("dojo"), "Dojo gesperrt am Anfang")
+	gs.total_hits = 5000
+	check(gs.minigame_unlocked("dojo"), "Dojo ab 5.000 Treffern")
+	gs.check_new_day()  # Login-Bonus des Tages vorab, damit er hier nicht mitzählt
+	var start: int = gs.beulen_marken
+	check_eq(gs.record_minigame("dojo", 17), 2, "17 Punkte = 2 Marken")
+	check_eq(gs.record_minigame("dojo", 10), 0, "Schlechteres Spiel bringt nichts extra")
+	check_eq(gs.record_minigame("dojo", 60), 3, "Bis 5 Marken pro Tag aufgefüllt")
+	check_eq(gs.record_minigame("dojo", 99), 0, "Tageslimit erreicht")
+	check_eq(gs.beulen_marken, start + 5, "Insgesamt 5 Marken")
+	check_eq(int(gs.stat("dojo_best")), 99, "Rekord gemerkt")
+	gs._today_override = "2026-11-03"
+	check_eq(gs.record_minigame("dojo", 40), 5, "Neuer Tag, neues Glück")
+	gs.free()
+
+
+func test_migration_v4() -> void:
+	print("Migration v3 → v4")
+	var gs := new_state()
+	gs.from_dict({"version": 3, "total_hits": 250000, "total_wumms": 10.0})
+	check_eq(gs.next_boss_at, 300000, "Alter Spielstand: nächster Boss beim nächsten Hunderttausend")
+	check_eq(gs.trophies.size(), 0, "Noch keine Pokale")
+	var again := new_state()
+	again.from_dict(JSON.parse_string(JSON.stringify(gs.to_dict())))
+	check_eq(again.next_boss_at, 300000, "Boss-Zähler bleibt beim Speichern erhalten")
+	check_eq(load("res://scripts/core/steam_service.gd").api_name("erstes_aua"), "ERSTES_AUA", "Steam-API-Name")
 	gs.free()
 	again.free()
