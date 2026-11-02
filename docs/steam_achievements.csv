@@ -1,0 +1,72 @@
+API-Name;Anzeigename;Beschreibung;Versteckt
+ERSTES_AUA;Erstes Aua;Der erste Treffer. Es wird nicht der letzte sein.;nein
+WARM_UP;Aufwärmen;100 Treffer. Die Faust ist jetzt warm.;nein
+ZAPPELPHILIPP;Zappelphilipp;1.000 Treffer. Stillsitzen ist überbewertet.;nein
+FINGERFERTIG;Fingerfertig;10.000 Treffer. Deine Maus braucht Urlaub.;nein
+SEHNENSCHEIDE;Sehnenscheidenentzündung;100.000 Treffer. Bitte mach mal eine Pause.;nein
+KLICK_LEGENDE;Klick-Legende;1 Million Treffer. Man erzählt sich Geschichten über dich.;nein
+TASCHENGELD;Taschengeld;1.000 Wumms insgesamt erzeugt.;nein
+SPARSCHWEIN;Sparschwein;100.000 Wumms insgesamt erzeugt.;nein
+WUMMS_MILLIONAER;Wumms-Millionär;1 Million Wumms insgesamt erzeugt.;nein
+WUMMS_MILLIARDAER;Wumms-Milliardär;1 Milliarde Wumms insgesamt erzeugt.;nein
+WUMMS_BILLIONAER;Wumms-Billionär;1 Billion Wumms insgesamt erzeugt.;nein
+WUMMS_BILLIARDAER;Wumms-Billiardär;1 Billiarde Wumms. Die Zahl hat jetzt ein e.;nein
+LAEUFT_VON_ALLEIN;Läuft von allein;1 Wumms pro Sekunde.;nein
+FLIESSBANDARBEIT;Fließbandarbeit;100 Wumms pro Sekunde.;nein
+INDUSTRIELLE_REVOLUTION;Industrielle Revolution;10.000 Wumms pro Sekunde.;nein
+OHRFEIGEN_KONZERN;Ohrfeigen-Konzern;1 Million Wumms pro Sekunde.;nein
+GALAKTISCH;Galaktisch;1 Milliarde Wumms pro Sekunde.;nein
+FAUST_CLUB;Faust-Club;100 Fäuste. Die erste Regel: Wir reden nicht drüber.;nein
+PANTOFFEL_ARMEE;Pantoffel-Armee;100 Pantoffel. Oma ist stolz.;nein
+QUIETSCH_ORCHESTER;Quietsch-Orchester;50 Gummihämmer in perfekter Harmonie.;nein
+SAHNESCHNITTE;Sahneschnitte;50 Tortenwurf-Kanonen. Der Konditor weint vor Glück.;nein
+ROBO_LIGA;Robo-Liga;25 Boxroboter. Keiner von ihnen lacht.;nein
+MOND_MANAGER;Mond-Manager;Dein erstes Mond-Katapult.;nein
+ZEITREISENDER;Zeitreisender;Deine erste Zeitreise-Backpfeife. Du hattest sie schon gestern.;nein
+MULTIVERSAL;Multiversal;Die Universelle Backpfeife gehört dir.;nein
+WERKSTATT;Werkstatt;10 Geräte insgesamt.;nein
+FABRIKHALLE;Fabrikhalle;100 Geräte insgesamt.;nein
+IMPERIUM;Imperium der Watschen;500 Geräte insgesamt.;nein
+KOMPLETTSET;Komplettset;Von jedem Gerät mindestens eins.;nein
+AUFGERUESTET;Aufgerüstet;Dein erstes Upgrade.;nein
+SHOPPING_QUEEN;Shopping-Queen;10 Upgrades gekauft.;nein
+ALLES_GEKAUFT;Alles gekauft?;40 Upgrades gekauft. Fast.;nein
+VOLLTREFFER;Volltreffer;Dein erster kritischer Treffer.;nein
+PRAEZISIONSARBEIT;Präzisionsarbeit;100 kritische Treffer.;nein
+GLUCKSPILZ;Glückspilz;Deinen ersten Goldenen Schuh gefangen.;nein
+SCHUH_SAMMLER;Schuh-Sammler;10 Goldene Schuhe gefangen.;nein
+GOLDENER_FINGER;Goldener Finger;50 Goldene Schuhe gefangen.;nein
+PANTOFFELHELD;Pantoffelheld;10 Silberne Pantoffel gefangen.;nein
+RASEREI_REITER;Raserei-Reiter;5 Mal Raserei ausgelöst.;nein
+PECHVOGEL;Pechvogel;Ein Pech-Schuh. Immerhin gab es Beulen-Marken.;nein
+FOTOGRAF;Fotograf;Dein erstes eigenes Bild importiert.;nein
+SAMMLER;Sammler;10 eigene Bilder importiert.;nein
+EINE_STUNDE;Eine Stunde Backpfeife;Eine Stunde Spielzeit.;nein
+EIN_TAG;Ein Tag Backpfeife;24 Stunden Spielzeit.;nein
+EIN_JAHR;Ein Jahr Backpfeife;Ein Jahr Spielzeit. Wir sind sprachlos.;nein
+NACHTSCHICHT;Nachtschicht;Zwischen 2 und 4 Uhr nachts gespielt.;ja
+PAZIFIST;Pazifist;10 Minuten lang nichts gehauen. Respekt.;ja
+WIEDER_ZUHAUSE;Wieder zuhause;Nach über 24 Stunden zurückgekehrt.;ja
+FRISCH_GEDUSCHT;Frisch geduscht;Das Opfer einmal abgeduscht.;ja
+AUSVERKAUF;Ausverkauf;Ein Gerät verkauft. Warum auch immer.;ja
+BOMBASTUS_FAN;Bombastus-Stammkunde;1.000 Treffer auf Generalissimo Bombastus.;ja
+NEUANFANG;Neuanfang;Zum ersten Mal neu angefangen. Bombastus hatte gerade die Beulen auskuriert.;nein
+WIEDERGEBURT;Wiedergeburt;5 Mal neu angefangen.;nein
+LORBEERKRANZ;Lorbeerkranz;10 Lorbeeren gesammelt.;nein
+ERSTER_ZWEIG;Erster Zweig;Den ersten Teil des Lorbeer-Baums freigeschaltet.;nein
+GAERTNER;Gärtner;10 Teile des Lorbeer-Baums freigeschaltet.;nein
+COMBO_KOENIG;Combo-König;Combo 100 erreicht. Deine Finger sind ein Schatten.;nein
+WUTBUERGER;Wutbürger;Zum ersten Mal den Wutmodus entfesselt.;nein
+WUTENTBRANNT;Wutentbrannt;25 Mal den Wutmodus entfesselt.;nein
+GUT_VERBEULT;Gut verbeult;Beulen-Level 5 bei einem Opfer.;nein
+VOLL_VERBEULT;Voll verbeult;Beulen-Level 10 bei einem Opfer. Mehr Beulen passen nicht drauf.;nein
+GALERIST;Galerist;Ein Bild in der Galerie umbenannt.;ja
+BOSSBEZWINGER;Bossbezwinger;Den ersten Boss-Kampf gewonnen.;nein
+BOSS_EXPERTE;Endgegner-Experte;5 Boss-Kämpfe gewonnen.;nein
+AUFTRAGNEHMER;Auftragnehmer;Den ersten Tagesauftrag erledigt.;nein
+FLEISSIG;Fleißiges Bienchen;25 Tagesaufträge erledigt.;nein
+TREUE_SEELE;Treue Seele;7 Tage in Folge vorbeigeschaut.;nein
+DOJO_MEISTER;Dojo-Meister;40 Punkte im Reaktions-Dojo.;nein
+TORTENKOENIG;Tortenkönig;60 Punkte in der Tortenwurf-Schießbude.;nein
+SAISONARBEITER;Saisonarbeiter;Ein Saison-Event abgeschlossen.;nein
+ERINNERUNGSFOTO;Erinnerungsfoto;Ein Foto gespeichert. Für die Enkel.;ja
