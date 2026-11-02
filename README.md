@@ -23,7 +23,18 @@ Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 | Strg+V | Bild aus der Zwischenablage als neues Opfer |
 | Bild ins Fenster ziehen | Neues Opfer |
 
-## Stand: Phase 6 (Englisch)
+## Stand: Phase 7 (Präsentation)
+
+**Phase 7**
+- **Schrift Poppins** fest eingebaut (OFL); eine eigene Comic-Schrift für Überschriften als `assets/fonts/heading.ttf` ablegen
+- **Musik:** Ragtime-Schleife, die mit dem Fortschritt um Instrumente wächst (Schlagzeug → Bass → Klavier → Klarinette → Bläser) und im Wutmodus schneller wird
+- **Lautstärke** getrennt für Musik, Effekte und Publikum (Menü → Lautstärke), Applaus bei Erfolgen und großen Momenten, mehr Treffer-Varianten
+- **Echte Sounds und Musik** einfach als Dateien ablegen: `assets/audio/sfx/punch_1.ogg` …, `assets/audio/music/loop.ogg`
+- **Animierte Geräte-Reihe** unter dem Bild mit Meilenstein-Rahmen (1, 5, 25, 50, 100, 150, 200 Stück: Holz bis Regenbogen) und Sternchen im Shop
+- **Ausschnitt wählen** beim Bild-Import: verschieben, zoomen, Original/Quadrat/Rund
+- **Steam:** Bestenlisten (Mini-Spiele, Lorbeeren), Rich Presence, 152 Erfolgsbilder in `steam/achievements/`
+
+## Phase 6 (Englisch)
 
 Das Spiel ist **zweisprachig: Deutsch und Englisch** (Menü → „Sprache / Language“; Standard ist die Systemsprache). Zahlen werden passend formatiert (1.234 / 1,23 Mio. bzw. 1,234 / 1.23 M).
 

@@ -5,7 +5,8 @@
 		"base_cost": 15,
 		"base_wps": 0.1,
 		"color": "#ffa94d",
-		"description": "Der Klassiker. Haut einfach mal drauf."
+		"description": "Der Klassiker. Haut einfach mal drauf.",
+		"icon": "res://assets/devices/faust.svg"
 	},
 	{
 		"id": "pantoffel",
@@ -13,7 +14,8 @@
 		"base_cost": 100,
 		"base_wps": 1,
 		"color": "#f783ac",
-		"description": "Oma-Schlappen mit viel Schwung."
+		"description": "Oma-Schlappen mit viel Schwung.",
+		"icon": "res://assets/devices/pantoffel.svg"
 	},
 	{
 		"id": "gummihammer",
@@ -21,7 +23,8 @@
 		"base_cost": 1100,
 		"base_wps": 8,
 		"color": "#69db7c",
-		"description": "Quietscht bei jedem Treffer."
+		"description": "Quietscht bei jedem Treffer.",
+		"icon": "res://assets/devices/gummihammer.svg"
 	},
 	{
 		"id": "katapult",
@@ -29,7 +32,8 @@
 		"base_cost": 12000,
 		"base_wps": 47,
 		"color": "#4dabf7",
-		"description": "Feder, Hebel, Handschuh."
+		"description": "Feder, Hebel, Handschuh.",
+		"icon": "res://assets/devices/katapult.svg"
 	},
 	{
 		"id": "tortenkanone",
@@ -37,7 +41,8 @@
 		"base_cost": 130000,
 		"base_wps": 260,
 		"color": "#da77f2",
-		"description": "Sahne in Überschallgeschwindigkeit."
+		"description": "Sahne in Überschallgeschwindigkeit.",
+		"icon": "res://assets/devices/tortenkanone.svg"
 	},
 	{
 		"id": "abrissbirne",
@@ -45,7 +50,8 @@
 		"base_cost": 1400000,
 		"base_wps": 1400,
 		"color": "#ff8787",
-		"description": "Groß, weich, beeindruckend."
+		"description": "Groß, weich, beeindruckend.",
+		"icon": "res://assets/devices/abrissbirne.svg"
 	},
 	{
 		"id": "fliessband",
@@ -53,7 +59,8 @@
 		"base_cost": 20000000,
 		"base_wps": 7800,
 		"color": "#ffd43b",
-		"description": "400 mechanische Hände im Takt."
+		"description": "400 mechanische Hände im Takt.",
+		"icon": "res://assets/devices/fliessband.svg"
 	},
 	{
 		"id": "amboss",
@@ -61,7 +68,8 @@
 		"base_cost": 330000000,
 		"base_wps": 44000,
 		"color": "#adb5bd",
-		"description": "Ein Klassiker aus dem Zeichentrick, jetzt in Serie."
+		"description": "Ein Klassiker aus dem Zeichentrick, jetzt in Serie.",
+		"icon": "res://assets/devices/amboss.svg"
 	},
 	{
 		"id": "boxroboter",
@@ -69,7 +77,8 @@
 		"base_cost": 5100000000,
 		"base_wps": 260000,
 		"color": "#74c0fc",
-		"description": "Gelenkig, humorlos, effektiv."
+		"description": "Gelenkig, humorlos, effektiv.",
+		"icon": "res://assets/devices/boxroboter.svg"
 	},
 	{
 		"id": "mondkatapult",
@@ -77,7 +86,8 @@
 		"base_cost": 75000000000,
 		"base_wps": 1600000,
 		"color": "#e5dbff",
-		"description": "Der Mond holt aus."
+		"description": "Der Mond holt aus.",
+		"icon": "res://assets/devices/mondkatapult.svg"
 	},
 	{
 		"id": "zeitreise",
@@ -85,7 +95,8 @@
 		"base_cost": 1000000000000,
 		"base_wps": 10000000,
 		"color": "#63e6be",
-		"description": "Haut gestern, heute und morgen gleichzeitig."
+		"description": "Haut gestern, heute und morgen gleichzeitig.",
+		"icon": "res://assets/devices/zeitreise.svg"
 	},
 	{
 		"id": "universell",
@@ -93,6 +104,7 @@
 		"base_cost": 14000000000000,
 		"base_wps": 65000000,
 		"color": "#9775fa",
-		"description": "Eine Ohrfeige, die durch das Multiversum hallt."
+		"description": "Eine Ohrfeige, die durch das Multiversum hallt.",
+		"icon": "res://assets/devices/universell.svg"
 	}
 ]

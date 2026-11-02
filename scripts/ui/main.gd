@@ -31,6 +31,7 @@ const MENU_IMPORT := 2
 const MENU_RESET := 3
 const MENU_PHOTO := 4
 const MENU_LANGUAGE := 5
+const MENU_VOLUME := 6
 const MENU_SOUND := 10
 const MENU_EFFECTS := 11
 const MENU_TIME_WARP := 12
@@ -95,7 +96,7 @@ func _ready() -> void:
 
 	target_area.hit.connect(_on_target_hit)
 	GameState.target_changed.connect(_on_target_changed)
-	GameState.device_bought.connect(func(_id: String, _n: int) -> void: Sfx.play("buy", 0.05, -6.0))
+	GameState.device_bought.connect(_on_device_bought)
 	GameState.upgrade_bought.connect(func(_id: String) -> void: Sfx.play("buy", 0.0, -4.0))
 	GameState.achievement_unlocked.connect(_on_achievement_unlocked)
 	GameState.shoe_spawned.connect(_spawn_shoe)
@@ -180,10 +181,7 @@ func _modal_open() -> bool:
 func _build_theme() -> Theme:
 	var t := Theme.new()
 	t.default_font_size = 17
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["Nunito", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"])
-	font.font_weight = 600
-	t.default_font = font
+	t.default_font = load("res://assets/fonts/Poppins-Medium.ttf")
 
 	for type in ["Label", "Button", "CheckButton", "MenuButton", "TooltipLabel", "PopupMenu", "LineEdit"]:
 		t.set_color("font_color", type, INK)
@@ -210,6 +208,9 @@ func _build_theme() -> Theme:
 	t.set_stylebox("background", "ProgressBar", _box(Color("eee3d0"), 6, 2, 0))
 	t.set_stylebox("fill", "ProgressBar", _box(Color("69db7c"), 6, 2, 0))
 	t.set_color("font_color", "ProgressBar", INK)
+	t.set_stylebox("slider", "HSlider", _box(Color("eee3d0"), 6, 2, 3))
+	t.set_stylebox("grabber_area", "HSlider", _box(Color("ffd43b"), 6, 2, 3))
+	t.set_stylebox("grabber_area_highlight", "HSlider", _box(Color("ffe066"), 6, 2, 3))
 	var sep := StyleBoxLine.new()
 	sep.color = Color(INK, 0.25)
 	sep.thickness = 2
@@ -243,7 +244,16 @@ func _style_labels() -> void:
 	%HelpLabel.text = tr("Klick oder Leertaste: hauen\nR: Wutmodus entfesseln\n1–9: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer\nGoldene Schuhe anklicken!")
 
 
+## Überschriften-Schrift: assets/fonts/heading.ttf/.otf, falls vorhanden (z. B. eine Comic-Schrift), sonst Poppins Bold.
+static func heading_font() -> Font:
+	for path in ["res://assets/fonts/heading.ttf", "res://assets/fonts/heading.otf"]:
+		if ResourceLoader.exists(path):
+			return load(path)
+	return load("res://assets/fonts/Poppins-Bold.ttf")
+
+
 func _comic(label: Label, font_size: int, color: Color) -> void:
+	label.add_theme_font_override("font", heading_font())
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", INK)
@@ -342,6 +352,7 @@ func _fill_menu() -> void:
 	popup.clear()
 	popup.add_check_item(tr("Ton"), MENU_SOUND)
 	popup.set_item_checked(popup.get_item_index(MENU_SOUND), GameState.sound_on)
+	popup.add_item(tr("Lautstärke …"), MENU_VOLUME)
 	popup.add_check_item(tr("Weniger Effekte"), MENU_EFFECTS)
 	popup.set_item_checked(popup.get_item_index(MENU_EFFECTS), GameState.reduced_effects)
 	if GameState.time_warp_unlocked():
@@ -548,7 +559,8 @@ func _refresh_devices() -> void:
 		var shown_amount := maxi(amount, 1)
 		var cost := GameState.device_cost(id, shown_amount)
 		var unit_wps := GameState.device_unit_wps(id)
-		row.info.text = tr("Besitz: %s · je %s WPS") % [Num.whole(owned), Num.fmt(unit_wps)]
+		var stars := "★".repeat(maxi(0, Balance.milestone_tier(owned) - 1))
+		row.info.text = tr("Besitz: %s · je %s WPS") % [Num.whole(owned), Num.fmt(unit_wps)] + ("  " + stars if stars != "" else "")
 		var label := tr("Kaufen") if _buy_mode == 1 else "×%s" % Num.whole(shown_amount)
 		row.buy.text = "%s\n%s" % [label, Num.whole(cost)]
 		row.buy.disabled = amount <= 0 or GameState.wumms < cost
@@ -670,6 +682,20 @@ func _on_target_changed() -> void:
 	_refresh()
 
 
+# i18n
+const MILESTONE_NAMES: Array[String] = ["", "", "Bronze", "Silber", "Gold", "Platin", "Rubin", "Regenbogen"]
+
+
+func _on_device_bought(id: String, amount: int) -> void:
+	Sfx.play("buy", 0.05, -6.0)
+	var count := GameState.device_count(id)
+	var tier := Balance.milestone_tier(count)
+	if tier >= 2 and tier > Balance.milestone_tier(count - amount):
+		var d := GameState.device_def(id)
+		show_toast(tr("%s: %d Stück – %s-Rahmen!") % [d.name, Balance.MILESTONES[tier - 1], tr(MILESTONE_NAMES[tier])])
+		Sfx.play("achievement", 0.05, -8.0)
+
+
 func _apply_cosmetics() -> void:
 	(%Background as GameBackground).refresh()
 	target_area.refresh_cursor()
@@ -708,10 +734,26 @@ func _on_bump_level_up(target: String, level: int) -> void:
 
 
 func _on_file_selected(path: String) -> void:
-	if GameState.import_image_file(path):
-		show_toast(tr("Neues Opfer: %s") % GameState.target_name())
-	else:
+	var img := Image.load_from_file(path)
+	if img == null or img.is_empty():
 		show_toast(tr("Dieses Bild konnte nicht geladen werden."))
+		return
+	_open_crop(img, path.get_file().get_basename())
+
+
+## Vor dem Import: Ausschnitt wählen (oder das ganze Bild übernehmen).
+func _open_crop(img: Image, display_name: String) -> void:
+	var editor := CropEditor.new()
+	editor.setup(img)
+	var m := Modal.open(self, tr("Ausschnitt wählen"), editor, [tr("Übernehmen"), tr("Ganzes Bild"), tr("Abbrechen")], 520.0)
+	m.closed.connect(func(index: int) -> void:
+		var chosen: Image = editor.result() if index == 0 else (img if index == 1 else null)
+		if chosen == null:
+			return
+		if GameState.import_image(chosen, display_name):
+			show_toast(tr("Neues Opfer: %s") % GameState.target_name())
+		else:
+			show_toast(tr("Dieses Bild konnte nicht geladen werden.")))
 
 
 func _on_files_dropped(files: PackedStringArray) -> void:
@@ -724,8 +766,7 @@ func _paste_image() -> void:
 	if not DisplayServer.clipboard_has_image():
 		show_toast(tr("In der Zwischenablage ist kein Bild."))
 		return
-	if GameState.import_image(DisplayServer.clipboard_get_image(), tr("Aus der Zwischenablage")):
-		show_toast(tr("Neues Opfer aus der Zwischenablage!"))
+	_open_crop(DisplayServer.clipboard_get_image(), tr("Aus der Zwischenablage"))
 
 
 # =====================================================================
@@ -762,6 +803,7 @@ func _on_shoe_claimed(kind: String, shoe: Shoe) -> void:
 func _on_achievement_unlocked(id: String) -> void:
 	var a := GameState.achievement_def(id)
 	Sfx.play("achievement", 0.0, -4.0)
+	Sfx.applause(false)
 	while achievement_toasts.get_child_count() >= MAX_ACHIEVEMENT_TOASTS:
 		var oldest := achievement_toasts.get_child(0)
 		achievement_toasts.remove_child(oldest)
@@ -862,6 +904,9 @@ func _on_menu(id: int) -> void:
 	match id:
 		MENU_SOUND:
 			GameState.sound_on = not GameState.sound_on
+			Sfx.apply_volumes()
+		MENU_VOLUME:
+			_show_volume()
 		MENU_EFFECTS:
 			GameState.reduced_effects = not GameState.reduced_effects
 		MENU_TIME_WARP:
@@ -965,6 +1010,7 @@ func _show_prestige() -> void:
 
 func _on_prestiged(gain: int) -> void:
 	target_area.effects.clear()
+	Sfx.applause(true)
 	for shoe in shoe_layer.get_children():
 		shoe.queue_free()
 	Sfx.play("prestige", 0.0, -2.0)
@@ -1226,6 +1272,7 @@ func _on_boss_finished(won: bool, reward: Dictionary) -> void:
 	boss.stop()
 	if won:
 		Sfx.play("prestige", 0.0, -2.0)
+		Sfx.applause(true)
 		if not GameState.reduced_effects:
 			Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
 		Modal.open(self, tr("Boss besiegt!"), tr("Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Beulen-Marken") % [
@@ -1343,6 +1390,7 @@ func _section_title(text: String) -> Label:
 
 func _on_event_completed(event: Dictionary) -> void:
 	Sfx.play("prestige", 0.0, -2.0)
+	Sfx.applause(true)
 	if not GameState.reduced_effects:
 		Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
 	_ticker_override = ""
@@ -1538,6 +1586,7 @@ func _on_challenge_changed() -> void:
 			if done.has(c.id) and not _celebrated_challenges.has(c.id):
 				_celebrated_challenges[c.id] = true
 				Sfx.play("prestige", 0.0, -2.0)
+				Sfx.applause(true)
 				if not GameState.reduced_effects:
 					Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
 				Modal.open(self, tr("Herausforderung gemeistert!"), tr("„%s“ geschafft!\n%s – ab sofort dauerhaft.") % [
@@ -1553,3 +1602,38 @@ func _update_slow_motion() -> void:
 		if b.id == "zeitlupe":
 			slow = true
 	Engine.time_scale = GameState.SLOW_MOTION_SCALE if slow and not GameState.reduced_effects else 1.0
+
+
+# =====================================================================
+# Lautstärke
+# =====================================================================
+
+func _show_volume() -> void:
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 12)
+	for entry in [["music_volume", tr("Musik")], ["sfx_volume", tr("Effekte")], ["ambient_volume", tr("Publikum")]]:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		var label := Label.new()
+		label.text = entry[1]
+		label.custom_minimum_size = Vector2(120, 0)
+		row.add_child(label)
+		var slider := HSlider.new()
+		slider.min_value = 0.0
+		slider.max_value = 1.0
+		slider.step = 0.05
+		slider.value = GameState.get(entry[0])
+		slider.custom_minimum_size = Vector2(320, 24)
+		slider.focus_mode = Control.FOCUS_NONE
+		var key: String = entry[0]
+		slider.value_changed.connect(func(v: float) -> void:
+			GameState.set(key, v)
+			Sfx.apply_volumes()
+			if key == "sfx_volume":
+				Sfx.play_hit(false)
+			elif key == "ambient_volume":
+				Sfx.applause(false))
+		row.add_child(slider)
+		content.add_child(row)
+	Modal.open(self, tr("Lautstärke"), content, [tr("Fertig")], 520.0).closed.connect(func(_i: int) -> void:
+		GameState.save_game())

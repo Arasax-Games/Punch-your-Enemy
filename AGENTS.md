@@ -9,7 +9,7 @@ Diese Datei gilt für **alle** Agenten, die an diesem Repo arbeiten. `CLAUDE.md`
 - Ziel: **Desktop-Spiel für Steam** (Windows, macOS, Linux). **Kein Browserspiel.**
 - Engine: **Godot 4.7**, Sprache **GDScript**, Renderer *GL Compatibility*.
 - Vollständiges Design: [`docs/konzept.md`](docs/konzept.md). Bei Widersprüchen gilt das Konzept, außer diese Datei sagt etwas anderes.
-- Aktueller Stand: **Phasen 1–6** sind umgesetzt (MVP, Clicker-Kern, Tiefe, Steam & Langzeit, Inhalt & Feinschliff, Englisch). Das Spiel ist zweisprachig: Deutsch (Quellsprache) und Englisch. Offene Punkte stehen unten; Steam-Veröffentlichung: [`docs/steam.md`](docs/steam.md).
+- Aktueller Stand: **Phasen 1–7** sind umgesetzt (MVP, Clicker-Kern, Tiefe, Steam & Langzeit, Inhalt & Feinschliff, Englisch, Präsentation: Schrift, Musik, Geräte-Reihe, Zuschneiden, Steam-Extras). Das Spiel ist zweisprachig: Deutsch (Quellsprache) und Englisch. Offene Punkte stehen unten; Steam-Veröffentlichung: [`docs/steam.md`](docs/steam.md).
 
 ## Ton und Inhalt (wichtig)
 
@@ -32,15 +32,19 @@ scripts/ui/            main.gd (UI-Logik), target_area.gd (Zielbild, Treffer, Cu
                        shoe.gd (Goldener Schuh/Silberner Pantoffel), modal.gd (Dialoge im Spielstil),
                        background.gd (Hintergründe Standard/Zirkus/Weltraum), boss_fight.gd (Boss-Overlay
                        mit Schwachstelle und Gimmicks), minigame.gd (Reaktions-Dojo, Tortenwurf-Schießbude),
-                       market_panel.gd (Börse für Beulen)
+                       market_panel.gd (Börse für Beulen), device_strip.gd (animierte Geräte-Reihe mit
+                       Meilenstein-Rahmen), crop_editor.gd (Ausschnitt beim Bild-Import)
 scripts/effects/       hit_effects.gd (Spritzer, Beulen, Pflaster, Sterne, Popups), confetti.gd,
                        bump_overlay.gd (dauerhafte Beulen-Level-Optik)
-scripts/audio/         sfx.gd (Autoload Sfx, prozedurale Sounds)
+scripts/audio/         sfx.gd (Autoload Sfx: prozedurale Effekte, Audio-Busse Music/SFX/Ambient, Applaus),
+                       music.gd (Autoload Music: Ragtime-Schleife in Schichten, im Wutmodus schneller)
 data/                  devices.json, upgrades.json, achievements.json, laurels.json (Lorbeer-Baum),
                        figures.json (Figuren inkl. Event-Figuren, Mimik-Stufen, Anker-Punkte),
                        bosses.json, quests.json (Tagesaufträge), events.json (Saison-Events),
                        cosmetics.json (Faust-Skins, Hintergründe, Sounds), challenges.json, market.json
-assets/                SVG-Grafiken (Figuren inkl. 3 Mimik-Stufen, Cursor inkl. goldene Faust, Events)
+assets/                SVG-Grafiken (Figuren inkl. 3 Mimik-Stufen, Cursor/Faust-Skins, Events, devices/ = Geräte-
+                       Symbole), fonts/ (Poppins, OFL; optional heading.ttf), audio/ (optional echte Dateien)
+steam/                 Nur für Steamworks, nicht im Spiel (.gdignore): achievements/ = Erfolgsbilder 64×64
 tests/run_tests.gd     Headless-Tests
 tests/simulate.gd      Balancing-Simulation: 24 h (ca. 1 min), mit `-- --days 7` eine Woche mit
                        Neuanfängen (ca. 4 min), mit `-- --challenge <id>` eine Herausforderung
@@ -71,6 +75,10 @@ godot --headless --path . --script res://tools/steam_achievements.gd
 python3 tools/i18n.py
 python3 tools/i18n.py --check      # muss vor jedem Commit ohne Fehler durchlaufen
 
+# Steam-Dateien neu erzeugen (Erfolgsbilder brauchen rsvg-convert + Pillow)
+python3 tools/achievement_icons.py
+godot --headless --path . --script res://tools/steam_rich_presence.gd
+
 # Spiel kurz headless starten, um Skriptfehler zu finden
 godot --headless --path . --quit-after 180
 
@@ -97,6 +105,9 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/Punch
 - Börse: Preise = Sekunden Produktion × höchste WPS dieses Durchlaufs × Kursfaktor (0,3–3, Schritt jede Minute). Beim Neuanfang schließt die Börse (Bestand weg).
 - Zeitlupe: `Engine.time_scale` wird in der Oberfläche gesetzt; `GameState._process` rechnet mit Echtzeit (`delta / Engine.time_scale`), damit Produktion und Timer nicht langsamer werden.
 - **Übersetzung:** Jeder Anzeigetext im Code steht in `tr("…")` (in statischen Funktionen `TranslationServer.translate("…")`). Texte in Konstanten bekommen darüber einen Kommentar `# i18n` und werden bei der Anzeige mit `tr()` übersetzt. Datenfelder `name`, `description`, `text`, `intro` übersetzt `GameState._localize_data()` beim Laden; Pokalnamen erst bei der Anzeige (sie stehen im Spielstand). Mehrzahl nie mit angehängten Endungen bauen (`"Lorbeer%s"`), sondern ganze Sätze übersetzen (Beispiel: `laurels_text()` in `main.gd`). Zahlen immer über `Num` – das Format hängt von der Sprache ab. Ersatzsprache ist Deutsch (`locale/fallback="de"`), sonst sähen deutsche Spieler Englisch. Sprachwechsel lädt die Hauptszene neu.
+- **Audio:** Effekte immer über `Sfx.play()`, Publikum über `Sfx.applause()`. Busse `Music`, `SFX`, `Ambient` (Lautstärke in `GameState.music_volume` usw., angewendet mit `Sfx.apply_volumes()`). Echte Aufnahmen ersetzen die Platzhalter ohne Code-Änderung: `assets/audio/sfx/<sound>[_n].ogg|wav` und `assets/audio/music/loop.ogg`. Musik wird nur außerhalb von `headless` erzeugt.
+- **Schrift:** Text Poppins Medium, Überschriften `main.gd.heading_font()` (Poppins Bold oder `assets/fonts/heading.ttf`).
+- Neue Geräte brauchen ein Symbol `assets/devices/<id>.svg` (in `devices.json` als `icon`).
 - Steam: Nur über `SteamService` (keine direkten `Steam`-Aufrufe anderswo). Steam-API-Name eines Erfolgs = ID in Großbuchstaben. Importierte Bilder und Fotos dürfen **nie** in die Steam Cloud.
 - Klassen, die Autoloads (`GameState`, `Sfx`) benutzen, nicht direkt aus `--script`-Testskripten referenzieren, sondern zur Laufzeit mit `load()` holen (die Autoloads existieren beim Kompilieren des Testskripts noch nicht).
 - **Formeln** gehören in `balance.gd` (reine, testbare Funktionen). Jede neue Formel bekommt einen Test in `tests/run_tests.gd`.
@@ -117,9 +128,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/Punch
 
 ## Offene Punkte / To-dos
 
-- Eigene Comic-Schrift (OFL-Lizenz, z. B. „Bangers“ für Überschriften, „Nunito“ für Text) in `assets/fonts/` einbinden; aktuell wird eine Systemschrift genutzt.
-- Echte Soundeffekte und Musik statt der prozeduralen Platzhalter in `sfx.gd`.
+- Eine echte Comic-Schrift als `assets/fonts/heading.ttf` (z. B. Bangers, OFL) – konnte in der Entwicklungsumgebung nicht heruntergeladen werden.
+- Echte Soundeffekte und eingespielte Musik (z. B. CC0 von Kenney.nl) in `assets/audio/` ablegen.
 - Weitere Sprachen: `LANGS` in `tools/i18n.py` und `GameState.LANGUAGES` ergänzen, `locale/<sprache>.po` übersetzen, in `project.godot` eintragen.
-- Animierte Geräte-Reihen unter dem Bild, Geräte-Meilenstein-Optik (1, 5, 25, …), Musik.
-- Ausschnitt-Editor beim Bild-Import (Zuschneiden, Rund-Maske, Zoom).
-- Steam-Bestenlisten (nur nicht-bildbezogene Werte, z. B. Mini-Spiel-Rekorde), Rich Presence, Erfolgs-Bilder für Steam (64×64).
+- Steam: Bestenlisten `DOJO_BEST`, `PIE_BEST`, `LAURELS` in Steamworks anlegen; Rich-Presence-Dateien hochladen (siehe docs/steam.md). Ungetestet ohne echten Steam-Client.

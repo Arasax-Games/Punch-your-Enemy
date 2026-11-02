@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Geräte-Symbol: zeitreise -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+  <circle cx="32" cy="34" r="22" fill="#63e6be"/>
+  <circle cx="32" cy="34" r="16" fill="#ffffff"/>
+  <path d="M32 34 L32 22 M32 34 L41 38" stroke-width="3.5"/>
+  <rect x="26" y="6" width="12" height="6" rx="2" fill="#495057"/>
+  </g>
+</svg>

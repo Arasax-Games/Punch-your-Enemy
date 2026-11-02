@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/ui/background.gd" id="4_background"]
 [ext_resource type="Script" path="res://scripts/effects/bump_overlay.gd" id="5_bumps"]
 [ext_resource type="Script" path="res://scripts/ui/boss_fight.gd" id="6_boss"]
+[ext_resource type="Script" path="res://scripts/ui/device_strip.gd" id="7_strip"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -215,14 +216,26 @@ Strg+V: Bild einfügen
 Bild ins Fenster ziehen: neues Opfer"
 autowrap_mode = 3
 
-[node name="TargetArea" type="Control" parent="Margin/Layout/Columns"]
+[node name="CenterBox" type="VBoxContainer" parent="Margin/Layout/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TargetArea" type="Control" parent="Margin/Layout/Columns/CenterBox"]
 unique_name_in_owner = true
 clip_contents = true
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("2_target")
 
-[node name="TargetImage" type="TextureRect" parent="Margin/Layout/Columns/TargetArea"]
+[node name="DeviceStrip" type="Control" parent="Margin/Layout/Columns/CenterBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("7_strip")
+
+[node name="TargetImage" type="TextureRect" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -237,7 +250,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BumpOverlay" type="Control" parent="Margin/Layout/Columns/TargetArea"]
+[node name="BumpOverlay" type="Control" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -247,7 +260,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_bumps")
 
-[node name="BossFight" type="Control" parent="Margin/Layout/Columns/TargetArea"]
+[node name="BossFight" type="Control" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -258,7 +271,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("6_boss")
 
-[node name="Effects" type="Control" parent="Margin/Layout/Columns/TargetArea"]
+[node name="Effects" type="Control" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

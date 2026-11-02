@@ -122,6 +122,19 @@ static func market_price(seconds: float, wps_scale: float, factor: float) -> flo
 	return ceilf(seconds * maxf(wps_scale, 1.0) * factor)
 
 
+## Geräte-Meilensteine: ab so vielen Stück bekommt ein Gerät eine neue Optik.
+const MILESTONES: Array[int] = [1, 5, 25, 50, 100, 150, 200]
+
+
+## Meilenstein-Stufe (0 = keins, 1 = ab 1 Stück … 7 = ab 200 Stück).
+static func milestone_tier(count: int) -> int:
+	var tier := 0
+	for m in MILESTONES:
+		if count >= m:
+			tier += 1
+	return tier
+
+
 ## Lorbeeren für den Neuanfang: floor(∛(Gesamt-Wumms ÷ 1 Billion)).
 static func laurels_for(total_wumms: float) -> int:
 	if total_wumms <= 0.0:

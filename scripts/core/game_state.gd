@@ -20,6 +20,7 @@ signal quests_changed
 signal event_completed(event: Dictionary)
 signal challenge_changed
 signal cosmetics_changed
+signal minigame_finished(game: String, score: int)
 
 const SAVE_VERSION := 5
 const SAVE_PATH := "user://savegame.json"
@@ -146,6 +147,9 @@ var background: String = "standard"
 var fist_skin: String = "standard"
 var sound_pack: String = "standard"
 var language: String = ""               # "" = Systemsprache, sonst "de" oder "en"
+var music_volume: float = 0.6
+var sfx_volume: float = 0.9
+var ambient_volume: float = 0.8
 
 # --- Laufzeit (wird nicht gespeichert) ---
 var buffs: Array = []       # {id, name, remaining, duration, wps_mult, click_mult}
@@ -1064,6 +1068,24 @@ func buy_cosmetic(id: String) -> bool:
 	return true
 
 
+## Angelegte Kosmetik, die man (nicht mehr) besitzt, auf Standard zurücksetzen.
+func validate_cosmetics() -> void:
+	for slot in ["fist", "background", "sound"]:
+		var current: String = {"fist": fist_skin, "background": background, "sound": sound_pack}[slot]
+		var ok := current == "standard"
+		for c in cosmetic_defs:
+			if c.slot == slot and c.value == current and has_cosmetic(c.id):
+				ok = true
+		if not ok:
+			match slot:
+				"fist":
+					fist_skin = "standard"
+				"background":
+					background = "standard"
+				"sound":
+					sound_pack = "standard"
+
+
 ## Ist dieses Kosmetik-Teil gerade angelegt?
 func cosmetic_equipped(id: String) -> bool:
 	var c := cosmetic_def(id)
@@ -1481,6 +1503,7 @@ func record_minigame(game: String, score: int) -> int:
 		return 0
 	check_new_day()
 	var info: Dictionary = MINIGAMES[game]
+	minigame_finished.emit(game, score)
 	add_stat("minigames_played")
 	add_stat(info.stat, score)
 	var reward := Balance.minigame_reward(score, int(info.points_per_marke))
@@ -1785,7 +1808,8 @@ func to_dict() -> Dictionary:
 func _settings_dict() -> Dictionary:
 	return {"reduced_effects": reduced_effects, "sound_on": sound_on, "autobuy_enabled": autobuy_enabled,
 		"time_warp": time_warp, "background": background, "fist_skin": fist_skin, "sound_pack": sound_pack,
-		"language": language}
+		"language": language, "music_volume": music_volume, "sfx_volume": sfx_volume,
+		"ambient_volume": ambient_volume}
 
 
 func from_dict(data: Dictionary) -> void:
@@ -1862,6 +1886,9 @@ func from_dict(data: Dictionary) -> void:
 	fist_skin = String(settings.get("fist_skin", "standard"))
 	sound_pack = String(settings.get("sound_pack", "standard"))
 	language = String(settings.get("language", language))
+	music_volume = float(settings.get("music_volume", 0.6))
+	sfx_volume = float(settings.get("sfx_volume", 0.9))
+	ambient_volume = float(settings.get("ambient_volume", 0.8))
 	buffs.clear()
 	idle_time = 0.0
 	combo = 0.0
@@ -1979,9 +2006,10 @@ func import_save_code(code: String) -> bool:
 ## Setzt den Spielstand komplett zurück (Bilder bleiben erhalten).
 func reset_progress() -> void:
 	var names := target_names.duplicate()
-	var keep_settings := {"reduced_effects": reduced_effects, "sound_on": sound_on, "language": language}
+	var keep_settings := _settings_dict()
 	from_dict({"version": SAVE_VERSION, "settings": keep_settings})
 	target_names = names
+	validate_cosmetics()
 	reset_shoe_timers()
 	save_game()
 	target_changed.emit()

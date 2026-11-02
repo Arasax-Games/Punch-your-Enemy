@@ -36,6 +36,7 @@ func _build(title: String, content: Variant, buttons: Array, min_width: float) -
 	var title_label := Label.new()
 	title_label.text = title
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.add_theme_font_override("font", load("res://scripts/ui/main.gd").heading_font())
 	title_label.add_theme_font_size_override("font_size", 32)
 	title_label.add_theme_color_override("font_color", Color("ffd43b"))
 	title_label.add_theme_color_override("font_outline_color", INK)
