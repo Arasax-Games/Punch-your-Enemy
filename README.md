@@ -5,6 +5,12 @@ Hau auf Generalissimo Bombastus von Größenwahn – oder auf ein eigenes Bild �
 
 Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 
+## Fertige Spielversionen
+
+Spielbare Versionen für Windows, macOS und Linux (ohne Godot) gibt es im Repo
+**[punch-my-enemy-ausfuehrbar](https://github.com/Arasax-Games/punch-my-enemy-ausfuehrbar)**.
+Neu bauen: `tools/build_release.sh` (braucht Godot 4.7 und die Export-Vorlagen).
+
 ## Spielen und Entwickeln
 
 1. [Godot 4.7](https://godotengine.org/download) herunterladen (Standard-Version, nicht .NET).

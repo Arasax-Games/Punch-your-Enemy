@@ -82,8 +82,10 @@ godot --headless --path . --script res://tools/steam_rich_presence.gd
 # Spiel kurz headless starten, um Skriptfehler zu finden
 godot --headless --path . --quit-after 180
 
-# Export (Export-Templates müssen installiert sein)
-godot --headless --path . --export-release "Windows Desktop" build/windows/PunchYourEnemy.exe
+# Spielbare Versionen für Windows, Linux, macOS bauen und nach build/dist/ packen
+# (Export-Vorlagen müssen installiert sein; prüft vorher Übersetzungen und Tests)
+GODOT=/pfad/zu/godot tools/build_release.sh
+# Ergebnisse landen im Repo Arasax-Games/punch-my-enemy-ausfuehrbar (Ordner downloads/ + README)
 ```
 
 ## Code-Konventionen
@@ -113,6 +115,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/Punch
 - **Formeln** gehören in `balance.gd` (reine, testbare Funktionen). Jede neue Formel bekommt einen Test in `tests/run_tests.gd`.
 - Spiellogik läuft über Zeitdifferenz (`delta`), nie über Frames.
 - Die UI fragt `GameState` regelmäßig ab; Signale nur für strukturelle Änderungen (Kauf, Bildwechsel).
+- Die Versionsnummer steht in `project.godot` (`config/version`) **und** in `export_presets.cfg` (Windows `file_version`/`product_version`, macOS `short_version`/`version`) – bei einem neuen Build alle anpassen. macOS wird nur ad-hoc signiert (keine Apple-Notarisierung); dafür muss `import_etc2_astc` an bleiben.
 - **Spielstand:** JSON in `user://savegame.json` mit `version` (aktuell 5). `user://` ist ein eigener Ordner `PunchYourEnemy` (für Steam Cloud); alte Spielstände aus dem Godot-Standardordner werden beim Start einmalig kopiert. Bei Formatänderungen `SAVE_VERSION` erhöhen und `_migrate()` erweitern. Alte Spielstände dürfen nie kaputtgehen – jede Migration bekommt einen Test.
 - Buffs, Schuh-Timer, `idle_time`, Combo, Wut-Leiste und ein laufender Boss-Kampf sind Laufzeitzustand und werden bewusst nicht gespeichert.
 - Dialoge immer über `Modal.open()`, nicht über Godots `AcceptDialog` (passt sonst nicht zum Stil).
