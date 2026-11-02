@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sir Fiesling der Dritte – fiktiver Schurke aus einem Stummfilm (schwarz-weiß) (genervt) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="640" viewBox="0 0 560 640">
+  <g stroke="#2b2118" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Umhang mit hohem Kragen -->
+    <path d="M30 640 C40 540 120 488 210 480 L350 480 C440 488 520 540 530 640 Z" fill="#212529"/>
+    <path d="M150 500 L120 380 L230 470 Z M410 500 L440 380 L330 470 Z" fill="#495057"/>
+    <path d="M240 480 L280 540 L320 480 Z" fill="#f8f9fa"/>
+    <path d="M272 500 L288 500 L284 530 L276 530 Z" fill="#212529" stroke-width="3"/>
+    <rect x="236" y="440" width="88" height="54" rx="18" fill="#f1f3f5"/>
+    <ellipse cx="136" cy="340" rx="28" ry="40" fill="#f1f3f5"/>
+    <ellipse cx="424" cy="340" rx="28" ry="40" fill="#f1f3f5"/>
+    <ellipse cx="280" cy="340" rx="142" ry="140" fill="#f1f3f5"/>
+    <ellipse cx="224" cy="310" rx="28" ry="25" fill="#ffffff"/>
+    <ellipse cx="336" cy="310" rx="28" ry="25" fill="#ffffff"/>
+    <circle cx="229" cy="314" r="11" fill="#2b2118"/>
+    <circle cx="331" cy="314" r="11" fill="#2b2118"/>
+    <path d="M194 306 Q224 282 254 306 Z" fill="#f1f3f5" stroke-width="5"/>
+    <path d="M306 306 Q336 282 366 306 Z" fill="#f1f3f5" stroke-width="5"/>
+    <path d="M182 252 L264 286" stroke="#212529" stroke-width="16"/>
+    <path d="M378 252 L296 286" stroke="#212529" stroke-width="16"/>
+    <path d="M276 320 L300 372 L272 374 Z" fill="#dee2e6"/>
+    <!-- Langer gezwirbelter Schnurrbart -->
+    <path d="M280 392 C250 380 210 384 180 398 C150 412 120 404 118 380 C116 360 140 356 148 372 C138 374 136 388 150 390 C180 392 230 360 280 380
+             C330 360 380 392 410 390 C424 388 422 374 412 372 C420 356 444 360 442 380 C440 404 410 412 380 398 C350 384 310 380 280 392 Z" fill="#212529"/>
+    <path d="M244 424 Q256 412 268 424 Q280 436 292 424 Q304 412 316 424" fill="none" stroke-width="7"/>
+    <path d="M410 246 C402 262 398 272 406 280 C414 288 426 280 424 268 C422 260 416 254 410 246 Z" fill="#74c0fc" stroke-width="4"/>
+    <g transform="rotate(-4 280 200)">
+    <!-- Hoher schwarzer Zylinder -->
+    <path d="M140 232 C200 214 360 214 420 232 C410 252 150 252 140 232 Z" fill="#212529"/>
+    <rect x="196" y="30" width="168" height="196" rx="8" fill="#212529"/>
+    <rect x="196" y="186" width="168" height="24" fill="#868e96"/>
+    </g>
+  </g>
+</svg>
