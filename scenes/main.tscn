@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scripts/effects/hit_effects.gd" id="3_effects"]
 [ext_resource type="Script" path="res://scripts/ui/background.gd" id="4_background"]
 [ext_resource type="Script" path="res://scripts/effects/bump_overlay.gd" id="5_bumps"]
+[ext_resource type="Script" path="res://scripts/ui/boss_fight.gd" id="6_boss"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -86,6 +87,20 @@ layout_mode = 2
 focus_mode = 0
 tooltip_text = "Alle Erfolge und dein Fortschritt."
 text = "Erfolge"
+
+[node name="QuestsButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Tagesaufträge, Login-Serie, Saison-Event und deine Pokale."
+text = "Aufträge"
+
+[node name="GamesButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Mini-Spiele für Beulen-Marken."
+text = "Spiele"
 
 [node name="LaurelButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
@@ -224,6 +239,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_bumps")
+
+[node name="BossFight" type="Control" parent="Margin/Layout/Columns/TargetArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_boss")
 
 [node name="Effects" type="Control" parent="Margin/Layout/Columns/TargetArea"]
 layout_mode = 1
