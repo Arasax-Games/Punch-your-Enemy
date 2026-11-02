@@ -1,0 +1,24 @@
+[
+	{
+		"id": "halloween",
+		"name": "Halloween-Hexe Hildegard",
+		"figure": "hexe",
+		"start": "10-24",
+		"end": "11-07",
+		"goal_hits": 5000,
+		"reward_marken": 10,
+		"trophy": "Kürbis-Pokal",
+		"intro": "Hexe Hildegard ist zu Besuch und hat ihre Warzen poliert. 5.000 Treffer bis zum Kürbis-Pokal!"
+	},
+	{
+		"id": "weihnachten",
+		"name": "Weihnachtsmuffel Gustav",
+		"figure": "muffel",
+		"start": "12-01",
+		"end": "12-26",
+		"goal_hits": 5000,
+		"reward_marken": 10,
+		"trophy": "Lebkuchen-Orden",
+		"intro": "Gustav hasst Lametta, Lieder und gute Laune. 5.000 Treffer bis zum Lebkuchen-Orden!"
+	}
+]

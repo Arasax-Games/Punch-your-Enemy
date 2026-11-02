@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Weihnachtsmuffel Gustav – fiktive Comicfigur für das Weihnachts-Event -->
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="640" viewBox="0 0 560 640">
+  <g stroke="#2b2118" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Hässlicher Weihnachtspulli -->
+    <path d="M40 640 C50 540 130 490 210 482 L350 482 C430 490 510 540 520 640 Z" fill="#2f9e44"/>
+    <path d="M60 572 L100 548 L140 572 L180 548 L220 572 L260 548 L300 572 L340 548 L380 572 L420 548 L460 572 L500 548" fill="none" stroke="#ffffff" stroke-width="10"/>
+    <path d="M60 572 L100 548 L140 572 L180 548 L220 572 L260 548 L300 572 L340 548 L380 572 L420 548 L460 572 L500 548" fill="none" stroke-width="3"/>
+    <g fill="none" stroke="#ffffff" stroke-width="5">
+      <path d="M140 610 l0 -24 M128 598 l24 0 M131 589 l18 18 M131 607 l18 -18"/>
+      <path d="M420 610 l0 -24 M408 598 l24 0 M411 589 l18 18 M411 607 l18 -18"/>
+    </g>
+    <!-- Hals -->
+    <rect x="236" y="432" width="88" height="56" rx="18" fill="#f4b183"/>
+    <!-- Ohren -->
+    <ellipse cx="136" cy="320" rx="28" ry="40" fill="#f4b183"/>
+    <ellipse cx="424" cy="320" rx="28" ry="40" fill="#f4b183"/>
+    <!-- Kopf -->
+    <ellipse cx="280" cy="330" rx="145" ry="140" fill="#f6c39b"/>
+    <!-- Bartstoppeln -->
+    <g fill="#868e96" stroke="none">
+      <circle cx="220" cy="430" r="3"/><circle cx="240" cy="440" r="3"/><circle cx="262" cy="446" r="3"/>
+      <circle cx="298" cy="446" r="3"/><circle cx="320" cy="440" r="3"/><circle cx="340" cy="430" r="3"/>
+      <circle cx="230" cy="418" r="3"/><circle cx="330" cy="418" r="3"/><circle cx="280" cy="450" r="3"/>
+    </g>
+    <!-- Augen, buschige graue Brauen -->
+    <ellipse cx="224" cy="300" rx="26" ry="20" fill="#ffffff"/>
+    <ellipse cx="336" cy="300" rx="26" ry="20" fill="#ffffff"/>
+    <circle cx="228" cy="304" r="10" fill="#2b2118"/>
+    <circle cx="332" cy="304" r="10" fill="#2b2118"/>
+    <path d="M182 270 L266 290 L262 270 L190 252 Z" fill="#adb5bd"/>
+    <path d="M378 270 L294 290 L298 270 L370 252 Z" fill="#adb5bd"/>
+    <!-- Rote Nase, Schmollmund -->
+    <ellipse cx="280" cy="350" rx="30" ry="26" fill="#ff8787"/>
+    <path d="M236 410 Q280 384 324 410" fill="none" stroke-width="8"/>
+    <!-- Pudelmütze -->
+    <path d="M120 236 C110 120 190 70 280 70 C370 70 450 120 440 236 Z" fill="#e03131"/>
+    <path d="M150 120 L410 120 M134 170 L426 170" fill="none" stroke="#ffffff" stroke-width="12"/>
+    <path d="M150 120 L410 120 M134 170 L426 170" fill="none" stroke-width="3"/>
+    <rect x="110" y="214" width="340" height="46" rx="18" fill="#2f9e44"/>
+    <circle cx="280" cy="58" r="40" fill="#ffffff"/>
+  </g>
+</svg>

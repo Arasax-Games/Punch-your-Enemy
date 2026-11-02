@@ -14,8 +14,12 @@ signal prestiged(gain: int)
 signal rage_changed(active: bool)
 signal bump_level_up(target: String, level: int)
 signal laurel_node_bought(id: String)
+signal boss_started
+signal boss_finished(won: bool, reward: Dictionary)
+signal quests_changed
+signal event_completed(event: Dictionary)
 
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 const SAVE_PATH := "user://savegame.json"
 const BACKUP_PATH := "user://savegame.bak.json"
 const IMAGE_DIR := "user://images"
@@ -31,6 +35,16 @@ const ACHIEVEMENTS_PATH := "res://data/achievements.json"
 const LAURELS_PATH := "res://data/laurels.json"
 const FIGURES_PATH := "res://data/figures.json"
 const CUSTOM_FIGURE := "_custom"
+const BOSSES_PATH := "res://data/bosses.json"
+const QUESTS_PATH := "res://data/quests.json"
+const EVENTS_PATH := "res://data/events.json"
+const QUESTS_PER_DAY := 3
+const DAY_CHECK_INTERVAL := 5.0
+const MAX_STATS: Array[String] = ["max_combo", "best_streak", "dojo_best", "pie_best"]
+const MINIGAMES := {
+	"dojo": {"name": "Reaktions-Dojo", "points_per_marke": 8, "stat": "dojo_best"},
+	"pie": {"name": "Tortenwurf-Schießbude", "points_per_marke": 12, "stat": "pie_best"},
+}
 
 const SHOE_GOLDEN := "golden"
 const SHOE_SILVER := "silver"
@@ -54,6 +68,8 @@ const STAT_KEYS: Array[String] = [
 	"crits", "golden_shoes", "silver_slippers", "frenzies", "bad_luck",
 	"images_imported", "play_time", "showers", "devices_sold", "long_return",
 	"prestiges", "rages", "max_combo", "renames",
+	"bosses_defeated", "quests_done", "best_streak", "dojo_best", "pie_best", "events_done", "screenshots",
+	"devices_bought", "upgrades_bought", "combo_maxed", "minigames_played",
 ]
 
 # --- Daten (aus JSON) ---
@@ -62,6 +78,9 @@ var upgrade_defs: Array[Dictionary] = []
 var achievement_defs: Array[Dictionary] = []
 var laurel_defs: Array[Dictionary] = []
 var figure_defs: Array[Dictionary] = []
+var boss_config: Dictionary = {}
+var quest_defs: Array[Dictionary] = []
+var event_defs: Array[Dictionary] = []
 var _device_by_id: Dictionary = {}
 var _upgrade_by_id: Dictionary = {}
 var _achievement_by_id: Dictionary = {}
@@ -75,6 +94,16 @@ var lifetime_wumms: float = 0.0         # über alle Durchläufe
 var laurels_total: int = 0              # je Lorbeer +1 % WPS und Klick, bleibt beim Ausgeben erhalten
 var laurels_spent: int = 0
 var laurel_nodes: Dictionary = {}       # id -> true
+var next_boss_at: int = 100000          # bei so vielen Treffern insgesamt kommt der nächste Boss
+var trophies: Array = []                # Namen gewonnener Pokale (Bosse, Events)
+var quests_day: String = ""
+var quests: Array = []                  # [{id, amount, reward, start, claimed}]
+var login_streak: int = 0
+var last_login_day: String = ""
+var event_progress: Dictionary = {}     # "halloween-2026" -> Treffer
+var events_done: Dictionary = {}        # "halloween-2026" -> true
+var minigame_day: String = ""
+var minigame_rewards_today: Dictionary = {}  # Spiel -> heute schon ausgezahlte Marken
 var total_hits: int = 0
 var beulen_marken: int = 0
 var devices: Dictionary = {}            # id -> Anzahl
@@ -104,6 +133,14 @@ var combo: float = 0.0
 var rage_meter: float = 0.0
 var rage_time: float = 0.0
 var _autobuy_timer: float = 0.0
+var boss_active: bool = false
+var boss_hp: float = 0.0
+var boss_max_hp: float = 0.0
+var boss_time: float = 0.0
+var boss_gimmick: Dictionary = {}
+var pending_login: Dictionary = {}      # Login-Belohnung für den Willkommens-Dialog
+var _day_timer: float = 0.0
+var _today_override: String = ""        # nur für Tests
 var _autosave_timer: float = 0.0
 ## false in Tests und Simulationen, damit der echte Spielstand nie überschrieben wird.
 var persist: bool = true
@@ -115,9 +152,11 @@ func _ready() -> void:
 	_rng.randomize()
 	load_data()
 	_reset_stats()
+	_migrate_user_dir()
 	if load_game():
 		_apply_offline_since_save()
 	reset_shoe_timers()
+	check_new_day()
 
 
 func _process(delta: float) -> void:
@@ -127,6 +166,10 @@ func _process(delta: float) -> void:
 	if _autosave_timer >= AUTOSAVE_INTERVAL:
 		_autosave_timer = 0.0
 		save_game()
+	_day_timer += delta
+	if _day_timer >= DAY_CHECK_INTERVAL:
+		_day_timer = 0.0
+		check_new_day()
 	_achievement_timer += delta
 	if _achievement_timer >= ACHIEVEMENT_CHECK_INTERVAL:
 		_achievement_timer = 0.0
@@ -173,6 +216,14 @@ func load_data() -> void:
 	_figure_by_id.clear()
 	for f in figure_defs:
 		_figure_by_id[f.id] = f
+	var bosses: Variant = JSON.parse_string(FileAccess.get_file_as_string(BOSSES_PATH))
+	boss_config = bosses if bosses is Dictionary else {}
+	quest_defs.clear()
+	for q in _read_json_array(QUESTS_PATH):
+		quest_defs.append(q)
+	event_defs.clear()
+	for e in _read_json_array(EVENTS_PATH):
+		event_defs.append(e)
 
 
 func _read_json_array(path: String) -> Array:
@@ -215,7 +266,7 @@ func stat(key: String) -> float:
 
 
 func add_stat(key: String, amount: float = 1.0) -> void:
-	if key == "max_combo":
+	if key in MAX_STATS:
 		stats[key] = maxi(int(stats.get(key, 0)), int(amount))
 	elif key == "play_time":
 		stats[key] = stat(key) + amount
@@ -236,6 +287,7 @@ func tick(delta: float) -> void:
 	_update_combo(delta)
 	_update_rage(delta)
 	_update_autobuy(delta)
+	_update_boss(delta)
 
 
 func earn(amount: float) -> void:
@@ -399,8 +451,11 @@ func hit() -> Dictionary:
 	earn(value)
 	total_hits += 1
 	idle_time = 0.0
+	var combo_before := combo
 	combo = minf(COMBO_MAX, combo + COMBO_STEP)
 	add_stat("max_combo", combo)
+	if combo >= COMBO_MAX and combo_before < COMBO_MAX:
+		add_stat("combo_maxed")
 	if not rage_active():
 		rage_meter = minf(RAGE_MAX, rage_meter + 1.0)
 	var level_before := current_bump_level()
@@ -409,6 +464,8 @@ func hit() -> Dictionary:
 	if level_after > level_before:
 		beulen_marken += 1
 		bump_level_up.emit(target_id, level_after)
+	_count_event_hit()
+	_check_boss_start()
 	return {"value": value, "crit": crit}
 
 
@@ -653,6 +710,7 @@ func buy_device(id: String, amount: int) -> bool:
 		return false
 	wumms -= cost
 	devices[id] = device_count(id) + amount
+	add_stat("devices_bought", amount)
 	device_bought.emit(id, amount)
 	return true
 
@@ -730,6 +788,7 @@ func buy_upgrade(id: String) -> bool:
 		return false
 	wumms -= float(u.cost)
 	upgrades[id] = true
+	add_stat("upgrades_bought")
 	upgrade_bought.emit(id)
 	return true
 
@@ -926,6 +985,238 @@ func available_backgrounds() -> Array[String]:
 
 
 # =====================================================================
+# Boss-Kämpfe
+# =====================================================================
+
+func _check_boss_start() -> void:
+	if boss_active or boss_config.is_empty() or total_hits < next_boss_at:
+		return
+	var defeated := int(stat("bosses_defeated"))
+	boss_max_hp = Balance.boss_hp(defeated, float(boss_config.get("base_hp", 100)))
+	boss_hp = boss_max_hp
+	boss_time = float(boss_config.get("time_limit", 30))
+	var gimmicks: Array = boss_config.get("gimmicks", [])
+	boss_gimmick = gimmicks[defeated % gimmicks.size()] if not gimmicks.is_empty() else {}
+	boss_active = true
+	boss_started.emit()
+
+
+## Schaden am Boss. `mult` kommt von der Oberfläche (Schwachstelle ×5).
+func boss_damage(mult: float = 1.0) -> void:
+	if not boss_active:
+		return
+	boss_hp = maxf(0.0, boss_hp - mult * rage_multiplier())
+	if boss_hp <= 0.0:
+		_finish_boss(true)
+
+
+func _update_boss(delta: float) -> void:
+	if not boss_active:
+		return
+	boss_time -= delta
+	if boss_time <= 0.0:
+		_finish_boss(false)
+
+
+func _finish_boss(won: bool) -> void:
+	boss_active = false
+	var reward := {}
+	if won:
+		var defeated := int(stat("bosses_defeated"))
+		var marken := int(boss_config.get("reward_marken_base", 5)) + int(boss_config.get("reward_marken_per_boss", 2)) * defeated
+		var list: Array = boss_config.get("trophies", ["Pokal"])
+		var trophy := String(list[defeated % list.size()])
+		if defeated >= list.size():
+			trophy += " (%d.)" % (defeated / list.size() + 1)
+		beulen_marken += marken
+		trophies.append(trophy)
+		add_stat("bosses_defeated")
+		next_boss_at = total_hits + int(boss_config.get("interval_hits", 100000))
+		reward = {"marken": marken, "trophy": trophy}
+	else:
+		next_boss_at = total_hits + int(boss_config.get("retry_hits", 10000))
+	boss_finished.emit(won, reward)
+
+
+# =====================================================================
+# Tage: Tagesaufträge, Login-Serie, Saison-Events
+# =====================================================================
+
+func today() -> String:
+	return _today_override if _today_override != "" else Time.get_date_string_from_system()
+
+
+static func previous_day(day: String) -> String:
+	var unix := Time.get_unix_time_from_datetime_string(day + "T12:00:00")
+	return Time.get_date_string_from_unix_time(unix - 86400)
+
+
+func check_new_day() -> void:
+	var day := today()
+	if quests_day != day:
+		_generate_quests(day)
+	if last_login_day != day:
+		_process_login(day)
+	if minigame_day != day:
+		minigame_day = day
+		minigame_rewards_today.clear()
+
+
+func _generate_quests(day: String) -> void:
+	quests_day = day
+	quests.clear()
+	if quest_defs.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(day)
+	var pool: Array = quest_defs.duplicate()
+	for i in mini(QUESTS_PER_DAY, pool.size()):
+		var q: Dictionary = pool.pop_at(rng.randi() % pool.size())
+		var tier := rng.randi() % (q.amounts as Array).size()
+		quests.append({"id": q.id, "amount": int(q.amounts[tier]), "reward": int(q.reward) + tier,
+			"start": quest_metric(q.metric), "claimed": false})
+	quests_changed.emit()
+
+
+func quest_def(id: String) -> Dictionary:
+	for q in quest_defs:
+		if q.id == id:
+			return q
+	return {}
+
+
+func quest_metric(metric: String) -> int:
+	return total_hits if metric == "hits" else int(stat(metric))
+
+
+func quest_progress(q: Dictionary) -> int:
+	var d := quest_def(q.id)
+	if d.is_empty():
+		return 0
+	return clampi(quest_metric(d.metric) - int(q.start), 0, int(q.amount))
+
+
+func quest_text(q: Dictionary) -> String:
+	return String(quest_def(q.id).get("text", "%s")) % Num.whole(float(q.amount))
+
+
+func quest_done(q: Dictionary) -> bool:
+	return quest_progress(q) >= int(q.amount)
+
+
+func claimable_quests() -> int:
+	var n := 0
+	for q in quests:
+		if quest_done(q) and not q.claimed:
+			n += 1
+	return n
+
+
+func claim_quest(index: int) -> int:
+	if index < 0 or index >= quests.size():
+		return 0
+	var q: Dictionary = quests[index]
+	if q.claimed or not quest_done(q):
+		return 0
+	q.claimed = true
+	beulen_marken += int(q.reward)
+	add_stat("quests_done")
+	quests_changed.emit()
+	return int(q.reward)
+
+
+func _process_login(day: String) -> void:
+	login_streak = login_streak + 1 if last_login_day == previous_day(day) else 1
+	last_login_day = day
+	add_stat("best_streak", login_streak)
+	var marken := Balance.login_marken(login_streak)
+	var gain := Balance.blessing(base_wps(), wumms, 5.0 * Balance.login_day(login_streak), 0.1,
+		100.0 * Balance.login_day(login_streak))
+	beulen_marken += marken
+	earn(gain)
+	pending_login = {"streak": login_streak, "day": Balance.login_day(login_streak), "marken": marken, "wumms": gain}
+
+
+## Das gerade laufende Saison-Event (oder ein leeres Dictionary).
+func active_event() -> Dictionary:
+	var md := today().substr(5)
+	for e in event_defs:
+		if md >= String(e.start) and md <= String(e.end):
+			return e
+	return {}
+
+
+func event_key(e: Dictionary) -> String:
+	return "%s-%s" % [e.id, today().substr(0, 4)]
+
+
+## Event-Figuren sind während ihres Events verfügbar und bleiben es, sobald man das Event einmal geschafft hat.
+func figure_available(id: String) -> bool:
+	if id == DEFAULT_TARGET:
+		return true
+	for e in event_defs:
+		if e.figure != id:
+			continue
+		if active_event().get("id", "") == e.id:
+			return true
+		for key in events_done:
+			if String(key).begins_with(e.id + "-"):
+				return true
+	return false
+
+
+func event_hits(e: Dictionary) -> int:
+	return int(event_progress.get(event_key(e), 0))
+
+
+func _count_event_hit() -> void:
+	var e := active_event()
+	if e.is_empty() or target_id != e.figure:
+		return
+	var key := event_key(e)
+	event_progress[key] = int(event_progress.get(key, 0)) + 1
+	if not events_done.has(key) and int(event_progress[key]) >= int(e.goal_hits):
+		events_done[key] = true
+		beulen_marken += int(e.reward_marken)
+		trophies.append(String(e.trophy))
+		add_stat("events_done")
+		event_completed.emit(e)
+
+
+# =====================================================================
+# Mini-Spiele
+# =====================================================================
+
+func minigame_unlocked(game: String) -> bool:
+	match game:
+		"dojo":
+			return total_hits >= 5000
+		"pie":
+			return device_count("tortenkanone") > 0 or laurels_total > 0
+	return false
+
+
+func minigame_unlock_text(game: String) -> String:
+	return "Ab 5.000 Treffern" if game == "dojo" else "Ab der ersten Tortenwurf-Kanone"
+
+
+## Wertet ein Mini-Spiel aus. Gibt die heute neu verdienten Beulen-Marken zurück (max. 5 pro Spiel und Tag).
+func record_minigame(game: String, score: int) -> int:
+	if not MINIGAMES.has(game):
+		return 0
+	check_new_day()
+	var info: Dictionary = MINIGAMES[game]
+	add_stat("minigames_played")
+	add_stat(info.stat, score)
+	var reward := Balance.minigame_reward(score, int(info.points_per_marke))
+	var already := int(minigame_rewards_today.get(game, 0))
+	var gain := maxi(0, reward - already)
+	minigame_rewards_today[game] = maxi(already, reward)
+	beulen_marken += gain
+	return gain
+
+
+# =====================================================================
 # Erfolge (Achievements)
 # =====================================================================
 
@@ -994,6 +1285,8 @@ func unlock_achievement(id: String) -> void:
 func target_name() -> String:
 	if target_id == DEFAULT_TARGET:
 		return DEFAULT_TARGET_NAME
+	if is_figure(target_id):
+		return String(figure_def(target_id).name)
 	return String(target_names.get(target_id, "Unbekanntes Opfer"))
 
 
@@ -1018,12 +1311,17 @@ func target_figure() -> Dictionary:
 	return figure_def(target_id if _figure_by_id.has(target_id) else CUSTOM_FIGURE)
 
 
+## Mitgelieferte Figur (Bombastus, Event-Figuren) statt eigenes Bild?
+func is_figure(id: String) -> bool:
+	return id != CUSTOM_FIGURE and _figure_by_id.has(id)
+
+
 func target_texture() -> Texture2D:
-	if target_id == DEFAULT_TARGET:
+	if is_figure(target_id):
 		var moods: Array = target_figure().get("moods", [])
 		if not moods.is_empty():
 			return load(moods[mini(mood_index(current_bump_level()), moods.size() - 1)]) as Texture2D
-	if target_id != DEFAULT_TARGET:
+	if not is_figure(target_id):
 		var img := Image.load_from_file(_image_path(target_id))
 		if img != null and not img.is_empty():
 			return ImageTexture.create_from_image(img)
@@ -1037,7 +1335,10 @@ func use_default_target() -> void:
 
 
 func select_target(id: String) -> void:
-	if id != DEFAULT_TARGET and not FileAccess.file_exists(_image_path(id)):
+	if is_figure(id):
+		if id != DEFAULT_TARGET and not figure_available(id):
+			return
+	elif not FileAccess.file_exists(_image_path(id)):
 		return
 	target_id = id
 	target_changed.emit()
@@ -1047,6 +1348,10 @@ func select_target(id: String) -> void:
 func gallery_entries() -> Array[Dictionary]:
 	var out: Array[Dictionary] = [{"id": DEFAULT_TARGET, "name": DEFAULT_TARGET_NAME,
 		"hits": int(target_hits.get(DEFAULT_TARGET, 0)), "level": bump_level_of(DEFAULT_TARGET), "custom": false}]
+	for f in figure_defs:
+		if f.id != DEFAULT_TARGET and f.id != CUSTOM_FIGURE and figure_available(f.id):
+			out.append({"id": f.id, "name": String(f.name), "hits": int(target_hits.get(f.id, 0)),
+				"level": bump_level_of(f.id), "custom": false})
 	var ids: Array = target_names.keys()
 	ids.sort()
 	ids.reverse()
@@ -1164,6 +1469,16 @@ func to_dict() -> Dictionary:
 		"laurels_total": laurels_total,
 		"laurels_spent": laurels_spent,
 		"laurel_nodes": laurel_nodes.keys(),
+		"next_boss_at": next_boss_at,
+		"trophies": trophies.duplicate(),
+		"quests_day": quests_day,
+		"quests": quests.duplicate(true),
+		"login_streak": login_streak,
+		"last_login_day": last_login_day,
+		"event_progress": event_progress.duplicate(),
+		"events_done": events_done.keys(),
+		"minigame_day": minigame_day,
+		"minigame_rewards_today": minigame_rewards_today.duplicate(),
 		"total_hits": total_hits,
 		"beulen_marken": beulen_marken,
 		"devices": devices.duplicate(),
@@ -1192,6 +1507,26 @@ func from_dict(data: Dictionary) -> void:
 	laurels_total = int(data.get("laurels_total", 0))
 	laurels_spent = int(data.get("laurels_spent", 0))
 	laurel_nodes = _key_set(data.get("laurel_nodes", []))
+	next_boss_at = int(data.get("next_boss_at", int(boss_config.get("interval_hits", 100000))))
+	trophies = (data.get("trophies", []) as Array).duplicate()
+	quests_day = String(data.get("quests_day", ""))
+	quests = []
+	for q in data.get("quests", []):
+		quests.append({"id": String(q.id), "amount": int(q.amount), "reward": int(q.reward),
+			"start": int(q.start), "claimed": bool(q.claimed)})
+	login_streak = int(data.get("login_streak", 0))
+	last_login_day = String(data.get("last_login_day", ""))
+	event_progress = {}
+	var saved_events: Dictionary = data.get("event_progress", {})
+	for key in saved_events:
+		event_progress[key] = int(saved_events[key])
+	events_done = _key_set(data.get("events_done", []))
+	minigame_day = String(data.get("minigame_day", ""))
+	minigame_rewards_today = {}
+	var saved_mg: Dictionary = data.get("minigame_rewards_today", {})
+	for key in saved_mg:
+		minigame_rewards_today[key] = int(saved_mg[key])
+	boss_active = false
 	total_hits = int(data.get("total_hits", 0))
 	beulen_marken = int(data.get("beulen_marken", 0))
 	devices.clear()
@@ -1250,8 +1585,33 @@ func _migrate(data: Dictionary) -> Dictionary:
 		data["laurels_spent"] = data.get("laurels_spent", 0)
 		data["laurel_nodes"] = data.get("laurel_nodes", [])
 		data["beulen_marken"] = int(data.get("beulen_marken", 0)) + (data.get("achievements", []) as Array).size()
+	if version < 4:
+		# v3 → v4: Bosse, Aufträge, Login-Serie, Events, Mini-Spiele. Wer schon viele Treffer hat,
+		# trifft den ersten Boss beim nächsten vollen Hunderttausend.
+		var interval := int(boss_config.get("interval_hits", 100000))
+		data["next_boss_at"] = (int(data.get("total_hits", 0)) / interval + 1) * interval
+		data["trophies"] = data.get("trophies", [])
 	data["version"] = maxi(version, SAVE_VERSION)
 	return data
+
+
+## Früher lag der Spielstand im Standard-Ordner von Godot. Seit Version 4 nutzt das Spiel einen eigenen
+## Ordner (für Steam Cloud). Alte Spielstände und Bilder werden einmalig herüberkopiert.
+func _migrate_user_dir() -> void:
+	if not persist or FileAccess.file_exists(SAVE_PATH):
+		return
+	var old_dir := OS.get_data_dir().path_join("Godot/app_userdata/Punch your Enemy")
+	var new_dir := ProjectSettings.globalize_path("user://")
+	if old_dir.simplify_path() == new_dir.simplify_path().trim_suffix("/") or not DirAccess.dir_exists_absolute(old_dir):
+		return
+	for file in ["savegame.json", "savegame.bak.json"]:
+		if FileAccess.file_exists(old_dir.path_join(file)):
+			DirAccess.copy_absolute(old_dir.path_join(file), new_dir.path_join(file))
+	var old_images := old_dir.path_join("images")
+	if DirAccess.dir_exists_absolute(old_images):
+		DirAccess.make_dir_recursive_absolute(IMAGE_DIR)
+		for file in DirAccess.get_files_at(old_images):
+			DirAccess.copy_absolute(old_images.path_join(file), ProjectSettings.globalize_path(IMAGE_DIR).path_join(file))
 
 
 func save_game() -> bool:

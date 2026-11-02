@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Halloween-Hexe Hildegard – fiktive Comicfigur für das Halloween-Event -->
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="640" viewBox="0 0 560 640">
+  <g stroke="#2b2118" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Kleid -->
+    <path d="M50 640 C60 540 140 496 210 486 L350 486 C420 496 500 540 510 640 Z" fill="#7048e8"/>
+    <path d="M200 486 L280 540 L360 486 L340 470 L220 470 Z" fill="#212529"/>
+    <!-- Kürbis-Brosche -->
+    <ellipse cx="280" cy="580" rx="30" ry="24" fill="#ff922b" stroke-width="5"/>
+    <path d="M280 556 L284 544" stroke-width="5"/>
+    <path d="M268 576 l6 -6 l6 6 Z M286 576 l6 -6 l6 6 Z M266 588 Q280 598 294 588" fill="#2b2118" stroke-width="3"/>
+    <!-- Haare -->
+    <path d="M110 300 C80 380 96 450 140 480 C120 420 130 380 150 350 Z" fill="#e8590c"/>
+    <path d="M450 300 C480 380 464 450 420 480 C440 420 430 380 410 350 Z" fill="#e8590c"/>
+    <!-- Hals -->
+    <rect x="236" y="440" width="88" height="50" rx="18" fill="#b2f2bb"/>
+    <!-- Kopf -->
+    <ellipse cx="280" cy="350" rx="140" ry="135" fill="#b2f2bb"/>
+    <!-- Augen -->
+    <ellipse cx="224" cy="320" rx="28" ry="26" fill="#ffffff"/>
+    <ellipse cx="336" cy="320" rx="28" ry="26" fill="#ffffff"/>
+    <circle cx="230" cy="324" r="11" fill="#2b2118"/>
+    <circle cx="330" cy="324" r="11" fill="#2b2118"/>
+    <path d="M190 284 Q224 270 258 290" fill="none" stroke-width="10"/>
+    <path d="M370 284 Q336 270 302 290" fill="none" stroke-width="10"/>
+    <!-- Hakennase mit Warze -->
+    <path d="M272 330 C300 350 330 390 312 404 C300 412 284 402 270 392 Z" fill="#8ce99a"/>
+    <circle cx="316" cy="384" r="7" fill="#69db7c" stroke-width="4"/>
+    <!-- Grinsen mit einem Zahn -->
+    <path d="M226 418 Q280 458 336 418" fill="#2b2118"/>
+    <rect x="262" y="424" width="16" height="16" rx="3" fill="#ffffff" stroke-width="3"/>
+    <!-- Hut -->
+    <path d="M60 246 C120 220 440 220 500 246 C470 266 90 266 60 246 Z" fill="#343a40"/>
+    <path d="M160 238 L240 40 C252 14 282 10 300 30 L332 70 L320 72 L396 238 Z" fill="#343a40"/>
+    <path d="M168 214 L392 214 L396 238 L160 238 Z" fill="#7048e8"/>
+    <rect x="258" y="210" width="44" height="32" rx="4" fill="#fcc419"/>
+    <rect x="270" y="218" width="20" height="16" fill="#7048e8" stroke-width="4"/>
+  </g>
+</svg>
