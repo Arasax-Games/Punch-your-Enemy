@@ -26,7 +26,7 @@ func setup(shoe_kind: String, life: float, at: Vector2) -> void:
 	pivot_offset = size * 0.5
 	position = at - size * 0.5
 	_base_position = position
-	tooltip_text = "Klick mich!"
+	tooltip_text = tr("Klick mich!")
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	scale = Vector2(0.2, 0.2)

@@ -13,6 +13,7 @@ const SPLAT_COLORS: Array[Color] = [
 const WORD_COLORS: Array[Color] = [
 	Color("ff6fae"), Color("ffd43b"), Color("3bc9db"), Color("ff922b"),
 ]
+# i18n: Texte werden bei der Anzeige mit tr() übersetzt
 const HIT_WORDS: Array[String] = [
 	"WUMMS!", "KLATSCH!", "AUA-UA!", "BONK!", "PATSCH!", "ZACK!", "BOING!", "PLONK!",
 ]
@@ -58,9 +59,9 @@ func add_hit(uv: Vector2, value: float, crit: bool) -> void:
 	var pos := area.uv_to_local(uv)
 	_popup("+" + Num.fmt(value), pos + Vector2(0, -10), 30 if not crit else 44, Color.WHITE, 0.9)
 	if crit:
-		_popup("KRITISCH!", pos + Vector2(0, -70), 64, Color("ff6fae"), 1.2, true)
+		_popup(tr("KRITISCH!"), pos + Vector2(0, -70), 64, Color("ff6fae"), 1.2, true)
 	elif not reduced and _rng.randf() < 0.35:
-		var word := HIT_WORDS[_rng.randi() % HIT_WORDS.size()]
+		var word := tr(HIT_WORDS[_rng.randi() % HIT_WORDS.size()])
 		_popup(word, pos + _jitter(40.0) + Vector2(0, -50), 40, WORD_COLORS[_rng.randi() % WORD_COLORS.size()], 0.8, true)
 	queue_redraw()
 

@@ -22,7 +22,7 @@ func _ready() -> void:
 	add_child(_info)
 	var header := _row_box()
 	for i in COLUMNS.size():
-		header.add_child(_cell(["Ware", "Kurs", "Trend", "Bestand", "Ø Einkauf"][i], 15, COLUMNS[i], true))
+		header.add_child(_cell([tr("Ware"), tr("Kurs"), tr("Trend"), tr("Bestand"), tr("Ø Einkauf")][i], 15, COLUMNS[i], true))
 	add_child(header)
 	for g in GameState.market_goods():
 		var row := _row_box()
@@ -38,7 +38,7 @@ func _ready() -> void:
 		var id: String = g.id
 		var buy1 := _button("+1", func() -> void: GameState.market_buy(id, 1))
 		var buy10 := _button("+10", func() -> void: GameState.market_buy(id, 10))
-		var sell := _button("Alles verkaufen", func() -> void: _sell_all(id))
+		var sell := _button(tr("Alles verkaufen"), func() -> void: _sell_all(id))
 		row.add_child(buy1)
 		row.add_child(buy10)
 		row.add_child(sell)
@@ -81,7 +81,7 @@ func _sell_all(id: String) -> void:
 	var profit := GameState.market_sell(id, int(GameState.market_holdings.get(id, 0)))
 	var owner := get_tree().current_scene
 	if owner and owner.has_method("show_toast"):
-		owner.show_toast(("Gewinn: +%s Wumms" if profit >= 0.0 else "Verlust: %s Wumms") % Num.whole(profit))
+		owner.show_toast((tr("Gewinn: +%s Wumms") if profit >= 0.0 else tr("Verlust: %s Wumms")) % Num.whole(profit))
 
 
 func _process(delta: float) -> void:
@@ -92,7 +92,7 @@ func _process(delta: float) -> void:
 
 
 func _refresh() -> void:
-	_info.text = "Kaufe Ware billig, verkaufe sie teuer. Die Kurse ändern sich jede Minute. Lager: höchstens %d Stück pro Ware. Guthaben: %s Wumms.\nAchtung: Beim Neuanfang schließt die Börse – nicht verkaufte Ware ist dann weg." % [
+	_info.text = tr("Kaufe Ware billig, verkaufe sie teuer. Die Kurse ändern sich jede Minute. Lager: höchstens %d Stück pro Ware. Guthaben: %s Wumms.\nAchtung: Beim Neuanfang schließt die Börse – nicht verkaufte Ware ist dann weg.") % [
 		GameState.market_capacity(), Num.whole(GameState.wumms)]
 	for id in _rows:
 		var r: Dictionary = _rows[id]
@@ -100,7 +100,7 @@ func _refresh() -> void:
 		var factor := GameState.market_factor(id)
 		r.price.text = Num.whole(price)
 		var last: float = _last_prices.get(id, price)
-		r.trend.text = "▲ teuer" if factor > 1.3 else ("▼ billig" if factor < 0.75 else "● normal")
+		r.trend.text = tr("▲ teuer") if factor > 1.3 else (tr("▼ billig") if factor < 0.75 else tr("● normal"))
 		r.trend.add_theme_color_override("font_color", Color("c92a2a") if factor > 1.3 else (Color("2f9e44") if factor < 0.75 else Color(INK, 0.6)))
 		var held := int(GameState.market_holdings.get(id, 0))
 		r.held.text = "%d / %d" % [held, GameState.market_capacity()]

@@ -1,0 +1,2774 @@
+# Punch your Enemy – Übersetzung (en). Quellsprache: Deutsch.
+# Mit tools/i18n.py aktualisieren, nicht die msgids von Hand ändern.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+#: scripts/core/game_state.gd
+msgid "Pech-Schuh"
+msgstr "Bad Luck Boot"
+
+#: scripts/core/game_state.gd
+msgid "Pech-Schuh!"
+msgstr "Bad Luck Boot!"
+
+#: scripts/core/game_state.gd
+msgid "Halbe WPS für 66 s. Trostpreis: 3 Beulen-Marken."
+msgstr "Half WPS for 66 s. Consolation prize: 3 Bump Tokens."
+
+#: scripts/core/game_state.gd
+msgid "Wumms-Segen!"
+msgstr "Wham Windfall!"
+
+#: scripts/core/game_state.gd
+msgid "+%s Wumms"
+msgstr "+%s Whams"
+
+#: scripts/core/game_state.gd
+msgid "Raserei"
+msgstr "Frenzy"
+
+#: scripts/core/game_state.gd
+msgid "Raserei!"
+msgstr "Frenzy!"
+
+#: scripts/core/game_state.gd
+msgid "Alle Geräte ×7 für 77 s."
+msgstr "All gadgets ×7 for 77 s."
+
+#: scripts/core/game_state.gd
+msgid "Klick-Raserei"
+msgstr "Click Frenzy"
+
+#: scripts/core/game_state.gd
+msgid "Klick-Raserei!"
+msgstr "Click Frenzy!"
+
+#: scripts/core/game_state.gd
+msgid "Klick-Wert ×777 für 13 s. Hau drauf!"
+msgstr "Click value ×777 for 13 s. Punch away!"
+
+#: scripts/core/game_state.gd
+msgid "Zeitlupe"
+msgstr "Slow Motion"
+
+#: scripts/core/game_state.gd
+msgid "Zeitlupe!"
+msgstr "Slow Motion!"
+
+#: scripts/core/game_state.gd
+msgid "Alles ganz langsam … und jeder Klick zählt dreifach."
+msgstr "Everything slooows down … and every click counts triple."
+
+#: scripts/core/game_state.gd
+msgid "Glied %d: +%s Wumms"
+msgstr "Link %d: +%s Whams"
+
+#: scripts/core/game_state.gd
+msgid " … da kommt noch einer!"
+msgstr " … here comes another one!"
+
+#: scripts/core/game_state.gd
+msgid " Die Kette ist gerissen."
+msgstr " The chain is broken."
+
+#: scripts/core/game_state.gd
+msgid "Kettenreaktion!"
+msgstr "Chain Reaction!"
+
+#: scripts/core/game_state.gd
+msgid "Silberner Pantoffel!"
+msgstr "Silver Slipper!"
+
+#: scripts/core/game_state.gd
+msgid "Kleine Raserei"
+msgstr "Mini Frenzy"
+
+#: scripts/core/game_state.gd
+msgid "Alle Geräte ×2 für 30 s."
+msgstr "All gadgets ×2 for 30 s."
+
+#: scripts/core/game_state.gd
+msgid "Klick-Wert ×%s"
+msgstr "Click value ×%s"
+
+#: scripts/core/game_state.gd
+msgid "%s produziert ×%s"
+msgstr "%s produces ×%s"
+
+#: scripts/core/game_state.gd
+msgid "Alle Geräte +%d %%"
+msgstr "All gadgets +%d %%"
+
+#: scripts/core/game_state.gd
+msgid "Jeder Klick bringt zusätzlich %s %% deiner WPS"
+msgstr "Every click also earns %s %% of your WPS"
+
+#: scripts/core/game_state.gd
+msgid "%d %% Chance auf ×%s-Treffer"
+msgstr "%d %% chance of a ×%s hit"
+
+#: scripts/core/game_state.gd
+msgid "Maus gedrückt halten schlägt %d× pro Sekunde"
+msgstr "Hold the mouse button to punch %d× per second"
+
+#: scripts/core/game_state.gd
+msgid "%s: +%d %% je %d %s"
+msgstr "%s: +%d %% per %d %s"
+
+#: scripts/core/game_state.gd
+msgid "Alle Geräte +%s %% pro Erfolg (aktuell %d Erfolge)"
+msgstr "All gadgets +%s %% per achievement (currently %d achievements)"
+
+#: scripts/core/game_state.gd
+msgid "Alle Geräte +%d %% je %d Erfolge"
+msgstr "All gadgets +%d %% per %d achievements"
+
+#: scripts/core/game_state.gd
+msgid "Goldene Schuhe und Silberne Pantoffel erscheinen %d %% häufiger"
+msgstr "Golden Shoes and Silver Slippers appear %d %% more often"
+
+#: scripts/core/game_state.gd
+msgid "Beulen-Marken"
+msgstr "Bump Tokens"
+
+#: scripts/core/game_state.gd
+msgid "Lorbeer"
+msgstr "Laurel"
+
+#: scripts/core/game_state.gd
+msgid "Lorbeeren"
+msgstr "Laurels"
+
+#: scripts/core/game_state.gd
+msgid "Pokal"
+msgstr "Trophy"
+
+#: scripts/core/game_state.gd
+msgid "Ab 5.000 Treffern"
+msgstr "From 5,000 hits"
+
+#: scripts/core/game_state.gd
+msgid "Ab der ersten Tortenwurf-Kanone"
+msgstr "From your first Pie Cannon"
+
+#: scripts/core/game_state.gd
+msgid "Unbekanntes Opfer"
+msgstr "Unknown target"
+
+#: scripts/core/game_state.gd
+msgid "Neues Opfer"
+msgstr "New target"
+
+#: scripts/core/game_state.gd
+msgid "Generalissimo Bombastus von Größenwahn"
+msgstr "Generalissimo Bombastus von Megalomania"
+
+#: scripts/core/game_state.gd
+msgid "Reaktions-Dojo"
+msgstr "Reaction Dojo"
+
+#: scripts/core/game_state.gd
+msgid "Tortenwurf-Schießbude"
+msgstr "Pie Shooting Gallery"
+
+#: scripts/core/num.gd
+msgid "nie"
+msgstr "never"
+
+#: scripts/core/num.gd
+msgid "Tage"
+msgstr "days"
+
+#: scripts/effects/hit_effects.gd
+msgid "KRITISCH!"
+msgstr "CRITICAL!"
+
+#: scripts/effects/hit_effects.gd
+msgid "WUMMS!"
+msgstr "WHAM!"
+
+#: scripts/effects/hit_effects.gd
+msgid "KLATSCH!"
+msgstr "SMACK!"
+
+#: scripts/effects/hit_effects.gd
+msgid "AUA-UA!"
+msgstr "OUCH-OUCH!"
+
+#: scripts/effects/hit_effects.gd
+msgid "BONK!"
+msgstr "BONK!"
+
+#: scripts/effects/hit_effects.gd
+msgid "PATSCH!"
+msgstr "SPLAT!"
+
+#: scripts/effects/hit_effects.gd
+msgid "ZACK!"
+msgstr "ZAP!"
+
+#: scripts/effects/hit_effects.gd
+msgid "BOING!"
+msgstr "BOING!"
+
+#: scripts/effects/hit_effects.gd
+msgid "PLONK!"
+msgstr "PLONK!"
+
+#: scripts/ui/boss_fight.gd
+msgid "BOSS · %s · %d s"
+msgstr "BOSS · %s · %d s"
+
+#: scripts/ui/main.gd
+msgid "Hau drauf! Klicken oder Leertaste."
+msgstr "Punch away! Click or press Space."
+
+#: scripts/ui/main.gd
+msgid "Saison-Event: %s – zu finden in der Galerie!"
+msgstr "Seasonal event: %s – find them in the gallery!"
+
+#: scripts/ui/main.gd
+msgid "Klick oder Leertaste: hauen\nR: Wutmodus entfesseln\n1–9: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer\nGoldene Schuhe anklicken!"
+msgstr "Click or Space: punch\nR: unleash Rage Mode\n1–9: buy gadget\nCtrl+V: paste image\nDrop an image on the window: new target\nClick Golden Shoes!"
+
+#: scripts/ui/main.gd
+msgid "Max"
+msgstr "Max"
+
+#: scripts/ui/main.gd
+msgid "Eins verkaufen (25 % zurück)"
+msgstr "Sell one (25 % back)"
+
+#: scripts/ui/main.gd
+msgid "Neues Opfer wählen – nimm Bilder, bei denen alle Beteiligten Spaß verstehen"
+msgstr "Choose a new target – only use pictures everyone involved will find funny"
+
+#: scripts/ui/main.gd
+msgid "*.png, *.jpg, *.jpeg, *.webp ; Bilder"
+msgstr "*.png, *.jpg, *.jpeg, *.webp ; Images"
+
+#: scripts/ui/main.gd
+msgid "Ton"
+msgstr "Sound"
+
+#: scripts/ui/main.gd
+msgid "Weniger Effekte"
+msgstr "Fewer effects"
+
+#: scripts/ui/main.gd
+msgid "Zeitraffer (Geräte ×2 schneller)"
+msgstr "Time warp (gadgets ×2 faster)"
+
+#: scripts/ui/main.gd
+msgid "Upgrades automatisch kaufen"
+msgstr "Buy upgrades automatically"
+
+#: scripts/ui/main.gd
+msgid "Foto speichern"
+msgstr "Save photo"
+
+#: scripts/ui/main.gd
+msgid "Speichern"
+msgstr "Save"
+
+#: scripts/ui/main.gd
+msgid "Spielstand exportieren (Textcode)"
+msgstr "Export save (text code)"
+
+#: scripts/ui/main.gd
+msgid "Spielstand importieren …"
+msgstr "Import save …"
+
+#: scripts/ui/main.gd
+msgid "Alles löschen und neu anfangen …"
+msgstr "Delete everything and start over …"
+
+#: scripts/ui/main.gd
+msgid "Wut-Leiste: füllt sich mit jedem Treffer.\nVoll? Mit R oder dem Knopf 10 s Wutmodus entfesseln:\nalles ×3, aber keine Goldenen Schuhe."
+msgstr "Rage meter: fills up with every hit.\nFull? Press R or the button to unleash 10 s of Rage Mode:\neverything ×3, but no Golden Shoes."
+
+#: scripts/ui/main.gd
+msgid "WUT!"
+msgstr "RAGE!"
+
+#: scripts/ui/main.gd
+msgid "Abbrechen"
+msgstr "Cancel"
+
+#: scripts/ui/main.gd
+msgid "Herausforderung abbrechen?"
+msgstr "Abort challenge?"
+
+#: scripts/ui/main.gd
+msgid "Du spielst normal weiter, bekommst aber keine Extra-Lorbeeren."
+msgstr "You keep playing normally, but you won't get any bonus laurels."
+
+#: scripts/ui/main.gd
+msgid "Weiterkämpfen"
+msgstr "Keep fighting"
+
+#: scripts/ui/main.gd
+msgid "Frisch geduscht!"
+msgstr "Freshly showered!"
+
+#: scripts/ui/main.gd
+msgid "pro Sekunde: %s"
+msgstr "per second: %s"
+
+#: scripts/ui/main.gd
+msgid "pro Klick: %s"
+msgstr "per click: %s"
+
+#: scripts/ui/main.gd
+msgid " (Zeitraffer ×2)"
+msgstr " (time warp ×2)"
+
+#: scripts/ui/main.gd
+msgid "Beulen-Marken: %d"
+msgstr "Bump Tokens: %d"
+
+#: scripts/ui/main.gd
+msgid "Opfer: %s"
+msgstr "Target: %s"
+
+#: scripts/ui/main.gd
+msgid "Insgesamt verhauen: %s"
+msgstr "Punched in total: %s"
+
+#: scripts/ui/main.gd
+msgid "Insgesamt erzeugt: %s Wumms"
+msgstr "Total produced: %s Whams"
+
+#: scripts/ui/main.gd
+msgid "Treffer gesamt: %s"
+msgstr "Total hits: %s"
+
+#: scripts/ui/main.gd
+msgid "Erfolge %d/%d"
+msgstr "Achievements %d/%d"
+
+#: scripts/ui/main.gd
+msgid "Aufträge (%d!)"
+msgstr "Tasks (%d!)"
+
+#: scripts/ui/main.gd
+msgid "Aufträge"
+msgstr "Tasks"
+
+#: scripts/ui/main.gd
+msgid "Combo %d · Klick ×%s"
+msgstr "Combo %d · Click ×%s"
+
+#: scripts/ui/main.gd
+msgid "Lorbeeren: %d (+%d %% auf alles)"
+msgstr "Laurels: %d (+%d %% on everything)"
+
+#: scripts/ui/main.gd
+msgid "Herausforderung „%s“: %s / %s Wumms"
+msgstr "Challenge “%s”: %s / %s Whams"
+
+#: scripts/ui/main.gd
+msgid "Neuanfang: %s"
+msgstr "Fresh Start: %s"
+
+#: scripts/ui/main.gd
+msgid "WPS ×%s"
+msgstr "WPS ×%s"
+
+#: scripts/ui/main.gd
+msgid "Klick ×%s"
+msgstr "Click ×%s"
+
+#: scripts/ui/main.gd
+msgid "Besitz: %s · je %s WPS"
+msgstr "Owned: %s · %s WPS each"
+
+#: scripts/ui/main.gd
+msgid "Kaufen"
+msgstr "Buy"
+
+#: scripts/ui/main.gd
+msgid "%s\n\n%s\nJedes Gerät: %s WPS (×%s durch Upgrades)\nAlle zusammen: %s WPS (%s %% deiner Produktion)\nAmortisation: %s"
+msgstr "%s\n\n%s\nEach gadget: %s WPS (×%s from upgrades)\nAll together: %s WPS (%s %% of your production)\nPays for itself in: %s"
+
+#: scripts/ui/main.gd
+msgid "%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms"
+msgstr "%s\n\n%s\n\nEffect: %s\nPrice: %s Whams"
+
+#: scripts/ui/main.gd
+msgid "Upgrade gekauft: %s"
+msgstr "Upgrade bought: %s"
+
+#: scripts/ui/main.gd
+msgid "1 Lorbeer"
+msgstr "1 laurel"
+
+#: scripts/ui/main.gd
+msgid "%d Lorbeeren"
+msgstr "%d laurels"
+
+#: scripts/ui/main.gd
+msgid "Geblockt!"
+msgstr "Blocked!"
+
+#: scripts/ui/main.gd
+msgid "SCHWACHSTELLE! ×%d"
+msgstr "WEAK SPOT! ×%d"
+
+#: scripts/ui/main.gd
+msgid "WUTMODUS! Alles ×3 für 10 Sekunden!"
+msgstr "RAGE MODE! Everything ×3 for 10 seconds!"
+
+#: scripts/ui/main.gd
+msgid "Puh. Durchatmen."
+msgstr "Phew. Deep breaths."
+
+#: scripts/ui/main.gd
+msgid "Erstes Pflaster!"
+msgstr "First band-aid!"
+
+#: scripts/ui/main.gd
+msgid "Ein Veilchen!"
+msgstr "A black eye!"
+
+#: scripts/ui/main.gd
+msgid "Riesenbeule!"
+msgstr "Giant bump!"
+
+#: scripts/ui/main.gd
+msgid "Jetzt ist er genervt."
+msgstr "Now he's annoyed."
+
+#: scripts/ui/main.gd
+msgid "Er sieht Sterne!"
+msgstr "He's seeing stars!"
+
+#: scripts/ui/main.gd
+msgid "Noch ein Veilchen!"
+msgstr "Another black eye!"
+
+#: scripts/ui/main.gd
+msgid "Kopfverband!"
+msgstr "Head bandage!"
+
+#: scripts/ui/main.gd
+msgid "Am Ende seiner Kräfte."
+msgstr "At the end of his rope."
+
+#: scripts/ui/main.gd
+msgid "Die Ohren qualmen!"
+msgstr "Steam's coming out of his ears!"
+
+#: scripts/ui/main.gd
+msgid "Vögelchen zwitschern. Maximum erreicht!"
+msgstr "Little birds are tweeting. Maximum reached!"
+
+#: scripts/ui/main.gd
+msgid "Beulen-Level %d: %s (+1 Beulen-Marke)"
+msgstr "Bump Level %d: %s (+1 Bump Token)"
+
+#: scripts/ui/main.gd
+msgid "Neues Opfer: %s"
+msgstr "New target: %s"
+
+#: scripts/ui/main.gd
+msgid "Dieses Bild konnte nicht geladen werden."
+msgstr "This image could not be loaded."
+
+#: scripts/ui/main.gd
+msgid "In der Zwischenablage ist kein Bild."
+msgstr "There's no image on the clipboard."
+
+#: scripts/ui/main.gd
+msgid "Aus der Zwischenablage"
+msgstr "From the clipboard"
+
+#: scripts/ui/main.gd
+msgid "Neues Opfer aus der Zwischenablage!"
+msgstr "New target from the clipboard!"
+
+#: scripts/ui/main.gd
+msgid "Erfolg freigeschaltet!"
+msgstr "Achievement unlocked!"
+
+#: scripts/ui/main.gd
+msgid "%d von %d freigeschaltet"
+msgstr "%d of %d unlocked"
+
+#: scripts/ui/main.gd
+msgid " · Wutmilch: +%s %% WPS"
+msgstr " · Rage Milk: +%s %% WPS"
+
+#: scripts/ui/main.gd
+msgid "Versteckter Erfolg"
+msgstr "Hidden achievement"
+
+#: scripts/ui/main.gd
+msgid "Erfolge"
+msgstr "Achievements"
+
+#: scripts/ui/main.gd
+msgid "Schließen"
+msgstr "Close"
+
+#: scripts/ui/main.gd
+msgid "Zeitraffer an: Geräte arbeiten doppelt so schnell."
+msgstr "Time warp on: gadgets work twice as fast."
+
+#: scripts/ui/main.gd
+msgid "Zeitraffer aus."
+msgstr "Time warp off."
+
+#: scripts/ui/main.gd
+msgid "Gespeichert."
+msgstr "Saved."
+
+#: scripts/ui/main.gd
+msgid "Spielstand exportieren"
+msgstr "Export save"
+
+#: scripts/ui/main.gd
+msgid "Der Textcode ist in deiner Zwischenablage. Heb ihn gut auf!"
+msgstr "The text code is on your clipboard. Keep it somewhere safe!"
+
+#: scripts/ui/main.gd
+msgid "Textcode hier einfügen"
+msgstr "Paste text code here"
+
+#: scripts/ui/main.gd
+msgid "Spielstand importieren"
+msgstr "Import save"
+
+#: scripts/ui/main.gd
+msgid "Achtung: Dein aktueller Spielstand wird ersetzt."
+msgstr "Careful: your current save will be replaced."
+
+#: scripts/ui/main.gd
+msgid "Jetzt laden"
+msgstr "Load"
+
+#: scripts/ui/main.gd
+msgid "Spielstand geladen!"
+msgstr "Save loaded!"
+
+#: scripts/ui/main.gd
+msgid "Dieser Code funktioniert leider nicht."
+msgstr "Sorry, this code doesn't work."
+
+#: scripts/ui/main.gd
+msgid "Alles löschen?"
+msgstr "Delete everything?"
+
+#: scripts/ui/main.gd
+msgid "Wirklich ALLES wird gelöscht: Wumms, Geräte, Upgrades, Erfolge, Lorbeeren und der Lorbeer-Baum. Deine Bilder bleiben erhalten.\n\n(Für einen Neuanfang mit Lorbeeren nimm den grünen Knopf in der Statistik.)"
+msgstr "EVERYTHING will be deleted: Whams, gadgets, upgrades, achievements, laurels and the Laurel Tree. Your images are kept.\n\n(For a Fresh Start with laurels, use the green button in the stats.)"
+
+#: scripts/ui/main.gd
+msgid "Ja, alles löschen"
+msgstr "Yes, delete everything"
+
+#: scripts/ui/main.gd
+msgid "Alles auf Anfang. Bombastus atmet auf."
+msgstr "Back to square one. Bombastus breathes a sigh of relief."
+
+#: scripts/ui/main.gd
+msgid "Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Wumms\nerwirtschaftet."
+msgstr "You were away for %s.\nMeanwhile your gadgets earned\n%s Whams\nfor you."
+
+#: scripts/ui/main.gd
+msgid "\n\n(Ohne Aufsicht arbeiten sie höchstens %s.)"
+msgstr "\n\n(Unsupervised they work for at most %s.)"
+
+#: scripts/ui/main.gd
+msgid "Login-Serie: Tag %d von 7%s\nTagesbonus: +%s Wumms und +%d Beulen-Marken"
+msgstr "Login streak: day %d of 7%s\nDaily bonus: +%s Whams and +%d Bump Tokens"
+
+#: scripts/ui/main.gd
+msgid " – Hauptgewinn!"
+msgstr " – jackpot!"
+
+#: scripts/ui/main.gd
+msgid "Willkommen zurück!"
+msgstr "Welcome back!"
+
+#: scripts/ui/main.gd
+msgid "Weiter hauen!"
+msgstr "Keep punching!"
+
+#: scripts/ui/main.gd
+msgid "Du fängst von vorne an und bekommst dafür %s.\n\n"
+msgstr "You start over and get %s for it.\n\n"
+
+#: scripts/ui/main.gd
+msgid "Jeder Lorbeer gibt dauerhaft +1 %% auf Produktion und Klicks – insgesamt dann +%d %%.\n"
+msgstr "Each laurel permanently gives +1 %% on production and clicks – +%d %% in total after this.\n"
+
+#: scripts/ui/main.gd
+msgid "Lorbeeren kannst du zusätzlich im Lorbeer-Baum ausgeben, der Bonus bleibt trotzdem.\n\n"
+msgstr "You can also spend laurels in the Laurel Tree – the bonus stays anyway.\n\n"
+
+#: scripts/ui/main.gd
+msgid "Weg sind: Wumms, Geräte und Upgrades.\nBleiben: Erfolge, Statistiken, Bilder, Beulen-Marken und der Lorbeer-Baum."
+msgstr "Gone: Whams, gadgets and upgrades.\nKept: achievements, statistics, images, Bump Tokens and the Laurel Tree."
+
+#: scripts/ui/main.gd
+msgid "Neuanfang?"
+msgstr "Fresh Start?"
+
+#: scripts/ui/main.gd
+msgid "Neu anfangen!"
+msgstr "Start fresh!"
+
+#: scripts/ui/main.gd
+msgid "Noch nicht"
+msgstr "Not yet"
+
+#: scripts/ui/main.gd
+msgid "Lorbeeren!"
+msgstr "Laurels!"
+
+#: scripts/ui/main.gd
+msgid "+%s. Bombastus hat sich erholt – und du bist stärker als vorher.\n\nMagst du gleich etwas im Lorbeer-Baum freischalten?"
+msgstr "+%s. Bombastus has recovered – and you're stronger than before.\n\nWant to unlock something in the Laurel Tree right away?"
+
+#: scripts/ui/main.gd
+msgid "Zum Lorbeer-Baum"
+msgstr "To the Laurel Tree"
+
+#: scripts/ui/main.gd
+msgid "Später"
+msgstr "Later"
+
+#: scripts/ui/main.gd
+msgid "Verfügbar: %s  ·  %d Beulen-Marken  ·  Lorbeer-Bonus: +%d %%"
+msgstr "Available: %s  ·  %d Bump Tokens  ·  Laurel bonus: +%d %%"
+
+#: scripts/ui/main.gd
+msgid "Lorbeeren gibt es beim Neuanfang. Beulen-Marken gibt es für Erfolge, Beulen-Level und Pech-Schuhe."
+msgstr "You get laurels from a Fresh Start. You get Bump Tokens from achievements, bump levels and Bad Luck Boots."
+
+#: scripts/ui/main.gd
+msgid "Herausforderungen – Extra-Lorbeeren"
+msgstr "Challenges – bonus laurels"
+
+#: scripts/ui/main.gd
+msgid "Lorbeer-Baum"
+msgstr "Laurel Tree"
+
+#: scripts/ui/main.gd
+msgid "%s: %s Ziel: %s Wumms → %s"
+msgstr "%s: %s Goal: %s Whams → %s"
+
+#: scripts/ui/main.gd
+msgid "Geschafft ✓"
+msgstr "Done ✓"
+
+#: scripts/ui/main.gd
+msgid "Läuft …"
+msgstr "Running …"
+
+#: scripts/ui/main.gd
+msgid "Starten"
+msgstr "Start"
+
+#: scripts/ui/main.gd
+msgid "„%s“ starten?"
+msgstr "Start “%s”?"
+
+#: scripts/ui/main.gd
+msgid "Dein Durchlauf beginnt von vorn – wie bei einem Neuanfang, nur ohne neue Lorbeeren.\nLorbeeren, Erfolge und der Lorbeer-Baum bleiben.\n\n%s\nZiel: %s Wumms"
+msgstr "Your run starts over – like a Fresh Start, just without new laurels.\nLaurels, achievements and the Laurel Tree are kept.\n\n%s\nGoal: %s Whams"
+
+#: scripts/ui/main.gd
+msgid "Los geht's!"
+msgstr "Let's go!"
+
+#: scripts/ui/main.gd
+msgid "Doch nicht"
+msgstr "Never mind"
+
+#: scripts/ui/main.gd
+msgid "Herausforderung „%s“ läuft!"
+msgstr "Challenge “%s” is on!"
+
+#: scripts/ui/main.gd
+msgid "✓ freigeschaltet"
+msgstr "✓ unlocked"
+
+#: scripts/ui/main.gd
+msgid "\n\nBraucht: "
+msgstr "\n\nRequires: "
+
+#: scripts/ui/main.gd
+msgid "%s\ngesperrt · %s"
+msgstr "%s\nlocked · %s"
+
+#: scripts/ui/main.gd
+msgid "Freigeschaltet: %s"
+msgstr "Unlocked: %s"
+
+#: scripts/ui/main.gd
+msgid "Neues Bild importieren …"
+msgstr "Import new image …"
+
+#: scripts/ui/main.gd
+msgid "Galerie"
+msgstr "Gallery"
+
+#: scripts/ui/main.gd
+msgid "%s Treffer · Beulen-Level %d"
+msgstr "%s hits · Bump Level %d"
+
+#: scripts/ui/main.gd
+msgid "Aktiv"
+msgstr "Active"
+
+#: scripts/ui/main.gd
+msgid "Hauen!"
+msgstr "Punch!"
+
+#: scripts/ui/main.gd
+msgid "Name"
+msgstr "Name"
+
+#: scripts/ui/main.gd
+msgid "Löschen"
+msgstr "Delete"
+
+#: scripts/ui/main.gd
+msgid "Umbenennen"
+msgstr "Rename"
+
+#: scripts/ui/main.gd
+msgid "Wie soll das Opfer heißen?"
+msgstr "What should the target be called?"
+
+#: scripts/ui/main.gd
+msgid "Bild löschen?"
+msgstr "Delete image?"
+
+#: scripts/ui/main.gd
+msgid "„%s“ und seine Treffer werden gelöscht."
+msgstr "“%s” and its hits will be deleted."
+
+#: scripts/ui/main.gd
+msgid "BOSS-KAMPF! %s"
+msgstr "BOSS FIGHT! %s"
+
+#: scripts/ui/main.gd
+msgid "Boss besiegt!"
+msgstr "Boss defeated!"
+
+#: scripts/ui/main.gd
+msgid "Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Beulen-Marken"
+msgstr "He gives up and waves the white flag.\n\nTrophy: %s\n+%d Bump Tokens"
+
+#: scripts/ui/main.gd
+msgid "Hurra!"
+msgstr "Hooray!"
+
+#: scripts/ui/main.gd
+msgid "Der Boss ist entkommen! In %s Treffern kommt er wieder."
+msgstr "The boss got away! He'll be back in %s hits."
+
+#: scripts/ui/main.gd
+msgid "Tagesaufträge"
+msgstr "Daily tasks"
+
+#: scripts/ui/main.gd
+msgid "Erledigt ✓"
+msgstr "Done ✓"
+
+#: scripts/ui/main.gd
+msgid "Abholen: %d Marken"
+msgstr "Claim: %d tokens"
+
+#: scripts/ui/main.gd
+msgid "+%d Beulen-Marken"
+msgstr "+%d Bump Tokens"
+
+#: scripts/ui/main.gd
+msgid "%s / %s · %d Marken"
+msgstr "%s / %s · %d tokens"
+
+#: scripts/ui/main.gd
+msgid "Login-Serie: 1 Tag · Morgen gibt es %d Beulen-Marken"
+msgstr "Login streak: 1 day · Tomorrow you get %d Bump Tokens"
+
+#: scripts/ui/main.gd
+msgid "Login-Serie: %d Tage in Folge · Morgen gibt es %d Beulen-Marken"
+msgstr "Login streak: %d days in a row · Tomorrow you get %d Bump Tokens"
+
+#: scripts/ui/main.gd
+msgid "Saison-Event: %s"
+msgstr "Seasonal event: %s"
+
+#: scripts/ui/main.gd
+msgid "Geschafft! %s gehört dir."
+msgstr "Done! %s is yours."
+
+#: scripts/ui/main.gd
+msgid "Zur Figur!"
+msgstr "Go to the character!"
+
+#: scripts/ui/main.gd
+msgid "Ist aktiv"
+msgstr "Is active"
+
+#: scripts/ui/main.gd
+msgid "Vitrine"
+msgstr "Trophy cabinet"
+
+#: scripts/ui/main.gd
+msgid "Noch leer. Pokale gibt es für Boss-Kämpfe (alle 100.000 Treffer) und Saison-Events."
+msgstr "Still empty. Trophies come from boss fights (every 100,000 hits) and seasonal events."
+
+#: scripts/ui/main.gd
+msgid "Nächster Boss in %s Treffern."
+msgstr "Next boss in %s hits."
+
+#: scripts/ui/main.gd
+msgid "Event geschafft!"
+msgstr "Event complete!"
+
+#: scripts/ui/main.gd
+msgid "%s gibt auf!\n\nPokal: %s\n+%d Beulen-Marken\n\nDie Figur bleibt für immer in deiner Galerie."
+msgstr "%s gives up!\n\nTrophy: %s\n+%d Bump Tokens\n\nThe character stays in your gallery forever."
+
+#: scripts/ui/main.gd
+msgid "Rekord: %d Punkte · heute verdient: %d/5 Beulen-Marken (je %d Punkte eine)"
+msgstr "Record: %d points · earned today: %d/5 Bump Tokens (one per %d points)"
+
+#: scripts/ui/main.gd
+msgid "Spielen!"
+msgstr "Play!"
+
+#: scripts/ui/main.gd
+msgid "Börse für Beulen"
+msgstr "Bump Exchange"
+
+#: scripts/ui/main.gd
+msgid "Pflaster, Eisbeutel, Torten und Gummienten handeln – billig kaufen, teuer verkaufen."
+msgstr "Trade band-aids, ice packs, pies and rubber ducks – buy low, sell high."
+
+#: scripts/ui/main.gd
+msgid "Zur Börse!"
+msgstr "To the exchange!"
+
+#: scripts/ui/main.gd
+msgid "Ab 10 Mio. Wumms"
+msgstr "From 10 M Whams"
+
+#: scripts/ui/main.gd
+msgid "Mini-Spiele"
+msgstr "Mini-games"
+
+#: scripts/ui/main.gd
+msgid "Foto konnte nicht gespeichert werden."
+msgstr "The photo could not be saved."
+
+#: scripts/ui/main.gd
+msgid "Foto gespeichert!"
+msgstr "Photo saved!"
+
+#: scripts/ui/main.gd
+msgid "Gespeichert als\n%s\n\nDas Foto bleibt auf deinem Rechner – teilen kannst du es, wenn alle Abgebildeten einverstanden sind."
+msgstr "Saved as\n%s\n\nThe photo stays on your computer – share it only if everyone in it is okay with that."
+
+#: scripts/ui/main.gd
+msgid "Ordner öffnen"
+msgstr "Open folder"
+
+#: scripts/ui/main.gd
+msgid "Du hast %d Beulen-Marken. Gekauftes kannst du jederzeit wechseln."
+msgstr "You have %d Bump Tokens. You can switch purchased items at any time."
+
+#: scripts/ui/main.gd
+msgid "Kosmetik-Laden"
+msgstr "Cosmetics Shop"
+
+#: scripts/ui/main.gd
+msgid "Angelegt ✓"
+msgstr "Equipped ✓"
+
+#: scripts/ui/main.gd
+msgid "Anlegen"
+msgstr "Equip"
+
+#: scripts/ui/main.gd
+msgid "Im Lorbeer-Baum"
+msgstr "In the Laurel Tree"
+
+#: scripts/ui/main.gd
+msgid "Kaufen: %d Marken"
+msgstr "Buy: %d tokens"
+
+#: scripts/ui/main.gd
+msgid "Neu im Schrank: %s"
+msgstr "New in the wardrobe: %s"
+
+#: scripts/ui/main.gd
+msgid "Herausforderung gemeistert!"
+msgstr "Challenge mastered!"
+
+#: scripts/ui/main.gd
+msgid "„%s“ geschafft!\n%s – ab sofort dauerhaft."
+msgstr "“%s” done!\n%s – permanently, starting now."
+
+#: scripts/ui/main.gd
+msgid "Nachbarn beschweren sich über Quietschen."
+msgstr "Neighbours complain about squeaking."
+
+#: scripts/ui/main.gd
+msgid "Der Mond sagt, er sei bereit."
+msgstr "The moon says it's ready."
+
+#: scripts/ui/main.gd
+msgid "Pantoffel-Hersteller meldet Rekordumsatz."
+msgstr "Slipper maker reports record sales."
+
+#: scripts/ui/main.gd
+msgid "Generalissimo Bombastus bestellt vorsorglich 400 Eisbeutel."
+msgstr "Generalissimo Bombastus orders 400 ice packs, just in case."
+
+#: scripts/ui/main.gd
+msgid "Studie: 9 von 10 Gummihämmern quietschen gern."
+msgstr "Study: 9 out of 10 rubber mallets enjoy squeaking."
+
+#: scripts/ui/main.gd
+msgid "Konditorei-Verband warnt vor Tortenknappheit."
+msgstr "Bakers' guild warns of pie shortage."
+
+#: scripts/ui/main.gd
+msgid "Bombastus verleiht sich selbst den Orden für das tapferste Kinn."
+msgstr "Bombastus awards himself the medal for bravest chin."
+
+#: scripts/ui/main.gd
+msgid "Eilmeldung: Schnurrbart wackelt weiterhin."
+msgstr "Breaking news: moustache still wobbling."
+
+#: scripts/ui/main.gd
+msgid "Versicherung lehnt Antrag „Beule, groß, schon wieder“ ab."
+msgstr "Insurance rejects claim “bump, large, again”."
+
+#: scripts/ui/main.gd
+msgid "Katapult-Gewerkschaft fordert längere Federn."
+msgstr "Catapult union demands longer springs."
+
+#: scripts/ui/main.gd
+msgid "Pflaster-Aktie erreicht Allzeithoch."
+msgstr "Band-aid stock hits all-time high."
+
+#: scripts/ui/main.gd
+msgid "Augenzeuge: „Es hat sehr laut BOING gemacht.“"
+msgstr "Eyewitness: “It went BOING really loudly.”"
+
+#: scripts/ui/main.gd
+msgid "Sichtung: Goldener Schuh in der Innenstadt. Bitte Ruhe bewahren."
+msgstr "Sighting: Golden Shoe downtown. Please remain calm."
+
+#: scripts/ui/main.gd
+msgid "Wetterbericht: Heute vereinzelt Ambosse, gegen Abend Torten."
+msgstr "Weather report: scattered anvils today, pies in the evening."
+
+#: scripts/ui/main.gd
+msgid "Boxroboter bestehen den Turing-Test nicht. Und wollen es auch nicht."
+msgstr "Boxing robots fail the Turing test. And don't want to pass it."
+
+#: scripts/ui/main.gd
+msgid "Astronomen bestätigen: Der Mond hat Muskelkater."
+msgstr "Astronomers confirm: the moon has sore muscles."
+
+#: scripts/ui/main.gd
+msgid "Fäuste"
+msgstr "Fists"
+
+#: scripts/ui/main.gd
+msgid "Hintergründe"
+msgstr "Backgrounds"
+
+#: scripts/ui/main.gd
+msgid "Sounds"
+msgstr "Sounds"
+
+#: scripts/ui/main.gd
+msgid "Handwerk"
+msgstr "Craft"
+
+#: scripts/ui/main.gd
+msgid "Glück"
+msgstr "Luck"
+
+#: scripts/ui/main.gd
+msgid "Komfort"
+msgstr "Comfort"
+
+#: scripts/ui/main.gd
+msgid "Show"
+msgstr "Show"
+
+#: scripts/ui/market_panel.gd
+msgid "Ware"
+msgstr "Goods"
+
+#: scripts/ui/market_panel.gd
+msgid "Kurs"
+msgstr "Price"
+
+#: scripts/ui/market_panel.gd
+msgid "Trend"
+msgstr "Trend"
+
+#: scripts/ui/market_panel.gd
+msgid "Bestand"
+msgstr "Stock"
+
+#: scripts/ui/market_panel.gd
+msgid "Ø Einkauf"
+msgstr "Ø paid"
+
+#: scripts/ui/market_panel.gd
+msgid "Alles verkaufen"
+msgstr "Sell all"
+
+#: scripts/ui/market_panel.gd
+msgid "Gewinn: +%s Wumms"
+msgstr "Profit: +%s Whams"
+
+#: scripts/ui/market_panel.gd
+msgid "Verlust: %s Wumms"
+msgstr "Loss: %s Whams"
+
+#: scripts/ui/market_panel.gd
+msgid "Kaufe Ware billig, verkaufe sie teuer. Die Kurse ändern sich jede Minute. Lager: höchstens %d Stück pro Ware. Guthaben: %s Wumms.\nAchtung: Beim Neuanfang schließt die Börse – nicht verkaufte Ware ist dann weg."
+msgstr "Buy goods cheap, sell them dear. Prices change every minute. Storage: at most %d per item. Balance: %s Whams.\nCareful: the exchange closes on a Fresh Start – unsold goods are lost."
+
+#: scripts/ui/market_panel.gd
+msgid "▲ teuer"
+msgstr "▲ pricey"
+
+#: scripts/ui/market_panel.gd
+msgid "▼ billig"
+msgstr "▼ cheap"
+
+#: scripts/ui/market_panel.gd
+msgid "● normal"
+msgstr "● normal"
+
+#: scripts/ui/minigame.gd
+msgid "%d Punkte!"
+msgstr "%d points!"
+
+#: scripts/ui/minigame.gd
+msgid "Neuer Rekord!\n"
+msgstr "New record!\n"
+
+#: scripts/ui/minigame.gd
+msgid "Rekord: %d\n"
+msgstr "Record: %d\n"
+
+#: scripts/ui/minigame.gd
+msgid "Heute gibt es dafür keine weiteren Beulen-Marken."
+msgstr "No more Bump Tokens for this today."
+
+#: scripts/ui/minigame.gd
+msgid "Nochmal"
+msgstr "Again"
+
+#: scripts/ui/minigame.gd
+msgid "Fertig"
+msgstr "Done"
+
+#: scripts/ui/minigame.gd
+msgid "Punkte %d · %d s"
+msgstr "Points %d · %d s"
+
+#: scripts/ui/minigame.gd
+msgid "Triff die Ziele, bevor sie schrumpfen!"
+msgstr "Hit the targets before they shrink!"
+
+#: scripts/ui/minigame.gd
+msgid "Wirf Torten auf die Pappfiguren! Schnelle Reihen geben mehr Punkte."
+msgstr "Throw pies at the cardboard figures! Faster rows give more points."
+
+#: scripts/ui/shoe.gd
+msgid "Klick mich!"
+msgstr "Click me!"
+
+#: scenes/main.tscn
+msgid "Bild von der Festplatte laden. Du kannst Bilder auch ins Fenster ziehen oder mit Strg+V einfügen.\nNimm Bilder, bei denen alle Beteiligten Spaß verstehen."
+msgstr "Load an image from your disk. You can also drop images on the window or paste them with Ctrl+V.\nOnly use pictures everyone involved will find funny."
+
+#: scenes/main.tscn
+msgid "Neues Opfer …"
+msgstr "New target …"
+
+#: scenes/main.tscn
+msgid "Alle Opfer: wechseln, umbenennen, löschen."
+msgstr "All targets: switch, rename, delete."
+
+#: scenes/main.tscn
+msgid "Wäscht alle Spritzer und Beulen ab. Der Fortschritt bleibt."
+msgstr "Washes off all splats and bumps. Your progress stays."
+
+#: scenes/main.tscn
+msgid "Duschen"
+msgstr "Shower"
+
+#: scenes/main.tscn
+msgid "Alle Erfolge und dein Fortschritt."
+msgstr "All achievements and your progress."
+
+#: scenes/main.tscn
+msgid "Tagesaufträge, Login-Serie, Saison-Event und deine Pokale."
+msgstr "Daily tasks, login streak, seasonal event and your trophies."
+
+#: scenes/main.tscn
+msgid "Kosmetik-Laden: Faust-Skins, Hintergründe und Sounds für Beulen-Marken."
+msgstr "Cosmetics shop: fist skins, backgrounds and sounds for Bump Tokens."
+
+#: scenes/main.tscn
+msgid "Laden"
+msgstr "Shop"
+
+#: scenes/main.tscn
+msgid "Mini-Spiele für Beulen-Marken."
+msgstr "Mini-games for Bump Tokens."
+
+#: scenes/main.tscn
+msgid "Spiele"
+msgstr "Games"
+
+#: scenes/main.tscn
+msgid "Lorbeeren und Beulen-Marken dauerhaft investieren."
+msgstr "Invest laurels and Bump Tokens for good."
+
+#: scenes/main.tscn
+msgid "Menü"
+msgstr "Menu"
+
+#: scenes/main.tscn
+msgid "0"
+msgstr "0"
+
+#: scenes/main.tscn
+msgid "Wumms"
+msgstr "Whams"
+
+#: scenes/main.tscn
+msgid "pro Sekunde: 0"
+msgstr "per second: 0"
+
+#: scenes/main.tscn
+msgid "pro Klick: 1"
+msgstr "per click: 1"
+
+#: scenes/main.tscn
+msgid "Beulen-Marken: 0"
+msgstr "Bump Tokens: 0"
+
+#: scenes/main.tscn
+msgid "Opfer"
+msgstr "Target"
+
+#: scenes/main.tscn
+msgid "Insgesamt verhauen: 0"
+msgstr "Punched in total: 0"
+
+#: scenes/main.tscn
+msgid "Insgesamt erzeugt: 0"
+msgstr "Total produced: 0"
+
+#: scenes/main.tscn
+msgid "Treffer gesamt: 0"
+msgstr "Total hits: 0"
+
+#: scenes/main.tscn
+msgid "Klick oder Leertaste: hauen\n1–5: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer"
+msgstr "Click or Space: punch\n1–5: buy gadget\nCtrl+V: paste image\nDrop an image on the window: new target"
+
+#: scenes/main.tscn
+msgid "Upgrades"
+msgstr "Upgrades"
+
+#: scenes/main.tscn
+msgid "Noch nichts in Sicht. Weiter hauen!"
+msgstr "Nothing in sight yet. Keep punching!"
+
+#: scenes/main.tscn
+msgid "Geräte"
+msgstr "Gadgets"
+
+#: scenes/main.tscn
+msgid "+++ Nachbarn beschweren sich über Quietschen +++"
+msgstr "+++ Neighbours complain about squeaking +++"
+
+#: data/achievements.json
+msgid "Erstes Aua"
+msgstr "First Ouch"
+
+#: data/achievements.json
+msgid "Der erste Treffer. Es wird nicht der letzte sein."
+msgstr "The first hit. It won't be the last."
+
+#: data/achievements.json
+msgid "Aufwärmen"
+msgstr "Warming Up"
+
+#: data/achievements.json
+msgid "100 Treffer. Die Faust ist jetzt warm."
+msgstr "100 hits. The fist is warm now."
+
+#: data/achievements.json
+msgid "Zappelphilipp"
+msgstr "Fidget Fiend"
+
+#: data/achievements.json
+msgid "1.000 Treffer. Stillsitzen ist überbewertet."
+msgstr "1,000 hits. Sitting still is overrated."
+
+#: data/achievements.json
+msgid "Fingerfertig"
+msgstr "Nimble Fingers"
+
+#: data/achievements.json
+msgid "10.000 Treffer. Deine Maus braucht Urlaub."
+msgstr "10,000 hits. Your mouse needs a holiday."
+
+#: data/achievements.json
+msgid "Sehnenscheidenentzündung"
+msgstr "Tendinitis"
+
+#: data/achievements.json
+msgid "100.000 Treffer. Bitte mach mal eine Pause."
+msgstr "100,000 hits. Please take a break."
+
+#: data/achievements.json
+msgid "Klick-Legende"
+msgstr "Click Legend"
+
+#: data/achievements.json
+msgid "1 Million Treffer. Man erzählt sich Geschichten über dich."
+msgstr "1 million hits. People tell stories about you."
+
+#: data/achievements.json
+msgid "Taschengeld"
+msgstr "Pocket Money"
+
+#: data/achievements.json
+msgid "1.000 Wumms insgesamt erzeugt."
+msgstr "1,000 Whams produced in total."
+
+#: data/achievements.json
+msgid "Sparschwein"
+msgstr "Piggy Bank"
+
+#: data/achievements.json
+msgid "100.000 Wumms insgesamt erzeugt."
+msgstr "100,000 Whams produced in total."
+
+#: data/achievements.json
+msgid "Wumms-Millionär"
+msgstr "Wham Millionaire"
+
+#: data/achievements.json
+msgid "1 Million Wumms insgesamt erzeugt."
+msgstr "1 million Whams produced in total."
+
+#: data/achievements.json
+msgid "Wumms-Milliardär"
+msgstr "Wham Billionaire"
+
+#: data/achievements.json
+msgid "1 Milliarde Wumms insgesamt erzeugt."
+msgstr "1 billion Whams produced in total."
+
+#: data/achievements.json
+msgid "Wumms-Billionär"
+msgstr "Wham Trillionaire"
+
+#: data/achievements.json
+msgid "1 Billion Wumms insgesamt erzeugt."
+msgstr "1 trillion Whams produced in total."
+
+#: data/achievements.json
+msgid "Wumms-Billiardär"
+msgstr "Wham Quadrillionaire"
+
+#: data/achievements.json
+msgid "1 Billiarde Wumms. Die Zahl hat jetzt ein e."
+msgstr "1 quadrillion Whams. The number has an e in it now."
+
+#: data/achievements.json
+msgid "Läuft von allein"
+msgstr "Runs By Itself"
+
+#: data/achievements.json
+msgid "1 Wumms pro Sekunde."
+msgstr "1 Wham per second."
+
+#: data/achievements.json
+msgid "Fließbandarbeit"
+msgstr "Assembly Line"
+
+#: data/achievements.json
+msgid "100 Wumms pro Sekunde."
+msgstr "100 Whams per second."
+
+#: data/achievements.json
+msgid "Industrielle Revolution"
+msgstr "Industrial Revolution"
+
+#: data/achievements.json
+msgid "10.000 Wumms pro Sekunde."
+msgstr "10,000 Whams per second."
+
+#: data/achievements.json
+msgid "Ohrfeigen-Konzern"
+msgstr "Slap Corporation"
+
+#: data/achievements.json
+msgid "1 Million Wumms pro Sekunde."
+msgstr "1 million Whams per second."
+
+#: data/achievements.json
+msgid "Galaktisch"
+msgstr "Galactic"
+
+#: data/achievements.json
+msgid "1 Milliarde Wumms pro Sekunde."
+msgstr "1 billion Whams per second."
+
+#: data/achievements.json
+msgid "Faust-Club"
+msgstr "Fist Club"
+
+#: data/achievements.json
+msgid "100 Fäuste. Die erste Regel: Wir reden nicht drüber."
+msgstr "100 fists. First rule: we don't talk about it."
+
+#: data/achievements.json
+msgid "Pantoffel-Armee"
+msgstr "Slipper Army"
+
+#: data/achievements.json
+msgid "100 Pantoffel. Oma ist stolz."
+msgstr "100 slippers. Grandma is proud."
+
+#: data/achievements.json
+msgid "Quietsch-Orchester"
+msgstr "Squeak Orchestra"
+
+#: data/achievements.json
+msgid "50 Gummihämmer in perfekter Harmonie."
+msgstr "50 rubber mallets in perfect harmony."
+
+#: data/achievements.json
+msgid "Sahneschnitte"
+msgstr "Cream Puff"
+
+#: data/achievements.json
+msgid "50 Tortenwurf-Kanonen. Der Konditor weint vor Glück."
+msgstr "50 pie cannons. The pastry chef weeps with joy."
+
+#: data/achievements.json
+msgid "Robo-Liga"
+msgstr "Robo League"
+
+#: data/achievements.json
+msgid "25 Boxroboter. Keiner von ihnen lacht."
+msgstr "25 boxing robots. None of them laughs."
+
+#: data/achievements.json
+msgid "Mond-Manager"
+msgstr "Moon Manager"
+
+#: data/achievements.json
+msgid "Dein erstes Mond-Katapult."
+msgstr "Your first moon catapult."
+
+#: data/achievements.json
+msgid "Zeitreisender"
+msgstr "Time Traveller"
+
+#: data/achievements.json
+msgid "Deine erste Zeitreise-Backpfeife. Du hattest sie schon gestern."
+msgstr "Your first time-travel slap. You already had it yesterday."
+
+#: data/achievements.json
+msgid "Multiversal"
+msgstr "Multiversal"
+
+#: data/achievements.json
+msgid "Die Universelle Backpfeife gehört dir."
+msgstr "The Universal Slap is yours."
+
+#: data/achievements.json
+msgid "Werkstatt"
+msgstr "Workshop"
+
+#: data/achievements.json
+msgid "10 Geräte insgesamt."
+msgstr "10 gadgets in total."
+
+#: data/achievements.json
+msgid "Fabrikhalle"
+msgstr "Factory Floor"
+
+#: data/achievements.json
+msgid "100 Geräte insgesamt."
+msgstr "100 gadgets in total."
+
+#: data/achievements.json
+msgid "Imperium der Watschen"
+msgstr "Empire of Slaps"
+
+#: data/achievements.json
+msgid "500 Geräte insgesamt."
+msgstr "500 gadgets in total."
+
+#: data/achievements.json
+msgid "Komplettset"
+msgstr "Complete Set"
+
+#: data/achievements.json
+msgid "Von jedem Gerät mindestens eins."
+msgstr "At least one of every gadget."
+
+#: data/achievements.json
+msgid "Aufgerüstet"
+msgstr "Upgraded"
+
+#: data/achievements.json
+msgid "Dein erstes Upgrade."
+msgstr "Your first upgrade."
+
+#: data/achievements.json
+msgid "Shopping-Queen"
+msgstr "Shopping Queen"
+
+#: data/achievements.json
+msgid "10 Upgrades gekauft."
+msgstr "10 upgrades bought."
+
+#: data/achievements.json
+msgid "Alles gekauft?"
+msgstr "Bought Everything?"
+
+#: data/achievements.json
+msgid "40 Upgrades gekauft. Fast."
+msgstr "40 upgrades bought. Almost."
+
+#: data/achievements.json
+msgid "Volltreffer"
+msgstr "Bullseye"
+
+#: data/achievements.json
+msgid "Dein erster kritischer Treffer."
+msgstr "Your first critical hit."
+
+#: data/achievements.json
+msgid "Präzisionsarbeit"
+msgstr "Precision Work"
+
+#: data/achievements.json
+msgid "100 kritische Treffer."
+msgstr "100 critical hits."
+
+#: data/achievements.json
+msgid "Glückspilz"
+msgstr "Lucky Duck"
+
+#: data/achievements.json
+msgid "Deinen ersten Goldenen Schuh gefangen."
+msgstr "Caught your first Golden Shoe."
+
+#: data/achievements.json
+msgid "Schuh-Sammler"
+msgstr "Shoe Collector"
+
+#: data/achievements.json
+msgid "10 Goldene Schuhe gefangen."
+msgstr "Caught 10 Golden Shoes."
+
+#: data/achievements.json
+msgid "Goldener Finger"
+msgstr "Golden Finger"
+
+#: data/achievements.json
+msgid "50 Goldene Schuhe gefangen."
+msgstr "Caught 50 Golden Shoes."
+
+#: data/achievements.json
+msgid "Pantoffelheld"
+msgstr "Slipper Hero"
+
+#: data/achievements.json
+msgid "10 Silberne Pantoffel gefangen."
+msgstr "Caught 10 Silver Slippers."
+
+#: data/achievements.json
+msgid "Raserei-Reiter"
+msgstr "Frenzy Rider"
+
+#: data/achievements.json
+msgid "5 Mal Raserei ausgelöst."
+msgstr "Triggered Frenzy 5 times."
+
+#: data/achievements.json
+msgid "Pechvogel"
+msgstr "Jinxed"
+
+#: data/achievements.json
+msgid "Ein Pech-Schuh. Immerhin gab es Beulen-Marken."
+msgstr "A Bad Luck Boot. At least there were Bump Tokens."
+
+#: data/achievements.json
+msgid "Fotograf"
+msgstr "Photographer"
+
+#: data/achievements.json
+msgid "Dein erstes eigenes Bild importiert."
+msgstr "Imported your first own image."
+
+#: data/achievements.json
+msgid "Sammler"
+msgstr "Collector"
+
+#: data/achievements.json
+msgid "10 eigene Bilder importiert."
+msgstr "Imported 10 own images."
+
+#: data/achievements.json
+msgid "Eine Stunde Backpfeife"
+msgstr "One Hour of Slapping"
+
+#: data/achievements.json
+msgid "Eine Stunde Spielzeit."
+msgstr "One hour of playtime."
+
+#: data/achievements.json
+msgid "Ein Tag Backpfeife"
+msgstr "One Day of Slapping"
+
+#: data/achievements.json
+msgid "24 Stunden Spielzeit."
+msgstr "24 hours of playtime."
+
+#: data/achievements.json
+msgid "Ein Jahr Backpfeife"
+msgstr "One Year of Slapping"
+
+#: data/achievements.json
+msgid "Ein Jahr Spielzeit. Wir sind sprachlos."
+msgstr "One year of playtime. We're speechless."
+
+#: data/achievements.json
+msgid "Nachtschicht"
+msgstr "Night Shift"
+
+#: data/achievements.json
+msgid "Zwischen 2 und 4 Uhr nachts gespielt."
+msgstr "Played between 2 and 4 a.m."
+
+#: data/achievements.json
+msgid "Pazifist"
+msgstr "Pacifist"
+
+#: data/achievements.json
+msgid "10 Minuten lang nichts gehauen. Respekt."
+msgstr "Didn't punch anything for 10 minutes. Respect."
+
+#: data/achievements.json
+msgid "Wieder zuhause"
+msgstr "Home Again"
+
+#: data/achievements.json
+msgid "Nach über 24 Stunden zurückgekehrt."
+msgstr "Came back after more than 24 hours."
+
+#: data/achievements.json
+msgid "Frisch geduscht"
+msgstr "Freshly Showered"
+
+#: data/achievements.json
+msgid "Das Opfer einmal abgeduscht."
+msgstr "Gave the target a shower."
+
+#: data/achievements.json
+msgid "Ausverkauf"
+msgstr "Clearance Sale"
+
+#: data/achievements.json
+msgid "Ein Gerät verkauft. Warum auch immer."
+msgstr "Sold a gadget. For whatever reason."
+
+#: data/achievements.json
+msgid "Bombastus-Stammkunde"
+msgstr "Bombastus Regular"
+
+#: data/achievements.json
+msgid "1.000 Treffer auf Generalissimo Bombastus."
+msgstr "1,000 hits on Generalissimo Bombastus."
+
+#: data/achievements.json
+msgid "Neuanfang"
+msgstr "Fresh Start"
+
+#: data/achievements.json
+msgid "Zum ersten Mal neu angefangen. Bombastus hatte gerade die Beulen auskuriert."
+msgstr "Started fresh for the first time. Bombastus had just healed his bumps."
+
+#: data/achievements.json
+msgid "Wiedergeburt"
+msgstr "Rebirth"
+
+#: data/achievements.json
+msgid "5 Mal neu angefangen."
+msgstr "Started fresh 5 times."
+
+#: data/achievements.json
+msgid "Lorbeerkranz"
+msgstr "Laurel Wreath"
+
+#: data/achievements.json
+msgid "10 Lorbeeren gesammelt."
+msgstr "Collected 10 laurels."
+
+#: data/achievements.json
+msgid "Erster Zweig"
+msgstr "First Branch"
+
+#: data/achievements.json
+msgid "Den ersten Teil des Lorbeer-Baums freigeschaltet."
+msgstr "Unlocked the first part of the Laurel Tree."
+
+#: data/achievements.json
+msgid "Gärtner"
+msgstr "Gardener"
+
+#: data/achievements.json
+msgid "10 Teile des Lorbeer-Baums freigeschaltet."
+msgstr "Unlocked 10 parts of the Laurel Tree."
+
+#: data/achievements.json
+msgid "Combo-König"
+msgstr "Combo King"
+
+#: data/achievements.json
+msgid "Combo 100 erreicht. Deine Finger sind ein Schatten."
+msgstr "Reached combo 100. Your fingers are a blur."
+
+#: data/achievements.json
+msgid "Wutbürger"
+msgstr "Angry Citizen"
+
+#: data/achievements.json
+msgid "Zum ersten Mal den Wutmodus entfesselt."
+msgstr "Unleashed Rage Mode for the first time."
+
+#: data/achievements.json
+msgid "Wutentbrannt"
+msgstr "Seething"
+
+#: data/achievements.json
+msgid "25 Mal den Wutmodus entfesselt."
+msgstr "Unleashed Rage Mode 25 times."
+
+#: data/achievements.json
+msgid "Gut verbeult"
+msgstr "Nicely Bumped"
+
+#: data/achievements.json
+msgid "Beulen-Level 5 bei einem Opfer."
+msgstr "Bump Level 5 on one target."
+
+#: data/achievements.json
+msgid "Voll verbeult"
+msgstr "Fully Bumped"
+
+#: data/achievements.json
+msgid "Beulen-Level 10 bei einem Opfer. Mehr Beulen passen nicht drauf."
+msgstr "Bump Level 10 on one target. No more bumps fit on there."
+
+#: data/achievements.json
+msgid "Galerist"
+msgstr "Gallerist"
+
+#: data/achievements.json
+msgid "Ein Bild in der Galerie umbenannt."
+msgstr "Renamed an image in the gallery."
+
+#: data/achievements.json
+msgid "Bossbezwinger"
+msgstr "Boss Beater"
+
+#: data/achievements.json
+msgid "Den ersten Boss-Kampf gewonnen."
+msgstr "Won your first boss fight."
+
+#: data/achievements.json
+msgid "Endgegner-Experte"
+msgstr "Final Boss Expert"
+
+#: data/achievements.json
+msgid "5 Boss-Kämpfe gewonnen."
+msgstr "Won 5 boss fights."
+
+#: data/achievements.json
+msgid "Auftragnehmer"
+msgstr "Contractor"
+
+#: data/achievements.json
+msgid "Den ersten Tagesauftrag erledigt."
+msgstr "Completed your first daily task."
+
+#: data/achievements.json
+msgid "Fleißiges Bienchen"
+msgstr "Busy Bee"
+
+#: data/achievements.json
+msgid "25 Tagesaufträge erledigt."
+msgstr "Completed 25 daily tasks."
+
+#: data/achievements.json
+msgid "Treue Seele"
+msgstr "Loyal Soul"
+
+#: data/achievements.json
+msgid "7 Tage in Folge vorbeigeschaut."
+msgstr "Dropped by 7 days in a row."
+
+#: data/achievements.json
+msgid "Dojo-Meister"
+msgstr "Dojo Master"
+
+#: data/achievements.json
+msgid "40 Punkte im Reaktions-Dojo."
+msgstr "40 points in the Reaction Dojo."
+
+#: data/achievements.json
+msgid "Tortenkönig"
+msgstr "Pie King"
+
+#: data/achievements.json
+msgid "60 Punkte in der Tortenwurf-Schießbude."
+msgstr "60 points in the Pie Shooting Gallery."
+
+#: data/achievements.json
+msgid "Saisonarbeiter"
+msgstr "Seasonal Worker"
+
+#: data/achievements.json
+msgid "Ein Saison-Event abgeschlossen."
+msgstr "Completed a seasonal event."
+
+#: data/achievements.json
+msgid "Erinnerungsfoto"
+msgstr "Souvenir Photo"
+
+#: data/achievements.json
+msgid "Ein Foto gespeichert. Für die Enkel."
+msgstr "Saved a photo. For the grandkids."
+
+#: data/achievements.json
+msgid "Herausforderer"
+msgstr "Challenger"
+
+#: data/achievements.json
+msgid "Eine Herausforderung gemeistert."
+msgstr "Mastered a challenge."
+
+#: data/achievements.json
+msgid "Alle Prüfungen bestanden"
+msgstr "All Trials Passed"
+
+#: data/achievements.json
+msgid "Alle drei Herausforderungen gemeistert."
+msgstr "Mastered all three challenges."
+
+#: data/achievements.json
+msgid "Börsenhai"
+msgstr "Market Shark"
+
+#: data/achievements.json
+msgid "10 Mal mit Gewinn an der Beulen-Börse verkauft."
+msgstr "Sold at a profit on the Bump Exchange 10 times."
+
+#: data/achievements.json
+msgid "Modebewusst"
+msgstr "Fashion Conscious"
+
+#: data/achievements.json
+msgid "Etwas im Kosmetik-Laden gekauft."
+msgstr "Bought something in the Cosmetics Shop."
+
+#: data/achievements.json
+msgid "Promi-Galerie"
+msgstr "Celebrity Gallery"
+
+#: data/achievements.json
+msgid "Jeden mitgelieferten Bösewicht mindestens 100 Mal gehauen."
+msgstr "Punched every included villain at least 100 times."
+
+#: data/bosses.json
+msgid "Wegducken"
+msgstr "Duck and Dodge"
+
+#: data/bosses.json
+msgid "Er duckt sich immer wieder weg – Timing!"
+msgstr "He keeps ducking away – timing!"
+
+#: data/bosses.json
+msgid "Schild aus Pappe"
+msgstr "Cardboard Shield"
+
+#: data/bosses.json
+msgid "Ein Pappschild blockt eine Seite. Hau auf die andere!"
+msgstr "A cardboard shield blocks one side. Hit the other one!"
+
+#: data/bosses.json
+msgid "Gummiente"
+msgstr "Rubber Duck"
+
+#: data/bosses.json
+msgid "Eine Gummiente lenkt ab. Nicht auf die Ente hauen!"
+msgstr "A rubber duck is distracting you. Don't hit the duck!"
+
+#: data/bosses.json
+msgid "Pappschild-Pokal"
+msgstr "Cardboard Shield Cup"
+
+#: data/bosses.json
+msgid "Goldene Gummiente"
+msgstr "Golden Rubber Duck"
+
+#: data/bosses.json
+msgid "Verbeulter Kochtopf-Helm"
+msgstr "Dented Saucepan Helmet"
+
+#: data/bosses.json
+msgid "Orden für Tapferkeit (aus Pappe)"
+msgstr "Medal of Bravery (cardboard)"
+
+#: data/bosses.json
+msgid "Silberner Pantoffel am Bande"
+msgstr "Silver Slipper on a Ribbon"
+
+#: data/bosses.json
+msgid "Kristall-Pflaster"
+msgstr "Crystal Band-Aid"
+
+#: data/bosses.json
+msgid "Die Goldene Beule"
+msgstr "The Golden Bump"
+
+#: data/bosses.json
+msgid "Großes Ehrenveilchen"
+msgstr "Grand Black Eye of Honour"
+
+#: data/challenges.json
+msgid "Nur Fäuste"
+msgstr "Fists Only"
+
+#: data/challenges.json
+msgid "Keine Geräte erlaubt – nur deine Klicks zählen."
+msgstr "No gadgets allowed – only your clicks count."
+
+#: data/challenges.json
+msgid "Ohne Upgrades"
+msgstr "No Upgrades"
+
+#: data/challenges.json
+msgid "Kein einziges Upgrade. Nur Geräte, so wie sie aus der Fabrik kommen."
+msgstr "Not a single upgrade. Gadgets only, straight from the factory."
+
+#: data/challenges.json
+msgid "Inflation"
+msgstr "Inflation"
+
+#: data/challenges.json
+msgid "Alle Geräte kosten das Dreifache."
+msgstr "All gadgets cost three times as much."
+
+#: data/cosmetics.json
+msgid "Faust"
+msgstr "Fist"
+
+#: data/cosmetics.json
+msgid "Die gute alte Faust."
+msgstr "The good old fist."
+
+#: data/cosmetics.json
+msgid "Goldene Faust"
+msgstr "Golden Fist"
+
+#: data/cosmetics.json
+msgid "Aus purem Gold. Fast."
+msgstr "Made of pure gold. Almost."
+
+#: data/cosmetics.json
+msgid "Gummihandschuh"
+msgstr "Rubber Glove"
+
+#: data/cosmetics.json
+msgid "Für die gründliche Grundreinigung."
+msgstr "For a really thorough clean."
+
+#: data/cosmetics.json
+msgid "Boxhandschuh"
+msgstr "Boxing Glove"
+
+#: data/cosmetics.json
+msgid "Zwölf Unzen reines Selbstbewusstsein."
+msgstr "Twelve ounces of pure confidence."
+
+#: data/cosmetics.json
+msgid "Schaumstoff-Hand"
+msgstr "Foam Hand"
+
+#: data/cosmetics.json
+msgid "Wir sind die Nummer eins! Glaubt die Hand."
+msgstr "We're number one! Says the hand."
+
+#: data/cosmetics.json
+msgid "Pfote"
+msgstr "Paw"
+
+#: data/cosmetics.json
+msgid "Samtpfote mit Krallen eingefahren. Meistens."
+msgstr "Velvet paw, claws retracted. Mostly."
+
+#: data/cosmetics.json
+msgid "Brathähnchenkeule"
+msgstr "Chicken Drumstick"
+
+#: data/cosmetics.json
+msgid "Knusprig, saftig, durchschlagend."
+msgstr "Crispy, juicy, hard-hitting."
+
+#: data/cosmetics.json
+msgid "Standard"
+msgstr "Standard"
+
+#: data/cosmetics.json
+msgid "Warm und gemütlich."
+msgstr "Warm and cosy."
+
+#: data/cosmetics.json
+msgid "Zirkuszelt"
+msgstr "Circus Tent"
+
+#: data/cosmetics.json
+msgid "Manege frei!"
+msgstr "Let the show begin!"
+
+#: data/cosmetics.json
+msgid "Weltraum"
+msgstr "Outer Space"
+
+#: data/cosmetics.json
+msgid "Backpfeifen in der Schwerelosigkeit."
+msgstr "Slaps in zero gravity."
+
+#: data/cosmetics.json
+msgid "Wohnzimmer"
+msgstr "Living Room"
+
+#: data/cosmetics.json
+msgid "Tapete, Sofa, Stehlampe. Bitte nicht auf den Teppich."
+msgstr "Wallpaper, sofa, floor lamp. Mind the carpet."
+
+#: data/cosmetics.json
+msgid "Arena"
+msgstr "Arena"
+
+#: data/cosmetics.json
+msgid "Seile, Scheinwerfer, tosender Applaus."
+msgstr "Ropes, spotlights, roaring applause."
+
+#: data/cosmetics.json
+msgid "Comic"
+msgstr "Comic"
+
+#: data/cosmetics.json
+msgid "Boing, Klatsch, Quietsch."
+msgstr "Boing, smack, squeak."
+
+#: data/cosmetics.json
+msgid "Retro-Arcade"
+msgstr "Retro Arcade"
+
+#: data/cosmetics.json
+msgid "Piep, Bump, Bling."
+msgstr "Beep, bump, bling."
+
+#: data/cosmetics.json
+msgid "Kampfsport"
+msgstr "Martial Arts"
+
+#: data/cosmetics.json
+msgid "Wusch! Zack! Gong!"
+msgstr "Whoosh! Zap! Gong!"
+
+#: data/devices.json
+msgid "Der Klassiker. Haut einfach mal drauf."
+msgstr "The classic. Just goes for it."
+
+#: data/devices.json
+msgid "Pantoffel"
+msgstr "Slipper"
+
+#: data/devices.json
+msgid "Oma-Schlappen mit viel Schwung."
+msgstr "Grandma's slippers with a lot of swing."
+
+#: data/devices.json
+msgid "Gummihammer"
+msgstr "Rubber Mallet"
+
+#: data/devices.json
+msgid "Quietscht bei jedem Treffer."
+msgstr "Squeaks with every hit."
+
+#: data/devices.json
+msgid "Boxhandschuh-Katapult"
+msgstr "Boxing Glove Catapult"
+
+#: data/devices.json
+msgid "Feder, Hebel, Handschuh."
+msgstr "Spring, lever, glove."
+
+#: data/devices.json
+msgid "Tortenwurf-Kanone"
+msgstr "Pie Cannon"
+
+#: data/devices.json
+msgid "Sahne in Überschallgeschwindigkeit."
+msgstr "Cream at supersonic speed."
+
+#: data/devices.json
+msgid "Abrissbirne (aus Schaumstoff)"
+msgstr "Wrecking Ball (foam)"
+
+#: data/devices.json
+msgid "Groß, weich, beeindruckend."
+msgstr "Big, soft, impressive."
+
+#: data/devices.json
+msgid "Ohrfeigen-Fließband"
+msgstr "Slap Conveyor Belt"
+
+#: data/devices.json
+msgid "400 mechanische Hände im Takt."
+msgstr "400 mechanical hands in rhythm."
+
+#: data/devices.json
+msgid "Amboss-Regen-Anlage"
+msgstr "Anvil Rain Machine"
+
+#: data/devices.json
+msgid "Ein Klassiker aus dem Zeichentrick, jetzt in Serie."
+msgstr "A cartoon classic, now in mass production."
+
+#: data/devices.json
+msgid "Boxroboter Mk. I"
+msgstr "Boxing Robot Mk. I"
+
+#: data/devices.json
+msgid "Gelenkig, humorlos, effektiv."
+msgstr "Agile, humourless, effective."
+
+#: data/devices.json
+msgid "Mond-Katapult"
+msgstr "Moon Catapult"
+
+#: data/devices.json
+msgid "Der Mond holt aus."
+msgstr "The moon winds up."
+
+#: data/devices.json
+msgid "Zeitreise-Backpfeife"
+msgstr "Time-Travel Slap"
+
+#: data/devices.json
+msgid "Haut gestern, heute und morgen gleichzeitig."
+msgstr "Hits yesterday, today and tomorrow at once."
+
+#: data/devices.json
+msgid "Die Universelle Backpfeife"
+msgstr "The Universal Slap"
+
+#: data/devices.json
+msgid "Eine Ohrfeige, die durch das Multiversum hallt."
+msgstr "A slap that echoes through the multiverse."
+
+#: data/events.json
+msgid "Halloween-Hexe Hildegard"
+msgstr "Hildegard the Halloween Witch"
+
+#: data/events.json
+msgid "Kürbis-Pokal"
+msgstr "Pumpkin Cup"
+
+#: data/events.json
+msgid "Hexe Hildegard ist zu Besuch und hat ihre Warzen poliert. 5.000 Treffer bis zum Kürbis-Pokal!"
+msgstr "Hildegard the witch is visiting and has polished her warts. 5,000 hits until the Pumpkin Cup!"
+
+#: data/events.json
+msgid "Weihnachtsmuffel Gustav"
+msgstr "Gustav the Christmas Grump"
+
+#: data/events.json
+msgid "Lebkuchen-Orden"
+msgstr "Gingerbread Medal"
+
+#: data/events.json
+msgid "Gustav hasst Lametta, Lieder und gute Laune. 5.000 Treffer bis zum Lebkuchen-Orden!"
+msgstr "Gustav hates tinsel, carols and good cheer. 5,000 hits until the Gingerbread Medal!"
+
+#: data/figures.json
+msgid "Dr. Doomsday Dieter"
+msgstr "Dr. Doomsday Dieter"
+
+#: data/figures.json
+msgid "Baron von Blamage"
+msgstr "Baron von Blunder"
+
+#: data/figures.json
+msgid "Sir Fiesling der Dritte"
+msgstr "Sir Scoundrel the Third"
+
+#: data/figures.json
+msgid "Eigenes Bild"
+msgstr "Own image"
+
+#: data/laurels.json
+msgid "Werkzeugkiste"
+msgstr "Toolbox"
+
+#: data/laurels.json
+msgid "Geräte kosten 5 % weniger."
+msgstr "Gadgets cost 5 % less."
+
+#: data/laurels.json
+msgid "Starthilfe"
+msgstr "Head Start"
+
+#: data/laurels.json
+msgid "Nach jedem Neuanfang stehen 10 Fäuste bereit."
+msgstr "10 fists are ready after every Fresh Start."
+
+#: data/laurels.json
+msgid "Großeinkauf"
+msgstr "Bulk Purchase"
+
+#: data/laurels.json
+msgid "Geräte kosten weitere 5 % weniger."
+msgstr "Gadgets cost another 5 % less."
+
+#: data/laurels.json
+msgid "Startpaket"
+msgstr "Starter Pack"
+
+#: data/laurels.json
+msgid "Nach jedem Neuanfang: zusätzlich 10 Pantoffel und 5 Gummihämmer."
+msgstr "After every Fresh Start: 10 slippers and 5 rubber mallets on top."
+
+#: data/laurels.json
+msgid "Meisterwerkstatt"
+msgstr "Master Workshop"
+
+#: data/laurels.json
+msgid "Geräte kosten weitere 10 % weniger."
+msgstr "Gadgets cost another 10 % less."
+
+#: data/laurels.json
+msgid "Glücksklee"
+msgstr "Four-Leaf Clover"
+
+#: data/laurels.json
+msgid "Goldene Schuhe und Silberne Pantoffel erscheinen 10 % häufiger."
+msgstr "Golden Shoes and Silver Slippers appear 10 % more often."
+
+#: data/laurels.json
+msgid "Langer Atem"
+msgstr "Staying Power"
+
+#: data/laurels.json
+msgid "Schuhe bleiben 50 % länger sichtbar."
+msgstr "Shoes stay visible 50 % longer."
+
+#: data/laurels.json
+msgid "Hufeisen"
+msgstr "Horseshoe"
+
+#: data/laurels.json
+msgid "Goldene Schuhe erscheinen 15 % häufiger."
+msgstr "Golden Shoes appear 15 % more often."
+
+#: data/laurels.json
+msgid "Goldrausch"
+msgstr "Gold Rush"
+
+#: data/laurels.json
+msgid "Raserei und andere Effekte halten 50 % länger."
+msgstr "Frenzy and other effects last 50 % longer."
+
+#: data/laurels.json
+msgid "Glücksinstinkt"
+msgstr "Lucky Instinct"
+
+#: data/laurels.json
+msgid "+3 % Chance auf kritische Treffer (×10), auch ohne Upgrade."
+msgstr "+3 % chance of critical hits (×10), even without the upgrade."
+
+#: data/laurels.json
+msgid "Nachtwächter"
+msgstr "Night Watchman"
+
+#: data/laurels.json
+msgid "Offline arbeiten die Geräte mit 75 % statt 50 %."
+msgstr "Offline, gadgets work at 75 % instead of 50 %."
+
+#: data/laurels.json
+msgid "Dauerfeuer-Abo"
+msgstr "Rapid Fire Subscription"
+
+#: data/laurels.json
+msgid "Dauerfeuer ist von Anfang an freigeschaltet."
+msgstr "Rapid Fire is unlocked from the start."
+
+#: data/laurels.json
+msgid "Langschläfer"
+msgstr "Late Sleeper"
+
+#: data/laurels.json
+msgid "Offline-Fortschritt bis zu 24 statt 8 Stunden."
+msgstr "Offline progress for up to 24 instead of 8 hours."
+
+#: data/laurels.json
+msgid "Automatischer Einkauf"
+msgstr "Automatic Shopping"
+
+#: data/laurels.json
+msgid "Kauft bezahlbare Upgrades automatisch (im Menü abschaltbar)."
+msgstr "Buys affordable upgrades automatically (can be turned off in the menu)."
+
+#: data/laurels.json
+msgid "Volle Schicht"
+msgstr "Full Shift"
+
+#: data/laurels.json
+msgid "Offline: 100 % Produktion, bis zu 48 Stunden."
+msgstr "Offline: 100 % production, for up to 48 hours."
+
+#: data/laurels.json
+msgid "Ein Mauszeiger aus purem Gold. Fast."
+msgstr "A mouse pointer made of pure gold. Almost."
+
+#: data/laurels.json
+msgid "Hintergrund: Manege frei!"
+msgstr "Background: let the show begin!"
+
+#: data/laurels.json
+msgid "Retro-Sounds"
+msgstr "Retro Sounds"
+
+#: data/laurels.json
+msgid "Piep, Bump, Bling – wie am Spielautomaten."
+msgstr "Beep, bump, bling – just like the arcade."
+
+#: data/laurels.json
+msgid "Hintergrund: Backpfeifen in der Schwerelosigkeit."
+msgstr "Background: slaps in zero gravity."
+
+#: data/laurels.json
+msgid "Konfetti-Kanone"
+msgstr "Confetti Cannon"
+
+#: data/laurels.json
+msgid "Jeder kritische Treffer feuert Konfetti."
+msgstr "Every critical hit fires confetti."
+
+#: data/market.json
+msgid "Pflaster"
+msgstr "Band-aids"
+
+#: data/market.json
+msgid "Eisbeutel"
+msgstr "Ice packs"
+
+#: data/market.json
+msgid "Sahnetorten"
+msgstr "Cream pies"
+
+#: data/market.json
+msgid "Gummienten"
+msgstr "Rubber ducks"
+
+#: data/quests.json
+msgid "Verhaue %s Mal ein Opfer"
+msgstr "Punch a target %s times"
+
+#: data/quests.json
+msgid "Kaufe %s Geräte"
+msgstr "Buy %s gadgets"
+
+#: data/quests.json
+msgid "Kaufe %s Upgrades"
+msgstr "Buy %s upgrades"
+
+#: data/quests.json
+msgid "Fange %s Goldene Schuhe"
+msgstr "Catch %s Golden Shoes"
+
+#: data/quests.json
+msgid "Entfessle %s Mal den Wutmodus"
+msgstr "Unleash Rage Mode %s times"
+
+#: data/quests.json
+msgid "Erreiche %s Mal Combo 100"
+msgstr "Reach combo 100 %s times"
+
+#: data/quests.json
+msgid "Lande %s kritische Treffer"
+msgstr "Land %s critical hits"
+
+#: data/quests.json
+msgid "Spiele %s Mini-Spiel(e)"
+msgstr "Play %s mini-game(s)"
+
+#: data/upgrades.json
+msgid "Boxhandschuh-Training"
+msgstr "Boxing Glove Training"
+
+#: data/upgrades.json
+msgid "Drei Runden Seilspringen und ein ernster Blick in den Spiegel."
+msgstr "Three rounds of skipping and a stern look in the mirror."
+
+#: data/upgrades.json
+msgid "Stahlkappenhandschuh"
+msgstr "Steel-Toe Glove"
+
+#: data/upgrades.json
+msgid "Eigentlich für Baustellen gedacht. Eigentlich."
+msgstr "Actually meant for building sites. Actually."
+
+#: data/upgrades.json
+msgid "Karate-Kurs (Volkshochschule)"
+msgstr "Karate Class (Community College)"
+
+#: data/upgrades.json
+msgid "Dienstags 19 Uhr, Raum 104. Bitte Hausschuhe mitbringen."
+msgstr "Tuesdays 7 p.m., room 104. Please bring house slippers."
+
+#: data/upgrades.json
+msgid "Kritische Treffer"
+msgstr "Critical Hits"
+
+#: data/upgrades.json
+msgid "Genau auf die Nase. Manchmal. Mit Glück."
+msgstr "Right on the nose. Sometimes. With luck."
+
+#: data/upgrades.json
+msgid "Dauerfeuer"
+msgstr "Rapid Fire"
+
+#: data/upgrades.json
+msgid "Wer braucht schon Pausen? Maus gedrückt halten und zusehen."
+msgstr "Who needs breaks? Hold the mouse button and watch."
+
+#: data/upgrades.json
+msgid "Sponsorenvertrag"
+msgstr "Sponsorship Deal"
+
+#: data/upgrades.json
+msgid "Eine Pflasterfirma zahlt pro Beule. Alle Geräte arbeiten motivierter."
+msgstr "A band-aid company pays per bump. All gadgets work harder."
+
+#: data/upgrades.json
+msgid "Klick = 1 % deiner WPS"
+msgstr "Click = 1 % of your WPS"
+
+#: data/upgrades.json
+msgid "Deine Geräte feuern dich an. Jeder Klick bekommt etwas von ihrer Arbeit ab."
+msgstr "Your gadgets cheer you on. Every click gets a share of their work."
+
+#: data/upgrades.json
+msgid "Klick = 5 % deiner WPS"
+msgstr "Click = 5 % of your WPS"
+
+#: data/upgrades.json
+msgid "Die Geräte klatschen jetzt im Takt mit."
+msgstr "The gadgets now clap along in time."
+
+#: data/upgrades.json
+msgid "Milchtüte der Wut"
+msgstr "Carton of Rage Milk"
+
+#: data/upgrades.json
+msgid "Wutmilch! Jeder Erfolg macht deine Geräte ein bisschen wütender."
+msgstr "Rage milk! Every achievement makes your gadgets a little angrier."
+
+#: data/upgrades.json
+msgid "Fanclub"
+msgstr "Fan Club"
+
+#: data/upgrades.json
+msgid "Mit Schal, Trommel und selbstgemaltem Transparent."
+msgstr "With scarves, drums and a hand-painted banner."
+
+#: data/upgrades.json
+msgid "Kamerateam"
+msgstr "Camera Crew"
+
+#: data/upgrades.json
+msgid "Wo eine Kamera ist, taucht auch ein Goldener Schuh auf."
+msgstr "Wherever there's a camera, a Golden Shoe turns up."
+
+#: data/upgrades.json
+msgid "Paparazzi"
+msgstr "Paparazzi"
+
+#: data/upgrades.json
+msgid "Noch mehr Kameras. Die Goldenen Schuhe fühlen sich geschmeichelt."
+msgstr "Even more cameras. The Golden Shoes are flattered."
+
+#: data/upgrades.json
+msgid "Knöchelpolster"
+msgstr "Knuckle Padding"
+
+#: data/upgrades.json
+msgid "Weich für dich, hart für ihn."
+msgstr "Soft for you, hard for him."
+
+#: data/upgrades.json
+msgid "Turbo-Knöchel"
+msgstr "Turbo Knuckles"
+
+#: data/upgrades.json
+msgid "Mit Rückstoßdämpfer und Rennstreifen."
+msgstr "With recoil dampers and racing stripes."
+
+#: data/upgrades.json
+msgid "Faust des Monats"
+msgstr "Fist of the Month"
+
+#: data/upgrades.json
+msgid "Ihr Foto hängt jetzt im Pausenraum."
+msgstr "Its photo now hangs in the break room."
+
+#: data/upgrades.json
+msgid "Flauschfutter"
+msgstr "Fluffy Lining"
+
+#: data/upgrades.json
+msgid "Pantoffel mit Teddyfell. Kuschelig und schwungvoll."
+msgstr "Slippers with teddy fur. Cosy and full of swing."
+
+#: data/upgrades.json
+msgid "Stahlkappen-Pantoffel"
+msgstr "Steel-Toe Slippers"
+
+#: data/upgrades.json
+msgid "Oma hat aufgerüstet."
+msgstr "Grandma has upgraded."
+
+#: data/upgrades.json
+msgid "Pantoffel mit Raketenantrieb"
+msgstr "Rocket-Powered Slippers"
+
+#: data/upgrades.json
+msgid "Bitte nicht in geschlossenen Räumen zünden."
+msgstr "Please do not ignite indoors."
+
+#: data/upgrades.json
+msgid "Extra-Quietscher"
+msgstr "Extra Squeaker"
+
+#: data/upgrades.json
+msgid "Ein zweites Quietsch-Ventil. Die Nachbarn sind begeistert."
+msgstr "A second squeak valve. The neighbours are thrilled."
+
+#: data/upgrades.json
+msgid "Doppelkopf-Hammer"
+msgstr "Double-Headed Mallet"
+
+#: data/upgrades.json
+msgid "Zwei Köpfe quietschen mehr als einer."
+msgstr "Two heads squeak more than one."
+
+#: data/upgrades.json
+msgid "Hammer-Hammer-Hammer"
+msgstr "Hammer-Hammer-Hammer"
+
+#: data/upgrades.json
+msgid "Ein Hammer, der mit Hämmern hämmert."
+msgstr "A hammer that hammers with hammers."
+
+#: data/upgrades.json
+msgid "Stärkere Feder"
+msgstr "Stronger Spring"
+
+#: data/upgrades.json
+msgid "Aus einer sehr motivierten Matratze ausgebaut."
+msgstr "Taken from a very motivated mattress."
+
+#: data/upgrades.json
+msgid "Doppelfeder-Getriebe"
+msgstr "Double-Spring Gearbox"
+
+#: data/upgrades.json
+msgid "Feder, Feder, Hebel, Handschuh."
+msgstr "Spring, spring, lever, glove."
+
+#: data/upgrades.json
+msgid "Katapult-Tarifvertrag"
+msgstr "Catapult Union Contract"
+
+#: data/upgrades.json
+msgid "Längere Federn, kürzere Pausen. Alle sind zufrieden."
+msgstr "Longer springs, shorter breaks. Everyone's happy."
+
+#: data/upgrades.json
+msgid "Sahnesteif"
+msgstr "Whipped Cream Stiffener"
+
+#: data/upgrades.json
+msgid "Hält die Form auch bei Mach 2."
+msgstr "Keeps its shape even at Mach 2."
+
+#: data/upgrades.json
+msgid "Schwarzwälder Munition"
+msgstr "Black Forest Ammunition"
+
+#: data/upgrades.json
+msgid "Mit Kirsche obendrauf. Als Zielhilfe."
+msgstr "With a cherry on top. For aiming."
+
+#: data/upgrades.json
+msgid "Hochzeitstorten-Salve"
+msgstr "Wedding Cake Salvo"
+
+#: data/upgrades.json
+msgid "Sieben Etagen, ein Ziel."
+msgstr "Seven tiers, one target."
+
+#: data/upgrades.json
+msgid "Extra-Schaumstoff"
+msgstr "Extra Foam"
+
+#: data/upgrades.json
+msgid "Noch weicher. Noch beeindruckender."
+msgstr "Even softer. Even more impressive."
+
+#: data/upgrades.json
+msgid "Riesenbirne"
+msgstr "Giant Ball"
+
+#: data/upgrades.json
+msgid "Passt kaum noch durchs Tor."
+msgstr "Barely fits through the gate."
+
+#: data/upgrades.json
+msgid "Birne mit Glitzer"
+msgstr "Glitter Ball"
+
+#: data/upgrades.json
+msgid "Hinterlässt Beulen und gute Laune."
+msgstr "Leaves bumps and good vibes."
+
+#: data/upgrades.json
+msgid "Handgelenk-Schmierfett"
+msgstr "Wrist Grease"
+
+#: data/upgrades.json
+msgid "Flutscht wie geölt. Weil es geölt ist."
+msgstr "Slick as if oiled. Because it is."
+
+#: data/upgrades.json
+msgid "Zweite Schicht"
+msgstr "Second Shift"
+
+#: data/upgrades.json
+msgid "Die Nachtschicht-Hände sind besonders motiviert."
+msgstr "The night-shift hands are especially motivated."
+
+#: data/upgrades.json
+msgid "Akkord-Ohrfeigen"
+msgstr "Piecework Slaps"
+
+#: data/upgrades.json
+msgid "Bezahlt wird pro Klatsch."
+msgstr "Paid per smack."
+
+#: data/upgrades.json
+msgid "Amboss-Zielfernrohr"
+msgstr "Anvil Scope"
+
+#: data/upgrades.json
+msgid "Trifft jetzt auch, wenn das Ziel zur Seite tritt."
+msgstr "Now hits even when the target steps aside."
+
+#: data/upgrades.json
+msgid "Amboss-Abo"
+msgstr "Anvil Subscription"
+
+#: data/upgrades.json
+msgid "Jeden Morgen frisch vom Himmel."
+msgstr "Fresh from the sky every morning."
+
+#: data/upgrades.json
+msgid "Wolken-Ambossfabrik"
+msgstr "Cloud Anvil Factory"
+
+#: data/upgrades.json
+msgid "Die Wettervorhersage sagt: 90 % Amboss."
+msgstr "The forecast says: 90 % anvil."
+
+#: data/upgrades.json
+msgid "Software-Update 1.1"
+msgstr "Software Update 1.1"
+
+#: data/upgrades.json
+msgid "Behebt einen Fehler, bei dem der Roboter höflich war."
+msgstr "Fixes a bug where the robot was polite."
+
+#: data/upgrades.json
+msgid "Humor-Modul (deaktiviert)"
+msgstr "Humour Module (disabled)"
+
+#: data/upgrades.json
+msgid "Sicher ist sicher."
+msgstr "Better safe than sorry."
+
+#: data/upgrades.json
+msgid "Mk.-II-Fäuste"
+msgstr "Mk. II Fists"
+
+#: data/upgrades.json
+msgid "Jetzt mit doppelt so vielen Fäusten."
+msgstr "Now with twice as many fists."
+
+#: data/upgrades.json
+msgid "Mondphasen-Kalender"
+msgstr "Moon Phase Calendar"
+
+#: data/upgrades.json
+msgid "Bei Vollmond trifft es sich einfach besser."
+msgstr "Everything just hits better at full moon."
+
+#: data/upgrades.json
+msgid "Vollmond-Modus"
+msgstr "Full Moon Mode"
+
+#: data/upgrades.json
+msgid "Immer Vollmond. Die Werwölfe sind verwirrt."
+msgstr "Always full moon. The werewolves are confused."
+
+#: data/upgrades.json
+msgid "Zweiter Mond"
+msgstr "Second Moon"
+
+#: data/upgrades.json
+msgid "Gebraucht gekauft. Läuft noch super."
+msgstr "Bought second-hand. Still runs great."
+
+#: data/upgrades.json
+msgid "Flux-Handschuh"
+msgstr "Flux Glove"
+
+#: data/upgrades.json
+msgid "Funktioniert erst ab 88 Klicks pro Minute."
+msgstr "Only works from 88 clicks per minute."
+
+#: data/upgrades.json
+msgid "Vorgestern-Paket"
+msgstr "Day-Before-Yesterday Pack"
+
+#: data/upgrades.json
+msgid "Jetzt auch für vorgestern und übermorgen."
+msgstr "Now also for the day before yesterday and the day after tomorrow."
+
+#: data/upgrades.json
+msgid "Zeitschleife"
+msgstr "Time Loop"
+
+#: data/upgrades.json
+msgid "Dieselbe Backpfeife, immer und immer wieder."
+msgstr "The same slap, over and over again."
+
+#: data/upgrades.json
+msgid "Paralleluniversum-Abo"
+msgstr "Parallel Universe Subscription"
+
+#: data/upgrades.json
+msgid "Jedes Universum hat eine Backpfeife frei."
+msgstr "Every universe gets one free slap."
+
+#: data/upgrades.json
+msgid "Multiversum-Gewerkschaft"
+msgstr "Multiverse Union"
+
+#: data/upgrades.json
+msgid "Alle Ichs aller Welten streiken nie."
+msgstr "All the yous of all the worlds never go on strike."
+
+#: data/upgrades.json
+msgid "Die Ohrfeige aller Ohrfeigen"
+msgstr "The Slap of All Slaps"
+
+#: data/upgrades.json
+msgid "Man hört sie noch in drei Universen weiter."
+msgstr "You can hear it three universes over."
+
+#: data/upgrades.json
+msgid "Fuß-Hand-Koordination"
+msgstr "Foot-Hand Coordination"
+
+#: data/upgrades.json
+msgid "Pantoffel geben den Takt vor, Fäuste folgen."
+msgstr "Slippers set the beat, fists follow."
+
+#: data/upgrades.json
+msgid "Quietsch-Chor"
+msgstr "Squeak Choir"
+
+#: data/upgrades.json
+msgid "Gummihämmer quietschen den Pantoffeln Mut zu."
+msgstr "Rubber mallets squeak encouragement to the slippers."
+
+#: data/upgrades.json
+msgid "Tortenkatapult"
+msgstr "Pie Catapult"
+
+#: data/upgrades.json
+msgid "Das Katapult wirft jetzt auch Torten. Und umgekehrt."
+msgstr "The catapult now throws pies too. And vice versa."
+
+#: data/upgrades.json
+msgid "Schaumstoff-Fließband"
+msgstr "Foam Conveyor Belt"
+
+#: data/upgrades.json
+msgid "Das Fließband liefert frische Abrissbirnen."
+msgstr "The conveyor belt delivers fresh wrecking balls."
+
+#: data/upgrades.json
+msgid "Mondroboter"
+msgstr "Moon Robots"
+
+#: data/upgrades.json
+msgid "Die Boxroboter laden den Mond nach."
+msgstr "The boxing robots reload the moon."
+
+#: data/upgrades.json
+msgid "Zeitschleifen-Amboss"
+msgstr "Time-Loop Anvil"
+
+#: data/upgrades.json
+msgid "Derselbe Amboss fällt einfach öfter."
+msgstr "The same anvil simply falls more often."

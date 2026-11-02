@@ -7,6 +7,7 @@ var _checks := 0
 
 
 func _initialize() -> void:
+	TranslationServer.set_locale("de")
 	test_balance()
 	test_number_format()
 	test_game_state()
@@ -32,6 +33,7 @@ func _initialize() -> void:
 	test_challenges()
 	test_market()
 	test_slow_motion_and_v5()
+	test_english()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -54,7 +56,9 @@ func check_eq(actual: Variant, expected: Variant, label: String) -> void:
 		print("  ✗ %s: erwartet %s, erhalten %s" % [label, str(expected), str(actual)])
 
 
-func new_state() -> Node:
+func new_state(locale: String = "de") -> Node:
+	# Der Autoload GameState stellt beim Start die Systemsprache ein – hier bewusst überschreiben.
+	TranslationServer.set_locale(locale)
 	var gs: Node = load("res://scripts/core/game_state.gd").new()
 	gs.persist = false
 	gs.load_data()
@@ -723,3 +727,45 @@ func test_slow_motion_and_v5() -> void:
 	check_eq(old.to_dict().version, 5, "Gespeichert als v5")
 	gs.free()
 	old.free()
+
+
+func test_english() -> void:
+	print("Englisch")
+	var po: Translation = load("res://locale/en.po")
+	check(po != null, "locale/en.po lädt")
+	# Alle Anzeigetexte aus den Daten brauchen eine englische Übersetzung.
+	var gs := new_state()
+	var lists: Array = [gs.device_defs, gs.upgrade_defs, gs.achievement_defs, gs.laurel_defs, gs.figure_defs,
+		gs.quest_defs, gs.event_defs, gs.cosmetic_defs, gs.challenge_defs, gs.boss_config.gimmicks, gs.market_config.goods]
+	var missing := 0
+	for list in lists:
+		for entry in list:
+			for field in ["name", "description", "text", "intro", "trophy"]:
+				if entry.has(field) and String(po.get_message(entry[field])) == "":
+					missing += 1
+					print("    fehlt: ", entry[field])
+	for t in gs.boss_config.trophies:
+		if String(po.get_message(t)) == "":
+			missing += 1
+			print("    fehlt: ", t)
+	check_eq(missing, 0, "Alle Daten-Texte übersetzt")
+	gs.free()
+	TranslationServer.set_locale("en")
+	check_eq(Num.fmt(1234), "1,234", "Englisch: Tausender mit Komma")
+	check_eq(Num.fmt(1230000), "1.23 M", "Englisch: Millionen")
+	check_eq(Num.fmt(7.8e12), "7.80 T", "Englisch: Billionen = trillion")
+	check_eq(Num.fmt(0.5), "0.5", "Englisch: Dezimalpunkt")
+	var en := new_state("en")
+	check_eq(en.device_def("pantoffel").name, "Slipper", "Daten werden beim Laden übersetzt")
+	check_eq(en.target_name(), "Generalissimo Bombastus von Megalomania", "Figurenname auf Englisch")
+	en.quests = [{"id": "hits", "amount": 3000, "reward": 2, "start": 0, "claimed": false}]
+	check_eq(en.quest_text(en.quests[0]), "Punch a target 3,000 times", "Auftragstext auf Englisch")
+	check_eq(en.upgrade_effect_text(en.upgrade_def("boxhandschuh_training")), "Click value ×2", "Wirkungstext auf Englisch")
+	var r: Dictionary = en.claim_shoe("golden", 0.6)
+	check_eq(r.title, "Frenzy!", "Goldener-Schuh-Text auf Englisch")
+	en.free()
+	TranslationServer.set_locale("de")
+	var de := new_state()
+	check_eq(de.device_def("pantoffel").name, "Pantoffel", "Zurück auf Deutsch")
+	check_eq(Num.fmt(1234), "1.234", "Deutsch: Tausenderpunkt")
+	de.free()

@@ -18,6 +18,7 @@ var _log: Array[String] = []
 
 
 func _initialize() -> void:
+	TranslationServer.set_locale("de")
 	var args := OS.get_cmdline_user_args()
 	var days_at := args.find("--days")
 	if days_at >= 0 and days_at + 1 < args.size():
@@ -25,6 +26,7 @@ func _initialize() -> void:
 	var ch_at := args.find("--challenge")
 	if ch_at >= 0 and ch_at + 1 < args.size():
 		challenge = args[ch_at + 1]
+	TranslationServer.set_locale("de")
 	gs = load("res://scripts/core/game_state.gd").new()
 	gs.persist = false
 	gs.load_data()
