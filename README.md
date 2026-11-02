@@ -17,12 +17,22 @@ Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 |---|---|
 | Klick auf das Bild / Leertaste | Hauen |
 | Maus gedrückt halten | Dauerfeuer (nach Upgrade) |
-| 1–5 | Gerät kaufen |
+| 1–9 | Gerät kaufen |
+| Goldener Schuh / Silberner Pantoffel anklicken | Bonus (Segen, Raserei, Klick-Raserei, Kettenreaktion … oder Pech) |
 | Strg+V | Bild aus der Zwischenablage als neues Opfer |
 | Bild ins Fenster ziehen | Neues Opfer |
 
-## Stand: Phase 1 (MVP)
+## Stand: Phase 2 (Clicker-Kern)
 
+**Phase 2**
+- Alle 12 Geräte, je 3 Geräte-Upgrades, 6 Synergie-Upgrades, globale Upgrades (Wutmilch, Fanclub, Kamerateam …) – insgesamt 54 Upgrades
+- 51 Erfolge mit Erfolgs-Seite, Fortschrittsbalken, versteckten Erfolgen und Konfetti
+- Goldener Schuh (alle 5–10 min) und Silberner Pantoffel mit Raserei, Klick-Raserei, Segen, Kettenreaktion und Pech-Schuh
+- Offline-Fortschritt (50 % für max. 8 h) mit Willkommen-zurück-Bildschirm
+- Menü: Speichern, Spielstand als Textcode exportieren/importieren, Neu anfangen
+- Balancing per 24-h-Simulation geprüft (`tests/simulate.gd`)
+
+**Phase 1**
 - Klicken mit Faust-Cursor, Treffer-Effekte (Farbspritzer, Beulen, Pflaster, Sterne, Comic-Wörter, kritische Treffer mit Wackeln)
 - Bild-Import per Dialog, Drag-and-Drop und Zwischenablage (lokal, max. 1024 px)
 - 5 Geräte, 10 Upgrades, Kaufmengen ×1/×10/×100/Max, Verkaufen
@@ -34,7 +44,8 @@ Das komplette Design steht in [`docs/konzept.md`](docs/konzept.md).
 ## Tests
 
 ```bash
-godot --headless --path . --script res://tests/run_tests.gd
+godot --headless --path . --script res://tests/run_tests.gd   # Tests
+godot --headless --path . --script res://tests/simulate.gd    # Balancing-Simulation (24 h)
 ```
 
 ## Für Steam exportieren
