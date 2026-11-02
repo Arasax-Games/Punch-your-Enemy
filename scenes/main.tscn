@@ -90,12 +90,19 @@ focus_mode = 0
 tooltip_text = "Kein Wackeln, keine Sternchen, weniger Comic-Wörter."
 text = "Weniger Effekte"
 
-[node name="SaveButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="AchievementsButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
-tooltip_text = "Das Spiel speichert außerdem alle 30 Sekunden und beim Beenden."
-text = "Speichern"
+tooltip_text = "Alle Erfolge und dein Fortschritt."
+text = "Erfolge"
+
+[node name="MenuButton" type="MenuButton" parent="Margin/Layout/TopBar/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Menü"
+flat = false
 
 [node name="Columns" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
@@ -132,6 +139,18 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "pro Klick: 1"
 horizontal_alignment = 1
+
+[node name="MarkenLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Beulen-Marken: 0"
+horizontal_alignment = 1
+
+[node name="BuffBox" type="VBoxContainer" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
 
 [node name="Sep1" type="HSeparator" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
 layout_mode = 2
@@ -221,12 +240,19 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Upgrades"
 
-[node name="UpgradeFlow" type="HFlowContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 64)
+[node name="UpgradeScroll" type="ScrollContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
+horizontal_scroll_mode = 0
 
-[node name="NoUpgradesLabel" type="Label" parent="Margin/Layout/Columns/ShopPanel/ShopBox/UpgradeFlow"]
+[node name="UpgradeFlow" type="HFlowContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox/UpgradeScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="NoUpgradesLabel" type="Label" parent="Margin/Layout/Columns/ShopPanel/ShopBox/UpgradeScroll/UpgradeFlow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Noch nichts in Sicht. Weiter hauen!"
@@ -267,6 +293,30 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "+++ Nachbarn beschweren sich über Quietschen +++"
 horizontal_alignment = 1
+
+[node name="ShoeLayer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AchievementToasts" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -360.0
+offset_top = 90.0
+offset_right = -24.0
+offset_bottom = 90.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
 
 [node name="Toast" type="Label" parent="."]
 unique_name_in_owner = true
