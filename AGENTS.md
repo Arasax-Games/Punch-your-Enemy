@@ -9,13 +9,13 @@ Diese Datei gilt für **alle** Agenten, die an diesem Repo arbeiten. `CLAUDE.md`
 - Ziel: **Desktop-Spiel für Steam** (Windows, macOS, Linux). **Kein Browserspiel.**
 - Engine: **Godot 4.7**, Sprache **GDScript**, Renderer *GL Compatibility*.
 - Vollständiges Design: [`docs/konzept.md`](docs/konzept.md). Bei Widersprüchen gilt das Konzept, außer diese Datei sagt etwas anderes.
-- Aktueller Stand: **Phasen 1–5** sind umgesetzt (MVP, Clicker-Kern, Tiefe, Steam & Langzeit, Inhalt & Feinschliff: weitere Standardfiguren, Kosmetik-Laden, Herausforderungen, Börse für Beulen, Zeitlupe). Offene Punkte stehen unten; Steam-Veröffentlichung: [`docs/steam.md`](docs/steam.md).
+- Aktueller Stand: **Phasen 1–6** sind umgesetzt (MVP, Clicker-Kern, Tiefe, Steam & Langzeit, Inhalt & Feinschliff, Englisch). Das Spiel ist zweisprachig: Deutsch (Quellsprache) und Englisch. Offene Punkte stehen unten; Steam-Veröffentlichung: [`docs/steam.md`](docs/steam.md).
 
 ## Ton und Inhalt (wichtig)
 
 - Alles ist **Comic-Slapstick**: Beulen, Sterne, Farbspritzer, Pflaster, Tortenwürfe. **Kein Blut, keine realistischen Verletzungen.**
 - Mitgelieferte Figuren sind **frei erfunden** und dürfen keiner realen Person ähneln (auch keinen realen Politikern oder Diktatoren, keine echten Hoheitszeichen).
-- Spieltexte sind **Deutsch**, witzig und harmlos. Englische Übersetzung kommt später über Godot-Übersetzungen.
+- Spieltexte werden auf **Deutsch** geschrieben (witzig und harmlos) und ins **Englische** übersetzt (`locale/en.po`). Englische Begriffe: Wumms → *Whams*, Beulen-Marken → *Bump Tokens*, Lorbeeren → *laurels*, Neuanfang → *Fresh Start*, Geräte → *gadgets*, Opfer → *target*.
 - Importierte Bilder bleiben **lokal** (`user://images/`), es gibt keinen Upload.
 
 ## Struktur
@@ -45,6 +45,7 @@ tests/run_tests.gd     Headless-Tests
 tests/simulate.gd      Balancing-Simulation: 24 h (ca. 1 min), mit `-- --days 7` eine Woche mit
                        Neuanfängen (ca. 4 min), mit `-- --challenge <id>` eine Herausforderung
 tools/                 Hilfsskripte (z. B. steam_achievements.gd → docs/steam_achievements.csv)
+locale/en.po           Englische Übersetzung (msgid = deutscher Text), gepflegt mit tools/i18n.py
 docs/konzept.md        Design-Dokument
 docs/steam.md          Anleitung: Steamworks, GodotSteam, Erfolge, Steam Cloud, Upload
 export_presets.cfg     Export für Windows, Linux, macOS
@@ -65,6 +66,10 @@ godot --headless --path . --script res://tests/simulate.gd -- --days 7   # inkl.
 
 # Erfolgsliste für Steamworks neu erzeugen – nach jeder Änderung an data/achievements.json
 godot --headless --path . --script res://tools/steam_achievements.gd
+
+# Übersetzungen: neue Texte einsammeln (dann in locale/en.po übersetzen) und prüfen
+python3 tools/i18n.py
+python3 tools/i18n.py --check      # muss vor jedem Commit ohne Fehler durchlaufen
 
 # Spiel kurz headless starten, um Skriptfehler zu finden
 godot --headless --path . --quit-after 180
@@ -91,6 +96,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/Punch
 - Herausforderungen (`challenges.json`): Regeln `no_devices`, `no_upgrades`, `device_cost_mult`. Belohnung landet in `laurels_total` **und** `laurels_extra` – Extra-Lorbeeren zählen nicht für die Neuanfang-Formel. Neuanfang und Herausforderungs-Start nutzen gemeinsam `_reset_run()`.
 - Börse: Preise = Sekunden Produktion × höchste WPS dieses Durchlaufs × Kursfaktor (0,3–3, Schritt jede Minute). Beim Neuanfang schließt die Börse (Bestand weg).
 - Zeitlupe: `Engine.time_scale` wird in der Oberfläche gesetzt; `GameState._process` rechnet mit Echtzeit (`delta / Engine.time_scale`), damit Produktion und Timer nicht langsamer werden.
+- **Übersetzung:** Jeder Anzeigetext im Code steht in `tr("…")` (in statischen Funktionen `TranslationServer.translate("…")`). Texte in Konstanten bekommen darüber einen Kommentar `# i18n` und werden bei der Anzeige mit `tr()` übersetzt. Datenfelder `name`, `description`, `text`, `intro` übersetzt `GameState._localize_data()` beim Laden; Pokalnamen erst bei der Anzeige (sie stehen im Spielstand). Mehrzahl nie mit angehängten Endungen bauen (`"Lorbeer%s"`), sondern ganze Sätze übersetzen (Beispiel: `laurels_text()` in `main.gd`). Zahlen immer über `Num` – das Format hängt von der Sprache ab. Ersatzsprache ist Deutsch (`locale/fallback="de"`), sonst sähen deutsche Spieler Englisch. Sprachwechsel lädt die Hauptszene neu.
 - Steam: Nur über `SteamService` (keine direkten `Steam`-Aufrufe anderswo). Steam-API-Name eines Erfolgs = ID in Großbuchstaben. Importierte Bilder und Fotos dürfen **nie** in die Steam Cloud.
 - Klassen, die Autoloads (`GameState`, `Sfx`) benutzen, nicht direkt aus `--script`-Testskripten referenzieren, sondern zur Laufzeit mit `load()` holen (die Autoloads existieren beim Kompilieren des Testskripts noch nicht).
 - **Formeln** gehören in `balance.gd` (reine, testbare Funktionen). Jede neue Formel bekommt einen Test in `tests/run_tests.gd`.
@@ -113,7 +119,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/Punch
 
 - Eigene Comic-Schrift (OFL-Lizenz, z. B. „Bangers“ für Überschriften, „Nunito“ für Text) in `assets/fonts/` einbinden; aktuell wird eine Systemschrift genutzt.
 - Echte Soundeffekte und Musik statt der prozeduralen Platzhalter in `sfx.gd`.
-- **Englische Übersetzung** (Godot-Übersetzungen, alle Texte aus Code und `data/*.json`) – wichtig für Steam.
+- Weitere Sprachen: `LANGS` in `tools/i18n.py` und `GameState.LANGUAGES` ergänzen, `locale/<sprache>.po` übersetzen, in `project.godot` eintragen.
 - Animierte Geräte-Reihen unter dem Bild, Geräte-Meilenstein-Optik (1, 5, 25, …), Musik.
 - Ausschnitt-Editor beim Bild-Import (Zuschneiden, Rund-Maske, Zoom).
 - Steam-Bestenlisten (nur nicht-bildbezogene Werte, z. B. Mini-Spiel-Rekorde), Rich Presence, Erfolgs-Bilder für Steam (64×64).
