@@ -24,6 +24,7 @@ config/custom_user_dir_name="PunchYourEnemy"
 GameState="*res://scripts/core/game_state.gd"
 Sfx="*res://scripts/audio/sfx.gd"
 SteamService="*res://scripts/core/steam_service.gd"
+Music="*res://scripts/audio/music.gd"
 
 [display]
 

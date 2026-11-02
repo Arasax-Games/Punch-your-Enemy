@@ -34,6 +34,7 @@ func _initialize() -> void:
 	test_market()
 	test_slow_motion_and_v5()
 	test_english()
+	test_phase7()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -769,3 +770,34 @@ func test_english() -> void:
 	check_eq(de.device_def("pantoffel").name, "Pantoffel", "Zurück auf Deutsch")
 	check_eq(Num.fmt(1234), "1.234", "Deutsch: Tausenderpunkt")
 	de.free()
+
+
+func test_phase7() -> void:
+	print("Phase 7: Meilensteine, Musik, Zuschneiden, Steam")
+	check_eq(Balance.milestone_tier(0), 0, "Kein Meilenstein ohne Gerät")
+	check_eq(Balance.milestone_tier(1), 1, "Ab 1 Stück: Stufe 1")
+	check_eq(Balance.milestone_tier(24), 2, "24 Stück: Stufe 2")
+	check_eq(Balance.milestone_tier(25), 3, "25 Stück: Stufe 3")
+	check_eq(Balance.milestone_tier(500), 7, "Ab 200 Stück: Höchststufe")
+	var music: GDScript = load("res://scripts/audio/music.gd")
+	check_eq(music.layers_for(0, 0), 1, "Musik am Anfang: nur Schlagzeug")
+	check_eq(music.layers_for(3, 0), 3, "3 Gerätetypen: 3 Instrumente")
+	check_eq(music.layers_for(1, 1), 5, "Nach dem Neuanfang spielt alles")
+	var gs := new_state()
+	for d in gs.device_defs:
+		check(ResourceLoader.exists(d.icon), "Geräte-Symbol vorhanden: %s" % d.id)
+	gs.free()
+	var crop: GDScript = load("res://scripts/ui/crop_editor.gd")
+	var img := Image.create(40, 40, false, Image.FORMAT_RGBA8)
+	img.fill(Color.RED)
+	var round: Image = crop.round_mask(img)
+	check_eq(round.get_pixel(0, 0).a, 0.0, "Runde Maske: Ecke durchsichtig")
+	check_eq(round.get_pixel(20, 20).a, 1.0, "Runde Maske: Mitte bleibt")
+	var steam: GDScript = load("res://scripts/core/steam_service.gd")
+	check_eq(steam.presence_target_token("baron", true), "Fig_baron", "Rich Presence: Figur")
+	check_eq(steam.presence_target_token("img_123", false), "Fig_custom", "Rich Presence: eigenes Bild ohne Namen")
+	var state := new_state()
+	state.fist_skin = "keule"
+	state.validate_cosmetics()
+	check_eq(state.fist_skin, "standard", "Nicht gekaufter Skin wird zurückgesetzt")
+	state.free()

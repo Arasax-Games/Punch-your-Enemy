@@ -181,6 +181,18 @@ msgstr "never"
 msgid "Tage"
 msgstr "days"
 
+#: scripts/core/steam_service.gd
+msgid "Haut auf %target%"
+msgstr "Punching %target%"
+
+#: scripts/core/steam_service.gd
+msgid "Kämpft gegen einen Boss!"
+msgstr "Fighting a boss!"
+
+#: scripts/core/steam_service.gd
+msgid "ein eigenes Bild"
+msgstr "a picture of their own"
+
 #: scripts/effects/hit_effects.gd
 msgid "KRITISCH!"
 msgstr "CRITICAL!"
@@ -221,6 +233,38 @@ msgstr "PLONK!"
 msgid "BOSS · %s · %d s"
 msgstr "BOSS · %s · %d s"
 
+#: scripts/ui/crop_editor.gd
+msgid "Original"
+msgstr "Original"
+
+#: scripts/ui/crop_editor.gd
+msgid "Quadrat"
+msgstr "Square"
+
+#: scripts/ui/crop_editor.gd
+msgid "Rund"
+msgstr "Round"
+
+#: scripts/ui/crop_editor.gd
+msgid "Zoom"
+msgstr "Zoom"
+
+#: scripts/ui/crop_editor.gd
+msgid "Ziehen zum Verschieben, Mausrad zum Zoomen."
+msgstr "Drag to move, mouse wheel to zoom."
+
+#: scripts/ui/device_strip.gd
+msgid "Hier tauchen deine Geräte auf, sobald du welche kaufst."
+msgstr "Your gadgets show up here as soon as you buy some."
+
+#: scripts/ui/device_strip.gd
+msgid "Nächster Meilenstein bei %d Stück"
+msgstr "Next milestone at %d"
+
+#: scripts/ui/device_strip.gd
+msgid "Alle Meilensteine erreicht!"
+msgstr "All milestones reached!"
+
 #: scripts/ui/main.gd
 msgid "Hau drauf! Klicken oder Leertaste."
 msgstr "Punch away! Click or press Space."
@@ -252,6 +296,10 @@ msgstr "*.png, *.jpg, *.jpeg, *.webp ; Images"
 #: scripts/ui/main.gd
 msgid "Ton"
 msgstr "Sound"
+
+#: scripts/ui/main.gd
+msgid "Lautstärke …"
+msgstr "Volume …"
 
 #: scripts/ui/main.gd
 msgid "Weniger Effekte"
@@ -418,6 +466,10 @@ msgid "SCHWACHSTELLE! ×%d"
 msgstr "WEAK SPOT! ×%d"
 
 #: scripts/ui/main.gd
+msgid "%s: %d Stück – %s-Rahmen!"
+msgstr "%s: %d owned – %s frame!"
+
+#: scripts/ui/main.gd
 msgid "WUTMODUS! Alles ×3 für 10 Sekunden!"
 msgstr "RAGE MODE! Everything ×3 for 10 seconds!"
 
@@ -470,12 +522,24 @@ msgid "Beulen-Level %d: %s (+1 Beulen-Marke)"
 msgstr "Bump Level %d: %s (+1 Bump Token)"
 
 #: scripts/ui/main.gd
-msgid "Neues Opfer: %s"
-msgstr "New target: %s"
-
-#: scripts/ui/main.gd
 msgid "Dieses Bild konnte nicht geladen werden."
 msgstr "This image could not be loaded."
+
+#: scripts/ui/main.gd
+msgid "Ausschnitt wählen"
+msgstr "Choose a section"
+
+#: scripts/ui/main.gd
+msgid "Übernehmen"
+msgstr "Use this"
+
+#: scripts/ui/main.gd
+msgid "Ganzes Bild"
+msgstr "Whole image"
+
+#: scripts/ui/main.gd
+msgid "Neues Opfer: %s"
+msgstr "New target: %s"
 
 #: scripts/ui/main.gd
 msgid "In der Zwischenablage ist kein Bild."
@@ -484,10 +548,6 @@ msgstr "There's no image on the clipboard."
 #: scripts/ui/main.gd
 msgid "Aus der Zwischenablage"
 msgstr "From the clipboard"
-
-#: scripts/ui/main.gd
-msgid "Neues Opfer aus der Zwischenablage!"
-msgstr "New target from the clipboard!"
 
 #: scripts/ui/main.gd
 msgid "Erfolg freigeschaltet!"
@@ -918,6 +978,26 @@ msgid "„%s“ geschafft!\n%s – ab sofort dauerhaft."
 msgstr "“%s” done!\n%s – permanently, starting now."
 
 #: scripts/ui/main.gd
+msgid "Musik"
+msgstr "Music"
+
+#: scripts/ui/main.gd
+msgid "Effekte"
+msgstr "Effects"
+
+#: scripts/ui/main.gd
+msgid "Publikum"
+msgstr "Audience"
+
+#: scripts/ui/main.gd
+msgid "Lautstärke"
+msgstr "Volume"
+
+#: scripts/ui/main.gd
+msgid "Fertig"
+msgstr "Done"
+
+#: scripts/ui/main.gd
 msgid "Nachbarn beschweren sich über Quietschen."
 msgstr "Neighbours complain about squeaking."
 
@@ -1009,6 +1089,30 @@ msgstr "Comfort"
 msgid "Show"
 msgstr "Show"
 
+#: scripts/ui/main.gd
+msgid "Bronze"
+msgstr "Bronze"
+
+#: scripts/ui/main.gd
+msgid "Silber"
+msgstr "Silver"
+
+#: scripts/ui/main.gd
+msgid "Gold"
+msgstr "Gold"
+
+#: scripts/ui/main.gd
+msgid "Platin"
+msgstr "Platinum"
+
+#: scripts/ui/main.gd
+msgid "Rubin"
+msgstr "Ruby"
+
+#: scripts/ui/main.gd
+msgid "Regenbogen"
+msgstr "Rainbow"
+
 #: scripts/ui/market_panel.gd
 msgid "Ware"
 msgstr "Goods"
@@ -1076,10 +1180,6 @@ msgstr "No more Bump Tokens for this today."
 #: scripts/ui/minigame.gd
 msgid "Nochmal"
 msgstr "Again"
-
-#: scripts/ui/minigame.gd
-msgid "Fertig"
-msgstr "Done"
 
 #: scripts/ui/minigame.gd
 msgid "Punkte %d · %d s"

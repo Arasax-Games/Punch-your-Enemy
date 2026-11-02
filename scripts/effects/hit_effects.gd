@@ -71,6 +71,15 @@ func popup_text(text: String, pos: Vector2, color: Color) -> void:
 	_popup(text, pos, 34, color, 0.8, true)
 
 
+var _heading: Font
+
+
+func _heading_font() -> Font:
+	if _heading == null:
+		_heading = load("res://scripts/ui/main.gd").heading_font()
+	return _heading
+
+
 ## "Duschen": entfernt alle Spuren, Fortschritt bleibt.
 func clear() -> void:
 	_marks.clear()
@@ -171,6 +180,7 @@ func _popup(text: String, pos: Vector2, font_size: int, color: Color, duration: 
 		get_child(0).queue_free()
 	var label := Label.new()
 	label.text = text
+	label.add_theme_font_override("font", _heading_font())
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", INK)
