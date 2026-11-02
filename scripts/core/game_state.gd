@@ -18,8 +18,10 @@ signal boss_started
 signal boss_finished(won: bool, reward: Dictionary)
 signal quests_changed
 signal event_completed(event: Dictionary)
+signal challenge_changed
+signal cosmetics_changed
 
-const SAVE_VERSION := 4
+const SAVE_VERSION := 5
 const SAVE_PATH := "user://savegame.json"
 const BACKUP_PATH := "user://savegame.bak.json"
 const IMAGE_DIR := "user://images"
@@ -38,6 +40,10 @@ const CUSTOM_FIGURE := "_custom"
 const BOSSES_PATH := "res://data/bosses.json"
 const QUESTS_PATH := "res://data/quests.json"
 const EVENTS_PATH := "res://data/events.json"
+const COSMETICS_PATH := "res://data/cosmetics.json"
+const CHALLENGES_PATH := "res://data/challenges.json"
+const MARKET_PATH := "res://data/market.json"
+const SLOW_MOTION_SCALE := 0.4
 const QUESTS_PER_DAY := 3
 const DAY_CHECK_INTERVAL := 5.0
 const MAX_STATS: Array[String] = ["max_combo", "best_streak", "dojo_best", "pie_best"]
@@ -70,6 +76,7 @@ const STAT_KEYS: Array[String] = [
 	"prestiges", "rages", "max_combo", "renames",
 	"bosses_defeated", "quests_done", "best_streak", "dojo_best", "pie_best", "events_done", "screenshots",
 	"devices_bought", "upgrades_bought", "combo_maxed", "minigames_played",
+	"challenges_done", "market_wins", "cosmetics_bought",
 ]
 
 # --- Daten (aus JSON) ---
@@ -81,6 +88,9 @@ var figure_defs: Array[Dictionary] = []
 var boss_config: Dictionary = {}
 var quest_defs: Array[Dictionary] = []
 var event_defs: Array[Dictionary] = []
+var cosmetic_defs: Array[Dictionary] = []
+var challenge_defs: Array[Dictionary] = []
+var market_config: Dictionary = {}
 var _device_by_id: Dictionary = {}
 var _upgrade_by_id: Dictionary = {}
 var _achievement_by_id: Dictionary = {}
@@ -104,6 +114,14 @@ var event_progress: Dictionary = {}     # "halloween-2026" -> Treffer
 var events_done: Dictionary = {}        # "halloween-2026" -> true
 var minigame_day: String = ""
 var minigame_rewards_today: Dictionary = {}  # Spiel -> heute schon ausgezahlte Marken
+var owned_cosmetics: Dictionary = {}    # Laden-Käufe: id -> true
+var laurels_extra: int = 0              # Lorbeeren aus Herausforderungen (zählen nicht für den Neuanfang)
+var challenge_active: String = ""
+var challenges_done: Dictionary = {}    # id -> true
+var market_factors: Dictionary = {}     # Ware -> Kursfaktor (0,3 … 3)
+var market_holdings: Dictionary = {}    # Ware -> Stück
+var market_paid: Dictionary = {}        # Ware -> insgesamt bezahlt (für den Einkaufsschnitt)
+var market_scale: float = 1.0           # höchste WPS in diesem Durchlauf – Basis der Börsenpreise
 var total_hits: int = 0
 var beulen_marken: int = 0
 var devices: Dictionary = {}            # id -> Anzahl
@@ -141,6 +159,7 @@ var boss_gimmick: Dictionary = {}
 var pending_login: Dictionary = {}      # Login-Belohnung für den Willkommens-Dialog
 var _day_timer: float = 0.0
 var _today_override: String = ""        # nur für Tests
+var _market_timer: float = 0.0
 var _autosave_timer: float = 0.0
 ## false in Tests und Simulationen, damit der echte Spielstand nie überschrieben wird.
 var persist: bool = true
@@ -160,6 +179,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	# In der Zeitlupe läuft die Darstellung langsamer, die Spiellogik aber in Echtzeit weiter.
+	delta /= maxf(Engine.time_scale, 0.01)
 	tick(delta)
 	_update_shoes(delta)
 	_autosave_timer += delta
@@ -224,6 +245,14 @@ func load_data() -> void:
 	event_defs.clear()
 	for e in _read_json_array(EVENTS_PATH):
 		event_defs.append(e)
+	cosmetic_defs.clear()
+	for c in _read_json_array(COSMETICS_PATH):
+		cosmetic_defs.append(c)
+	challenge_defs.clear()
+	for c in _read_json_array(CHALLENGES_PATH):
+		challenge_defs.append(c)
+	var market: Variant = JSON.parse_string(FileAccess.get_file_as_string(MARKET_PATH))
+	market_config = market if market is Dictionary else {}
 
 
 func _read_json_array(path: String) -> Array:
@@ -288,6 +317,8 @@ func tick(delta: float) -> void:
 	_update_rage(delta)
 	_update_autobuy(delta)
 	_update_boss(delta)
+	_update_challenge()
+	_update_market(delta)
 
 
 func earn(amount: float) -> void:
@@ -638,6 +669,9 @@ func claim_shoe(kind: String, roll: float = -1.0) -> Dictionary:
 		add_stat("frenzies")
 		add_buff("klick_raserei", "Klick-Raserei", 13.0, 1.0, 777.0)
 		result = {"title": "Klick-Raserei!", "text": "Klick-Wert ×777 für 13 s. Hau drauf!", "good": true}
+	elif roll >= 0.97:
+		add_buff("zeitlupe", "Zeitlupe", 10.0, 1.0, 3.0)
+		result = {"title": "Zeitlupe!", "text": "Alles ganz langsam … und jeder Klick zählt dreifach.", "good": true}
 	else:
 		_chain_count = 0
 		result = _chain_effect()
@@ -693,7 +727,7 @@ func device_cost_factor() -> float:
 	var f := 1.0
 	for e in _laurel_effects("device_cost"):
 		f *= float(e.factor)
-	return f
+	return f * float(challenge_rules().get("device_cost_mult", 1.0))
 
 
 func device_cost(id: String, amount: int) -> float:
@@ -703,7 +737,7 @@ func device_cost(id: String, amount: int) -> float:
 
 
 func buy_device(id: String, amount: int) -> bool:
-	if amount <= 0 or device_def(id).is_empty():
+	if amount <= 0 or device_def(id).is_empty() or challenge_rules().get("no_devices", false):
 		return false
 	var cost := device_cost(id, amount)
 	if wumms < cost:
@@ -782,7 +816,7 @@ func visible_upgrades() -> Array[Dictionary]:
 
 func buy_upgrade(id: String) -> bool:
 	var u := upgrade_def(id)
-	if u.is_empty() or has_upgrade(id) or not upgrade_requirement_met(u):
+	if u.is_empty() or has_upgrade(id) or not upgrade_requirement_met(u) or challenge_rules().get("no_upgrades", false):
 		return false
 	if wumms < float(u.cost):
 		return false
@@ -831,7 +865,7 @@ func _device_name(id: String) -> String:
 # =====================================================================
 
 func prestige_gain() -> int:
-	return Balance.laurel_gain(lifetime_wumms, laurels_total)
+	return Balance.laurel_gain(lifetime_wumms, laurels_total - laurels_extra)
 
 
 func can_prestige() -> bool:
@@ -846,6 +880,15 @@ func perform_prestige() -> int:
 	var gain := prestige_gain()
 	laurels_total += gain
 	add_stat("prestiges")
+	challenge_active = ""
+	_reset_run()
+	prestiged.emit(gain)
+	save_game()
+	return gain
+
+
+## Setzt den laufenden Durchlauf zurück (Neuanfang, Herausforderung).
+func _reset_run() -> void:
 	wumms = 0.0
 	total_wumms = 0.0
 	devices.clear()
@@ -855,11 +898,12 @@ func perform_prestige() -> int:
 	combo = 0.0
 	rage_meter = 0.0
 	rage_time = 0.0
-	_apply_start_devices()
+	market_holdings.clear()
+	market_paid.clear()
+	market_scale = 1.0
+	if not challenge_rules().get("no_devices", false):
+		_apply_start_devices()
 	reset_shoe_timers()
-	prestiged.emit(gain)
-	save_game()
-	return gain
 
 
 func _apply_start_devices() -> void:
@@ -959,29 +1003,213 @@ func laurel_cost_text(n: Dictionary) -> String:
 
 # --- Kosmetik ---
 
+func cosmetic_def(id: String) -> Dictionary:
+	for c in cosmetic_defs:
+		if c.id == id:
+			return c
+	return {}
+
+
 func has_cosmetic(id: String) -> bool:
+	if owned_cosmetics.has(id) or cosmetic_def(id).get("source", "") == "default":
+		return true
 	for e in _laurel_effects("cosmetic"):
 		if e.id == id:
 			return true
 	return false
 
 
+func buy_cosmetic(id: String) -> bool:
+	var c := cosmetic_def(id)
+	if c.is_empty() or c.get("source", "") != "shop" or has_cosmetic(id) or beulen_marken < int(c.cost):
+		return false
+	beulen_marken -= int(c.cost)
+	owned_cosmetics[id] = true
+	add_stat("cosmetics_bought")
+	apply_cosmetic(id)
+	return true
+
+
+## Ist dieses Kosmetik-Teil gerade angelegt?
+func cosmetic_equipped(id: String) -> bool:
+	var c := cosmetic_def(id)
+	match c.get("slot", ""):
+		"fist":
+			return fist_skin == c.value
+		"background":
+			return background == c.value
+		"sound":
+			return sound_pack == c.value
+	return false
+
+
 ## Neu gekaufte Kosmetik direkt anlegen.
 func apply_cosmetic(id: String) -> void:
-	if id.begins_with("bg_"):
-		background = id.trim_prefix("bg_")
-	elif id == "fist_gold":
-		fist_skin = "gold"
-	elif id == "sound_retro":
-		sound_pack = "retro"
+	var c := cosmetic_def(id)
+	if c.is_empty() or not has_cosmetic(id):
+		return
+	match c.slot:
+		"fist":
+			fist_skin = c.value
+		"background":
+			background = c.value
+		"sound":
+			sound_pack = c.value
+	cosmetics_changed.emit()
 
 
 func available_backgrounds() -> Array[String]:
-	var out: Array[String] = ["standard"]
-	for id in ["zirkus", "weltraum"]:
-		if has_cosmetic("bg_" + id):
-			out.append(id)
+	var out: Array[String] = []
+	for c in cosmetic_defs:
+		if c.slot == "background" and has_cosmetic(c.id):
+			out.append(String(c.value))
 	return out
+
+
+# =====================================================================
+# Herausforderungen
+# =====================================================================
+
+func challenge_def(id: String) -> Dictionary:
+	for c in challenge_defs:
+		if c.id == id:
+			return c
+	return {}
+
+
+func challenge_rules() -> Dictionary:
+	if challenge_active == "":
+		return {}
+	return challenge_def(challenge_active).get("rules", {})
+
+
+func challenges_unlocked() -> bool:
+	return stat("prestiges") > 0
+
+
+## Startet eine Herausforderung: Der Durchlauf beginnt von vorn (ohne Lorbeeren), mit Einschränkungen.
+func start_challenge(id: String) -> bool:
+	var c := challenge_def(id)
+	if c.is_empty() or not challenges_unlocked() or challenge_active != "" or challenges_done.has(id):
+		return false
+	challenge_active = id
+	_reset_run()
+	challenge_changed.emit()
+	save_game()
+	return true
+
+
+func abort_challenge() -> void:
+	if challenge_active == "":
+		return
+	challenge_active = ""
+	challenge_changed.emit()
+
+
+func challenge_progress() -> float:
+	var c := challenge_def(challenge_active)
+	if c.is_empty():
+		return 0.0
+	return clampf(total_wumms / float(c.goal_wumms), 0.0, 1.0)
+
+
+func _update_challenge() -> void:
+	if challenge_active == "":
+		return
+	var c := challenge_def(challenge_active)
+	if c.is_empty() or total_wumms < float(c.goal_wumms):
+		return
+	var reward := int(c.reward_laurels)
+	laurels_total += reward
+	laurels_extra += reward
+	challenges_done[challenge_active] = true
+	add_stat("challenges_done")
+	challenge_active = ""
+	challenge_changed.emit()
+
+
+# =====================================================================
+# Börse für Beulen
+# =====================================================================
+
+func market_unlocked() -> bool:
+	return lifetime_wumms >= float(market_config.get("unlock_lifetime_wumms", 1e7))
+
+
+func market_goods() -> Array:
+	return market_config.get("goods", [])
+
+
+func market_good(id: String) -> Dictionary:
+	for g in market_goods():
+		if g.id == id:
+			return g
+	return {}
+
+
+func market_factor(id: String) -> float:
+	return float(market_factors.get(id, 1.0))
+
+
+func market_price(id: String) -> float:
+	var g := market_good(id)
+	if g.is_empty():
+		return INF
+	return Balance.market_price(float(g.seconds), market_scale, market_factor(id))
+
+
+func market_capacity() -> int:
+	return int(market_config.get("capacity", 50))
+
+
+func market_buy(id: String, amount: int) -> int:
+	var price := market_price(id)
+	var space := market_capacity() - int(market_holdings.get(id, 0))
+	amount = mini(amount, mini(space, int(floor(wumms / price)) if price > 0.0 else 0))
+	if amount <= 0:
+		return 0
+	wumms -= price * amount
+	market_holdings[id] = int(market_holdings.get(id, 0)) + amount
+	market_paid[id] = float(market_paid.get(id, 0.0)) + price * amount
+	return amount
+
+
+## Verkauft Ware. Gibt den Gewinn (kann negativ sein) zurück.
+func market_sell(id: String, amount: int) -> float:
+	var held := int(market_holdings.get(id, 0))
+	amount = mini(amount, held)
+	if amount <= 0:
+		return 0.0
+	var avg := float(market_paid.get(id, 0.0)) / held
+	var revenue := market_price(id) * amount
+	var profit := revenue - avg * amount
+	wumms += revenue
+	market_holdings[id] = held - amount
+	market_paid[id] = avg * (held - amount)
+	if profit > 0.0:
+		add_stat("market_wins")
+	return profit
+
+
+func market_average_price(id: String) -> float:
+	var held := int(market_holdings.get(id, 0))
+	return 0.0 if held <= 0 else float(market_paid.get(id, 0.0)) / held
+
+
+func _update_market(delta: float) -> void:
+	market_scale = maxf(market_scale, base_wps())
+	if market_config.is_empty():
+		return
+	_market_timer += delta
+	if _market_timer < float(market_config.get("update_seconds", 60)):
+		return
+	_market_timer = 0.0
+	step_market()
+
+
+func step_market() -> void:
+	for g in market_goods():
+		market_factors[g.id] = Balance.market_step(market_factor(g.id), _rng.randfn(0.0, 1.0), float(g.volatility))
 
 
 # =====================================================================
@@ -1154,6 +1382,12 @@ func event_key(e: Dictionary) -> String:
 func figure_available(id: String) -> bool:
 	if id == DEFAULT_TARGET:
 		return true
+	var is_event_figure := false
+	for e in event_defs:
+		if e.figure == id:
+			is_event_figure = true
+	if not is_event_figure:
+		return _figure_by_id.has(id)
 	for e in event_defs:
 		if e.figure != id:
 			continue
@@ -1162,6 +1396,13 @@ func figure_available(id: String) -> bool:
 		for key in events_done:
 			if String(key).begins_with(e.id + "-"):
 				return true
+	return false
+
+
+func _is_event_figure(id: String) -> bool:
+	for e in event_defs:
+		if e.figure == id:
+			return true
 	return false
 
 
@@ -1248,6 +1489,12 @@ func condition_progress(cond: Dictionary) -> Vector2:
 			return Vector2(laurels_total, target)
 		"laurel_nodes":
 			return Vector2(laurel_nodes.size(), target)
+		"figures_hit":
+			var least := INF
+			for f in figure_defs:
+				if f.id != CUSTOM_FIGURE and not _is_event_figure(f.id):
+					least = minf(least, float(target_hits.get(f.id, 0)))
+			return Vector2(0.0 if is_inf(least) else least, target)
 		"bump_level":
 			var best := 0
 			for id in target_hits:
@@ -1479,6 +1726,14 @@ func to_dict() -> Dictionary:
 		"events_done": events_done.keys(),
 		"minigame_day": minigame_day,
 		"minigame_rewards_today": minigame_rewards_today.duplicate(),
+		"owned_cosmetics": owned_cosmetics.keys(),
+		"laurels_extra": laurels_extra,
+		"challenge_active": challenge_active,
+		"challenges_done": challenges_done.keys(),
+		"market_factors": market_factors.duplicate(),
+		"market_holdings": market_holdings.duplicate(),
+		"market_paid": market_paid.duplicate(),
+		"market_scale": market_scale,
 		"total_hits": total_hits,
 		"beulen_marken": beulen_marken,
 		"devices": devices.duplicate(),
@@ -1527,6 +1782,23 @@ func from_dict(data: Dictionary) -> void:
 	for key in saved_mg:
 		minigame_rewards_today[key] = int(saved_mg[key])
 	boss_active = false
+	owned_cosmetics = _key_set(data.get("owned_cosmetics", []))
+	laurels_extra = int(data.get("laurels_extra", 0))
+	challenge_active = String(data.get("challenge_active", ""))
+	challenges_done = _key_set(data.get("challenges_done", []))
+	market_factors = {}
+	var saved_factors: Dictionary = data.get("market_factors", {})
+	for key in saved_factors:
+		market_factors[key] = float(saved_factors[key])
+	market_holdings = {}
+	var saved_holdings: Dictionary = data.get("market_holdings", {})
+	for key in saved_holdings:
+		market_holdings[key] = int(saved_holdings[key])
+	market_paid = {}
+	var saved_paid: Dictionary = data.get("market_paid", {})
+	for key in saved_paid:
+		market_paid[key] = float(saved_paid[key])
+	market_scale = float(data.get("market_scale", 1.0))
 	total_hits = int(data.get("total_hits", 0))
 	beulen_marken = int(data.get("beulen_marken", 0))
 	devices.clear()
@@ -1591,6 +1863,10 @@ func _migrate(data: Dictionary) -> Dictionary:
 		var interval := int(boss_config.get("interval_hits", 100000))
 		data["next_boss_at"] = (int(data.get("total_hits", 0)) / interval + 1) * interval
 		data["trophies"] = data.get("trophies", [])
+	if version < 5:
+		# v4 → v5: Kosmetik-Laden, Herausforderungen, Börse. Nichts umzurechnen, nur Standardwerte.
+		data["owned_cosmetics"] = data.get("owned_cosmetics", [])
+		data["laurels_extra"] = data.get("laurels_extra", 0)
 	data["version"] = maxi(version, SAVE_VERSION)
 	return data
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Faust-Skin: keule -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" transform="rotate(-12 32 32)">
+    <path d="M38 40 L52 54" stroke="#f8f9fa" stroke-width="8"/>
+    <circle cx="54" cy="52" r="5" fill="#f8f9fa"/><circle cx="50" cy="57" r="5" fill="#f8f9fa"/>
+    <path d="M10 22 C6 8 24 2 36 10 C48 18 48 34 40 42 C32 50 16 40 10 22 Z" fill="#e8590c"/>
+    <path d="M18 16 C24 12 30 14 34 18" fill="none" stroke="#ffd8a8" stroke-width="3"/>
+  </g>
+</svg>

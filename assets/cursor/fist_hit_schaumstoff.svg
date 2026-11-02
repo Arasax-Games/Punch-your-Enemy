@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Faust-Skin: schaumstoff -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-linecap="round" stroke-width="3">
+    <path d="M6 10 L13 16 M30 2 L30 9 M54 10 L47 16 M2 30 L9 30" fill="none" stroke="#e8590c"/>
+  </g>
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" transform="translate(2 4) scale(0.95)">
+    <rect x="18" y="44" width="20" height="16" rx="4" fill="#1c7ed6"/>
+    <path d="M10 30 C10 22 16 20 20 20 L26 20 L26 2 C26 -2 36 -2 36 2 L36 20 L46 20 C52 20 54 24 54 30 L54 38 C54 44 48 46 42 46 L20 46 C14 46 10 42 10 36 Z" fill="#4dabf7"/>
+    <path d="M18 30 L44 30" stroke="#ffffff" stroke-width="3"/>
+  </g>
+</svg>

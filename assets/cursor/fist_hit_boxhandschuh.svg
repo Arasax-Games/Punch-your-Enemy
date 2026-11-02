@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Faust-Skin: boxhandschuh -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-linecap="round" stroke-width="3">
+    <path d="M6 10 L13 16 M30 2 L30 9 M54 10 L47 16 M2 30 L9 30" fill="none" stroke="#e8590c"/>
+  </g>
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" transform="translate(2 4) scale(0.95)">
+    <rect x="16" y="40" width="22" height="18" rx="4" fill="#ffffff"/>
+    <path d="M10 26 C10 12 22 8 34 8 C48 8 56 16 56 28 C56 40 48 46 36 46 L22 46 C14 46 10 38 10 26 Z" fill="#e03131"/>
+    <path d="M12 30 C20 26 26 30 28 38" fill="none" stroke-width="2.5"/>
+    <path d="M22 14 C30 10 40 10 46 16" fill="none" stroke="#ffffff" stroke-width="3"/>
+  </g>
+</svg>

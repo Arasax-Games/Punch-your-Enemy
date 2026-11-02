@@ -112,6 +112,16 @@ static func login_marken(streak: int) -> int:
 	return day + (3 if day == 7 else 0)
 
 
+## Börsenkurs: wandert zufällig, zieht aber immer wieder Richtung 1 (Normalpreis). `noise` ~ N(0, 1).
+static func market_step(factor: float, noise: float, volatility: float) -> float:
+	return clampf(factor + (1.0 - factor) * 0.1 + noise * volatility, 0.3, 3.0)
+
+
+## Preis einer Börsenware: so viele Sekunden Produktion × Kursfaktor (mindestens 1 WPS als Basis).
+static func market_price(seconds: float, wps_scale: float, factor: float) -> float:
+	return ceilf(seconds * maxf(wps_scale, 1.0) * factor)
+
+
 ## Lorbeeren für den Neuanfang: floor(∛(Gesamt-Wumms ÷ 1 Billion)).
 static func laurels_for(total_wumms: float) -> int:
 	if total_wumms <= 0.0:

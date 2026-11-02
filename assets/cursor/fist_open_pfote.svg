@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Faust-Skin: pfote -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" transform="rotate(-12 32 32)">
+    <ellipse cx="32" cy="38" rx="20" ry="17" fill="#c0895a"/>
+    <ellipse cx="32" cy="40" rx="10" ry="8" fill="#ffa8a8"/>
+    <circle cx="14" cy="22" r="7" fill="#c0895a"/><circle cx="26" cy="14" r="7" fill="#c0895a"/>
+    <circle cx="40" cy="14" r="7" fill="#c0895a"/><circle cx="52" cy="22" r="7" fill="#c0895a"/>
+    <circle cx="14" cy="22" r="3" fill="#ffa8a8" stroke="none"/><circle cx="26" cy="14" r="3" fill="#ffa8a8" stroke="none"/>
+    <circle cx="40" cy="14" r="3" fill="#ffa8a8" stroke="none"/><circle cx="52" cy="22" r="3" fill="#ffa8a8" stroke="none"/>
+  </g>
+</svg>

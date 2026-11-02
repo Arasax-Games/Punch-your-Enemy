@@ -27,6 +27,11 @@ func _initialize() -> void:
 	test_events()
 	test_minigames()
 	test_migration_v4()
+	test_figures_p5()
+	test_cosmetics()
+	test_challenges()
+	test_market()
+	test_slow_motion_and_v5()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -91,6 +96,10 @@ func test_balance() -> void:
 	check_eq(Balance.minigame_reward(500, 8), 5, "Mini-Spiel: max. 5 Marken")
 	check_eq(Balance.login_day(8), 1, "Login-Serie beginnt nach Tag 7 von vorn")
 	check_eq(Balance.login_marken(7), 10, "Tag 7: Hauptgewinn")
+	check_eq(Balance.market_step(1.0, 0.0, 0.2), 1.0, "Börse: ohne Zufall bleibt der Kurs")
+	check(is_equal_approx(Balance.market_step(2.0, 0.0, 0.2), 1.9), "Börse: Kurs zieht Richtung 1")
+	check_eq(Balance.market_step(1.0, 100.0, 0.2), 3.0, "Börse: Kurs max. 3")
+	check_eq(Balance.market_price(10.0, 0.0, 1.0), 10.0, "Börsenpreis mit mindestens 1 WPS")
 
 
 func test_number_format() -> void:
@@ -585,3 +594,132 @@ func test_migration_v4() -> void:
 	check_eq(load("res://scripts/core/steam_service.gd").api_name("erstes_aua"), "ERSTES_AUA", "Steam-API-Name")
 	gs.free()
 	again.free()
+
+
+func test_figures_p5() -> void:
+	print("Neue Standardfiguren")
+	var gs := new_state()
+	for id in ["dieter", "baron", "fiesling"]:
+		var f: Dictionary = gs.figure_def(id)
+		check_eq(f.id, id, "Figur vorhanden: %s" % id)
+		check_eq((f.moods as Array).size(), 3, "3 Mimik-Stufen: %s" % id)
+		for m in f.moods:
+			check(ResourceLoader.exists(m), "Grafik existiert: %s" % m)
+		check(gs.figure_available(id), "Immer verfügbar: %s" % id)
+	var ids: Array = gs.gallery_entries().map(func(e: Dictionary) -> String: return e.id)
+	check(ids.has("baron"), "Baron in der Galerie")
+	gs.select_target("fiesling")
+	check_eq(gs.target_name(), "Sir Fiesling der Dritte", "Fiesling auswählbar")
+	for f in ["bombastus", "dieter", "baron", "fiesling"]:
+		gs.target_hits[f] = 99
+	check(not gs.achievement_met(gs.achievement_def("promi_galerie")), "Promi-Galerie erst ab 100 je Figur")
+	for f in ["bombastus", "dieter", "baron", "fiesling"]:
+		gs.target_hits[f] = 100
+	check(gs.achievement_met(gs.achievement_def("promi_galerie")), "Promi-Galerie geschafft")
+	gs.free()
+
+
+func test_cosmetics() -> void:
+	print("Kosmetik-Laden")
+	var gs := new_state()
+	for c in gs.cosmetic_defs:
+		if c.slot == "fist" and c.value != "standard":
+			check(ResourceLoader.exists("res://assets/cursor/fist_open_%s.svg" % c.value), "Cursor offen: %s" % c.value)
+			check(ResourceLoader.exists("res://assets/cursor/fist_hit_%s.svg" % c.value), "Cursor zu: %s" % c.value)
+	check(gs.has_cosmetic("fist_standard"), "Standard-Faust immer da")
+	check(not gs.buy_cosmetic("fist_boxhandschuh"), "Ohne Marken nicht kaufbar")
+	gs.beulen_marken = 10
+	check(gs.buy_cosmetic("fist_boxhandschuh"), "Boxhandschuh kaufbar")
+	check_eq(gs.beulen_marken, 4, "6 Marken abgezogen")
+	check_eq(gs.fist_skin, "boxhandschuh", "Sofort angelegt")
+	check(gs.cosmetic_equipped("fist_boxhandschuh"), "Als angelegt erkannt")
+	check(not gs.buy_cosmetic("fist_gold"), "Goldene Faust nur über den Lorbeer-Baum")
+	gs.apply_cosmetic("fist_standard")
+	check_eq(gs.fist_skin, "standard", "Wieder zur normalen Faust")
+	gs.apply_cosmetic("bg_arena")
+	check_eq(gs.background, "standard", "Nicht gekaufter Hintergrund lässt sich nicht anlegen")
+	gs.free()
+
+
+func test_challenges() -> void:
+	print("Herausforderungen")
+	var gs := new_state()
+	check(not gs.start_challenge("nur_faeuste"), "Erst nach dem ersten Neuanfang")
+	gs.stats["prestiges"] = 1
+	gs.laurels_total = 1
+	gs.laurel_nodes = {"starthilfe": true}
+	gs.wumms = 1e6
+	check(gs.start_challenge("nur_faeuste"), "Nur Fäuste startet")
+	check_eq(gs.wumms, 0.0, "Durchlauf beginnt von vorn")
+	check_eq(gs.device_count("faust"), 0, "Keine Startgeräte bei Nur Fäuste")
+	gs.wumms = 1e5
+	check(not gs.buy_device("faust", 1), "Geräte verboten")
+	check(gs.buy_upgrade("boxhandschuh_training"), "Upgrades erlaubt")
+	check(not gs.start_challenge("inflation"), "Nur eine Herausforderung gleichzeitig")
+	gs.earn(1e6)
+	gs.tick(0.1)
+	check_eq(gs.challenge_active, "", "Ziel erreicht – Herausforderung beendet")
+	check_eq(gs.laurels_total, 2, "+1 Extra-Lorbeer")
+	check_eq(gs.laurels_extra, 1, "Als Extra-Lorbeer gemerkt")
+	check(not gs.start_challenge("nur_faeuste"), "Jede Herausforderung nur einmal")
+	gs.lifetime_wumms = 1e12
+	check_eq(gs.prestige_gain(), 0, "Extra-Lorbeeren verringern den Neuanfang-Gewinn nicht doppelt")
+	gs.lifetime_wumms = 8e12
+	check_eq(gs.prestige_gain(), 1, "Neuanfang zählt nur Neuanfang-Lorbeeren")
+	check(gs.start_challenge("inflation"), "Inflation startet")
+	check_eq(gs.device_cost("faust", 1), Balance.unit_cost(45.0, 10), "Inflation: dreifacher Preis (10 Startfäuste)")
+	gs.abort_challenge()
+	check_eq(gs.device_cost("faust", 1), Balance.unit_cost(15.0, 10), "Nach Abbruch normale Preise")
+	check(gs.start_challenge("ohne_upgrades"), "Ohne Upgrades startet")
+	gs.wumms = 1e6
+	check(not gs.buy_upgrade("boxhandschuh_training"), "Upgrades verboten")
+	gs.free()
+
+
+func test_market() -> void:
+	print("Börse für Beulen")
+	var gs := new_state()
+	check(not gs.market_unlocked(), "Börse gesperrt am Anfang")
+	gs.lifetime_wumms = 2e7
+	check(gs.market_unlocked(), "Börse ab 10 Mio. Wumms")
+	gs.devices = {"pantoffel": 100}
+	gs.tick(0.01)
+	check(is_equal_approx(gs.market_scale, 100.0), "Preisbasis = höchste WPS")
+	check_eq(gs.market_price("pflaster"), 500.0, "Pflaster = 5 s Produktion")
+	gs.wumms = 1e6
+	check_eq(gs.market_buy("pflaster", 10), 10, "10 Pflaster gekauft")
+	check(is_equal_approx(gs.wumms, 1e6 - 5000.0), "Bezahlt")
+	check_eq(gs.market_buy("pflaster", 100), 40, "Lager begrenzt auf 50")
+	gs.market_factors["pflaster"] = 2.0
+	var profit: float = gs.market_sell("pflaster", 50)
+	check(is_equal_approx(profit, 50.0 * 500.0), "Verkauf zum doppelten Preis = Gewinn")
+	check_eq(int(gs.stat("market_wins")), 1, "Gewinn-Verkauf gezählt")
+	check_eq(int(gs.market_holdings.get("pflaster", 0)), 0, "Lager leer")
+	gs.market_buy("torten", 5)
+	gs.stats["prestiges"] = 0
+	gs.earn(1e13)
+	gs.perform_prestige()
+	check_eq(int(gs.market_holdings.get("torten", 0)), 0, "Neuanfang schließt die Börse")
+	for i in 20:
+		gs.step_market()
+	for g in gs.market_goods():
+		var f: float = gs.market_factor(g.id)
+		check(f >= 0.3 and f <= 3.0, "Kurs im Rahmen: %s" % g.id)
+	gs.free()
+
+
+func test_slow_motion_and_v5() -> void:
+	print("Zeitlupe und Migration v4 → v5")
+	var gs := new_state()
+	var r: Dictionary = gs.claim_shoe("golden", 0.98)
+	check_eq(r.title, "Zeitlupe!", "Roll 0,98 = Zeitlupe")
+	check(is_equal_approx(gs.buff_click_multiplier(), 3.0), "Zeitlupe: Klick ×3")
+	r = gs.claim_shoe("golden", 0.95)
+	check_eq(r.title, "Kettenreaktion!", "Roll 0,95 = Kettenreaktion")
+	var old := new_state()
+	old.from_dict({"version": 4, "wumms": 5.0, "laurels_total": 3})
+	check_eq(old.laurels_extra, 0, "Keine Extra-Lorbeeren in alten Spielständen")
+	check(old.owned_cosmetics.is_empty(), "Laden leer")
+	check_eq(old.to_dict().version, 5, "Gespeichert als v5")
+	gs.free()
+	old.free()

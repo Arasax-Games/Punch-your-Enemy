@@ -1,0 +1,31 @@
+{
+	"update_seconds": 60,
+	"capacity": 50,
+	"unlock_lifetime_wumms": 10000000.0,
+	"goods": [
+		{
+			"id": "pflaster",
+			"name": "Pflaster",
+			"seconds": 5,
+			"volatility": 0.12
+		},
+		{
+			"id": "eisbeutel",
+			"name": "Eisbeutel",
+			"seconds": 15,
+			"volatility": 0.16
+		},
+		{
+			"id": "torten",
+			"name": "Sahnetorten",
+			"seconds": 45,
+			"volatility": 0.22
+		},
+		{
+			"id": "gummienten",
+			"name": "Gummienten",
+			"seconds": 120,
+			"volatility": 0.3
+		}
+	]
+}
