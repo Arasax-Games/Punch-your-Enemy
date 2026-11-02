@@ -30,6 +30,29 @@ Das schreibt `docs/steam_achievements.csv` (API-Name; Name und Beschreibung auf 
 
 Das Spiel meldet Erfolge sofort beim Freischalten und beim Start noch einmal alle bereits verdienten (falls jemand vorher ohne Steam gespielt hat).
 
+### Erfolgsbilder
+
+Fertige Bilder (64×64, farbig und grau für „noch gesperrt“) liegen in `steam/achievements/`:
+`ERSTES_AUA.png` und `ERSTES_AUA_locked.png` usw. Neu erzeugen mit `python3 tools/achievement_icons.py`.
+
+### Bestenlisten
+
+In Steamworks unter **Stats & Achievements → Leaderboards** anlegen (Sortierung absteigend, Anzeige „numeric“):
+
+| API-Name | Inhalt |
+|---|---|
+| `DOJO_BEST` | Rekord im Reaktions-Dojo |
+| `PIE_BEST` | Rekord in der Tortenwurf-Schießbude |
+| `LAURELS` | Lorbeeren insgesamt |
+
+Bewusst keine Bestenliste mit bildbezogenen Werten (z. B. Treffer auf ein eigenes Bild).
+
+### Rich Presence
+
+Unter **Community → Rich Presence** die Dateien `docs/steam_rich_presence_german.vdf` und `docs/steam_rich_presence_english.vdf` hochladen
+(neu erzeugen mit `godot --headless --path . --script res://tools/steam_rich_presence.gd`). Freunde sehen dann z. B.
+„Haut auf Baron von Blamage“. Eigene Bilder erscheinen nie mit Namen, nur als „ein eigenes Bild“.
+
 ## 4. Steam Cloud (Spielstände)
 
 Kein Code nötig – **Auto-Cloud** in Steamworks einrichten (**Steam Cloud → Auto-Cloud Configuration**):

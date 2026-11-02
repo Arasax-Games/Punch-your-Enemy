@@ -1,0 +1,16 @@
+"lang"
+{
+	"Language"	"german"
+	"Tokens"
+	{
+		"#Status_Punching"	"Haut auf {#%target%}"
+		"#Status_Boss"	"Kämpft gegen einen Boss!"
+		"#Fig_custom"	"ein eigenes Bild"
+		"#Fig_bombastus"	"Generalissimo Bombastus von Größenwahn"
+		"#Fig_dieter"	"Dr. Doomsday Dieter"
+		"#Fig_baron"	"Baron von Blamage"
+		"#Fig_fiesling"	"Sir Fiesling der Dritte"
+		"#Fig_hexe"	"Halloween-Hexe Hildegard"
+		"#Fig_muffel"	"Weihnachtsmuffel Gustav"
+	}
+}

@@ -1,0 +1,16 @@
+"lang"
+{
+	"Language"	"english"
+	"Tokens"
+	{
+		"#Status_Punching"	"Punching {#%target%}"
+		"#Status_Boss"	"Fighting a boss!"
+		"#Fig_custom"	"a picture of their own"
+		"#Fig_bombastus"	"Generalissimo Bombastus von Megalomania"
+		"#Fig_dieter"	"Dr. Doomsday Dieter"
+		"#Fig_baron"	"Baron von Blunder"
+		"#Fig_fiesling"	"Sir Scoundrel the Third"
+		"#Fig_hexe"	"Hildegard the Halloween Witch"
+		"#Fig_muffel"	"Gustav the Christmas Grump"
+	}
+}
