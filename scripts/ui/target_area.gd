@@ -5,13 +5,16 @@ extends Control
 
 signal hit(uv: Vector2)
 
-const CURSOR_OPEN := preload("res://assets/cursor/fist_open.svg")
-const CURSOR_HIT := preload("res://assets/cursor/fist_hit.svg")
+const CURSORS := {
+	"standard": [preload("res://assets/cursor/fist_open.svg"), preload("res://assets/cursor/fist_hit.svg")],
+	"gold": [preload("res://assets/cursor/fist_open_gold.svg"), preload("res://assets/cursor/fist_hit_gold.svg")],
+}
 const CURSOR_HOTSPOT := Vector2(30, 26)
 const ALPHA_THRESHOLD := 0.1
 
 @onready var image: TextureRect = $TargetImage
 @onready var effects: HitEffects = $Effects
+@onready var bumps: BumpOverlay = $BumpOverlay
 
 var _alpha_image: Image
 var _held := false
@@ -22,7 +25,7 @@ var _squash_tween: Tween
 
 
 func _ready() -> void:
-	_set_cursor(CURSOR_OPEN)
+	_set_cursor(_cursor(0))
 	resized.connect(_update_pivot)
 	image.resized.connect(_update_pivot)
 
@@ -37,6 +40,7 @@ func set_texture(tex: Texture2D) -> void:
 				img.decompress()
 			_alpha_image = img
 	effects.clear()
+	bumps.refresh()
 
 
 ## Rechteck, in dem das Bild tatsächlich gezeichnet wird (lokale Koordinaten dieses Controls).
@@ -113,7 +117,7 @@ func _process(delta: float) -> void:
 	if _cursor_timer > 0.0:
 		_cursor_timer -= delta
 		if _cursor_timer <= 0.0:
-			_set_cursor(CURSOR_OPEN)
+			_set_cursor(_cursor(0))
 
 
 func position_offset(offset: Vector2) -> void:
@@ -145,8 +149,16 @@ func _update_pivot() -> void:
 
 
 func _punch_cursor() -> void:
-	_set_cursor(CURSOR_HIT)
+	_set_cursor(_cursor(1))
 	_cursor_timer = 0.09
+
+
+func _cursor(frame: int) -> Texture2D:
+	return CURSORS.get(GameState.fist_skin, CURSORS.standard)[frame]
+
+
+func refresh_cursor() -> void:
+	_set_cursor(_cursor(0))
 
 
 func _set_cursor(tex: Texture2D) -> void:

@@ -31,7 +31,7 @@ func _ready() -> void:
 
 func add_hit(uv: Vector2, value: float, crit: bool) -> void:
 	var reduced := GameState.reduced_effects
-	var size_mult := 1.8 if crit else 1.0
+	var size_mult := (1.8 if crit else 1.0) * (1.0 + GameState.combo / 200.0)
 
 	var blobs: Array = []
 	for i in _rng.randi_range(5, 9):
