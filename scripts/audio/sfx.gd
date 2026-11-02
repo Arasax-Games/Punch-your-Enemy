@@ -25,11 +25,21 @@ func _ready() -> void:
 	_streams["achievement"] = [_make_arpeggio([523.0, 659.0, 784.0, 1047.0], 0.11, 0.4)]
 	_streams["bad"] = [_make_arpeggio([392.0, 370.0, 349.0, 262.0], 0.16, 0.35)]
 	_streams["shoe_appear"] = [_make_arpeggio([1319.0, 1760.0], 0.06, 0.25)]
+	_streams["rage"] = [_make_square(110.0, 55.0, 0.6, 0.35), ]
+	_streams["prestige"] = [_make_arpeggio([262.0, 330.0, 392.0, 523.0, 659.0, 784.0, 1047.0], 0.09, 0.4)]
+	# Retro-Soundpaket (Lorbeer-Baum, Zweig "Show"): Rechteckwellen wie am Spielautomaten
+	_streams["retro_punch"] = [_make_square(220.0, 80.0, 0.09, 0.3), _make_square(180.0, 70.0, 0.1, 0.3)]
+	_streams["retro_crit"] = [_make_square(440.0, 60.0, 0.3, 0.35)]
+	_streams["retro_buy"] = [_make_square(660.0, 1320.0, 0.12, 0.25)]
+	_streams["retro_boing"] = [_make_square(300.0, 600.0, 0.2, 0.2)]
+	_streams["retro_squeak"] = [_make_square(1200.0, 1600.0, 0.08, 0.15)]
 
 
 func play(sound: String, pitch_spread: float = 0.1, volume_db: float = 0.0) -> void:
 	if not GameState.sound_on or not _streams.has(sound):
 		return
+	if GameState.sound_pack == "retro" and _streams.has("retro_" + sound):
+		sound = "retro_" + sound
 	var p := _players[_next]
 	_next = (_next + 1) % _players.size()
 	var variants: Array = _streams[sound]
@@ -124,6 +134,19 @@ func _make_arpeggio(notes: Array, note_length: float, volume: float) -> AudioStr
 			if env < 0.001:
 				break
 			s[i] += (sin(TAU * freq * t) + 0.25 * sin(TAU * freq * 2.0 * t)) * env * volume
+	return _to_wav(s)
+
+
+## Rechteckwelle mit Tonhöhen-Rampe (8-Bit-Stil).
+func _make_square(freq_from: float, freq_to: float, duration: float, volume: float) -> AudioStreamWAV:
+	var s := _buffer(duration)
+	var phase := 0.0
+	for i in s.size():
+		var t := float(i) / RATE
+		var f := lerpf(freq_from, freq_to, t / duration)
+		phase += f / RATE
+		var square := 1.0 if fmod(phase, 1.0) < 0.5 else -1.0
+		s[i] = square * volume * (1.0 - t / duration)
 	return _to_wav(s)
 
 

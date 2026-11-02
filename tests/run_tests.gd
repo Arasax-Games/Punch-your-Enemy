@@ -17,6 +17,11 @@ func _initialize() -> void:
 	test_achievements()
 	test_shoes_and_buffs()
 	test_offline()
+	test_prestige()
+	test_laurel_tree()
+	test_combo_and_rage()
+	test_bump_levels_and_gallery()
+	test_migration_v3()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -41,6 +46,7 @@ func check_eq(actual: Variant, expected: Variant, label: String) -> void:
 
 func new_state() -> Node:
 	var gs: Node = load("res://scripts/core/game_state.gd").new()
+	gs.persist = false
 	gs.load_data()
 	return gs
 
@@ -66,6 +72,14 @@ func test_balance() -> void:
 	check_eq(Balance.offline_gain(10.0, 3600.0), 18000.0, "Offline: halbe WPS")
 	check_eq(Balance.offline_gain(10.0, 20.0 * 3600.0), 144000.0, "Offline: max. 8 Stunden")
 	check_eq(Balance.synergy_bonus(25, 0.05, 10), 1.1, "Synergie: +5 % je 10")
+	check_eq(Balance.laurel_gain(8e12, 1), 1, "Neuanfang bringt nur neue Lorbeeren")
+	check_eq(Balance.laurel_gain(5e11, 0), 0, "unter 1 Billion keine Lorbeeren")
+	check_eq(Balance.laurel_bonus(25), 1.25, "25 Lorbeeren = +25 %")
+	check_eq(Balance.combo_multiplier(0), 1.0, "Combo 0 = ×1")
+	check_eq(Balance.combo_multiplier(150), 2.0, "Combo max. ×2")
+	check_eq(Balance.bump_level(999), 0, "Beulen-Level 0 unter 1.000")
+	check_eq(Balance.bump_level(3500), 3, "Beulen-Level 3")
+	check_eq(Balance.bump_level(50000), 10, "Beulen-Level max. 10")
 
 
 func test_number_format() -> void:
@@ -89,8 +103,10 @@ func test_game_state() -> void:
 	check_eq(gs.click_value(), 1.0, "Startklick = 1")
 	for i in 15:
 		gs.hit()
-	check_eq(gs.wumms, 15.0, "15 Klicks = 15 Wumms")
+	check(is_equal_approx(gs.wumms, 17.1), "15 Klicks = 15 Wumms + Combo-Bonus (17,1)")
 	check_eq(gs.total_hits, 15, "Treffer gezählt")
+	gs.wumms = 15.0
+	gs.combo = 0.0
 	check(gs.buy_device("faust", 1), "Faust kaufbar")
 	check_eq(gs.wumms, 0.0, "Wumms abgezogen")
 	check(not gs.buy_device("faust", 1), "Zweite Faust zu teuer")
@@ -194,7 +210,7 @@ func test_save_migration() -> void:
 	check_eq(int(gs.stats.crits), 0, "Statistik angelegt")
 	gs.check_achievements()
 	check(gs.achievements.has("zappelphilipp"), "Erfolge rückwirkend vergeben")
-	check_eq(gs.to_dict().version, 2, "wird als v2 gespeichert")
+	check_eq(gs.to_dict().version, 3, "wird als aktuelle Version gespeichert")
 	var code: String = gs.export_save_code()
 	var other := new_state()
 	check(other.import_save_code(code), "Import ausgeführt")
@@ -289,3 +305,143 @@ func test_offline() -> void:
 	gs.apply_offline_progress(90000.0)
 	check_eq(int(gs.stat("long_return")), 1, "Wieder zuhause nach 24 h")
 	gs.free()
+
+
+func test_prestige() -> void:
+	print("Neuanfang")
+	var gs := new_state()
+	gs.wumms = 5e11
+	gs.earn(5e11)
+	check(not gs.can_prestige(), "Unter 1 Billion kein Neuanfang")
+	gs.earn(8e12)
+	check(gs.can_prestige(), "Neuanfang ab 1 Billion möglich")
+	gs.devices = {"faust": 50}
+	gs.upgrades = {"boxhandschuh_training": true}
+	gs.achievements = {"erstes_aua": true}
+	var marken: int = gs.beulen_marken
+	var gain: int = gs.perform_prestige()
+	check_eq(gain, 2, "8,5 Billionen = 2 Lorbeeren")
+	check_eq(gs.laurels_total, 2, "Lorbeeren gutgeschrieben")
+	check_eq(gs.wumms, 0.0, "Wumms zurückgesetzt")
+	check_eq(gs.device_count("faust"), 0, "Geräte zurückgesetzt")
+	check(not gs.has_upgrade("boxhandschuh_training"), "Upgrades zurückgesetzt")
+	check(gs.achievements.has("erstes_aua"), "Erfolge bleiben")
+	check_eq(gs.beulen_marken, marken, "Beulen-Marken bleiben")
+	check_eq(int(gs.stat("prestiges")), 1, "Neuanfänge gezählt")
+	check(not gs.can_prestige(), "Direkt danach kein zweiter Neuanfang")
+	gs.devices = {"pantoffel": 10}
+	check(is_equal_approx(gs.base_wps(), 10.0 * 1.02), "2 Lorbeeren = +2 % WPS")
+	check(is_equal_approx(gs.base_click_value(), 1.02), "2 Lorbeeren = +2 % Klick")
+	check(gs.time_warp_unlocked(), "Zeitraffer nach dem ersten Neuanfang")
+	gs.time_warp = true
+	var before: float = gs.wumms
+	gs.tick(10.0)
+	check(is_equal_approx(gs.wumms - before, 10.0 * 1.02 * 20.0), "Zeitraffer: doppelte Produktion")
+	gs.free()
+
+
+func test_laurel_tree() -> void:
+	print("Lorbeer-Baum")
+	var gs := new_state()
+	check_eq(gs.laurel_defs.size(), 20, "20 Knoten")
+	for n in gs.laurel_defs:
+		for r in n.get("requires", []):
+			check(not gs.laurel_def(r).is_empty(), "Voraussetzung existiert: %s" % n.id)
+		check(n.branch in ["handwerk", "glueck", "komfort", "show"], "Zweig gültig: %s" % n.id)
+	gs.laurels_total = 3
+	check(not gs.buy_laurel_node("grosseinkauf"), "Gesperrt ohne Werkzeugkiste")
+	check(gs.buy_laurel_node("werkzeugkiste"), "Werkzeugkiste kaufbar")
+	check_eq(gs.laurels_available(), 2, "Lorbeer ausgegeben")
+	check_eq(gs.laurels_total, 3, "Bonus bleibt beim Ausgeben")
+	check_eq(gs.device_cost("faust", 1), ceilf(15.0 * 0.95), "Geräte 5 % günstiger")
+	check(gs.buy_laurel_node("starthilfe"), "Starthilfe kaufbar")
+	gs.earn(7e13)  # bei 3 Lorbeeren braucht der nächste 4³ = 64 Billionen
+	check_eq(gs.perform_prestige(), 1, "Vierter Lorbeer ab 64 Billionen")
+	check_eq(gs.device_count("faust"), 10, "Starthilfe: 10 Fäuste nach Neuanfang")
+	check(not gs.buy_laurel_node("goldene_faust"), "Show-Zweig kostet Beulen-Marken")
+	gs.beulen_marken = 3
+	check(gs.buy_laurel_node("goldene_faust"), "Goldene Faust mit Marken kaufbar")
+	check_eq(gs.fist_skin, "gold", "Goldene Faust sofort aktiv")
+	check_eq(gs.beulen_marken, 0, "Marken abgezogen")
+	gs.laurel_nodes = {"nachtwaechter": true, "langschlaefer": true}
+	check(is_equal_approx(gs.offline_rate(), 0.75), "Nachtwächter: 75 % offline")
+	check(is_equal_approx(gs.offline_cap(), 24.0 * 3600.0), "Langschläfer: 24 h")
+	gs.laurel_nodes = {"dauerfeuer_abo": true}
+	check(gs.has_autofire(), "Dauerfeuer-Abo ohne Upgrade")
+	gs.laurel_nodes = {"gluecksinstinkt": true}
+	check(is_equal_approx(gs.crit_chance(), 0.03) and gs.crit_factor() == 10.0, "Glücksinstinkt: 3 % ×10")
+	gs.laurel_nodes = {"autokauf": true}
+	gs.wumms = 1000.0
+	gs.revealed_upgrades = {}
+	gs.tick(1.1)
+	check(gs.has_upgrade("boxhandschuh_training"), "Automatischer Einkauf kauft Upgrades")
+	gs.free()
+
+
+func test_combo_and_rage() -> void:
+	print("Combo und Wutmodus")
+	var gs := new_state()
+	for i in 60:
+		gs.hit()
+	check_eq(gs.combo, 100.0, "Combo max. 100")
+	check(is_equal_approx(gs.click_value(), 2.0), "Combo 100 = Klick ×2")
+	check_eq(int(gs.stat("max_combo")), 100, "Höchste Combo gemerkt")
+	gs.tick(1.0)
+	check_eq(gs.combo, 100.0, "Combo hält 2 s")
+	gs.tick(1.5)
+	check(gs.combo < 100.0, "Combo fällt nach Pause")
+	check(not gs.rage_ready(), "Wut-Leiste noch nicht voll")
+	for i in 100:
+		gs.hit()
+	check(gs.rage_ready(), "Wut-Leiste nach 150 Treffern voll")
+	gs.devices = {"pantoffel": 10}
+	var base: float = gs.wps()
+	check(gs.start_rage(), "Wutmodus startet")
+	check(is_equal_approx(gs.wps(), base * 3.0), "Wutmodus: WPS ×3")
+	check_eq(gs.rage_meter, 0.0, "Leiste geleert")
+	gs._shoe_timers["golden"] = 0.5
+	gs._update_shoes(1.0)
+	check(not gs._shoe_active.get("golden", false), "Im Wutmodus keine Goldenen Schuhe")
+	gs.tick(10.5)
+	check(not gs.rage_active(), "Wutmodus endet nach 10 s")
+	check(is_equal_approx(gs.wps(), base), "WPS wieder normal")
+	gs.free()
+
+
+func test_bump_levels_and_gallery() -> void:
+	print("Beulen-Level und Galerie")
+	var gs := new_state()
+	var levels: Array[int] = []
+	gs.bump_level_up.connect(func(_t: String, level: int) -> void: levels.append(level))
+	gs.target_hits = {"bombastus": 999}
+	gs.hit()
+	check_eq(levels, [1] as Array[int], "Level 1 nach 1.000 Treffern")
+	check_eq(gs.beulen_marken, 1, "Beulen-Level gibt eine Marke")
+	check_eq(gs.mood_index(3), 0, "Mimik gelassen bis Level 3")
+	check_eq(gs.mood_index(4), 1, "Mimik genervt ab Level 4")
+	check_eq(gs.mood_index(8), 2, "Mimik am Ende ab Level 8")
+	check(gs.target_figure().anchors.has("eye_left"), "Bombastus hat Anker")
+	check_eq(gs.figure_def("img_123").id, "_custom", "Eigene Bilder nutzen Standard-Anker")
+	var entries: Array = gs.gallery_entries()
+	check_eq(entries[0].id, "bombastus", "Bombastus steht in der Galerie")
+	check(not gs.rename_target("bombastus", "X"), "Bombastus kann nicht umbenannt werden")
+	gs.target_names = {"img_1": "Alt"}
+	check(gs.rename_target("img_1", "  Neuer Name  "), "Eigenes Bild umbenennen")
+	check_eq(gs.target_names.img_1, "Neuer Name", "Name gekürzt und gespeichert")
+	gs.free()
+
+
+func test_migration_v3() -> void:
+	print("Migration v2 → v3")
+	var gs := new_state()
+	gs.from_dict({"version": 2, "wumms": 10.0, "total_wumms": 3e12, "achievements": ["erstes_aua", "warm_up"],
+		"beulen_marken": 3, "stats": {"golden_shoes": 2}})
+	check_eq(gs.lifetime_wumms, 3e12, "Lebenszeit-Wumms aus total_wumms")
+	check_eq(gs.beulen_marken, 5, "Marken für bisherige Erfolge nachgezahlt")
+	check_eq(gs.laurels_total, 0, "Noch keine Lorbeeren")
+	check(gs.can_prestige(), "Alter Spielstand kann sofort neu anfangen")
+	var again := new_state()
+	again.from_dict(JSON.parse_string(JSON.stringify(gs.to_dict())))
+	check_eq(again.beulen_marken, 5, "v3-Spielstand wird nicht doppelt migriert")
+	gs.free()
+	again.free()

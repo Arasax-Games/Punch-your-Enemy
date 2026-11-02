@@ -68,6 +68,30 @@ static func synergy_bonus(source_count: int, percent: float, per: int) -> float:
 	return 1.0 + percent * floorf(float(source_count) / float(maxi(per, 1)))
 
 
+## Ab so viel insgesamt erzeugtem Wumms ist ein Neuanfang möglich.
+const PRESTIGE_THRESHOLD := 1e12
+
+
+## Wie viele Lorbeeren ein Neuanfang jetzt zusätzlich bringen würde.
+static func laurel_gain(lifetime_wumms: float, laurels_already: int) -> int:
+	return maxi(0, laurels_for(lifetime_wumms) - laurels_already)
+
+
+## Dauerhafter Bonus durch Lorbeeren: +1 % je Lorbeer.
+static func laurel_bonus(laurels: int) -> float:
+	return 1.0 + 0.01 * laurels
+
+
+## Combo-Bonus auf den Klick-Wert: 0 → ×1, 100 → ×2.
+static func combo_multiplier(combo: float) -> float:
+	return 1.0 + clampf(combo, 0.0, 100.0) / 100.0
+
+
+## Beulen-Level eines Opfers: alle 1.000 Treffer eins, höchstens 10.
+static func bump_level(hits: int) -> int:
+	return mini(10, int(hits / 1000))
+
+
 ## Lorbeeren für den Neuanfang (Phase 3): floor(∛(Gesamt-Wumms ÷ 1 Billion)).
 static func laurels_for(total_wumms: float) -> int:
 	if total_wumms <= 0.0:

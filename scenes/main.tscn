@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://scripts/ui/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/ui/target_area.gd" id="2_target"]
 [ext_resource type="Script" path="res://scripts/effects/hit_effects.gd" id="3_effects"]
+[ext_resource type="Script" path="res://scripts/ui/background.gd" id="4_background"]
+[ext_resource type="Script" path="res://scripts/effects/bump_overlay.gd" id="5_bumps"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -13,7 +15,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,7 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.996, 0.925, 0.8, 1)
+script = ExtResource("4_background")
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -63,12 +66,12 @@ tooltip_text = "Bild von der Festplatte laden. Du kannst Bilder auch ins Fenster
 Nimm Bilder, bei denen alle Beteiligten Spaß verstehen."
 text = "Neues Opfer wählen …"
 
-[node name="DefaultButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="GalleryButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
-tooltip_text = "Zurück zu Generalissimo Bombastus."
-text = "Bombastus"
+tooltip_text = "Alle Opfer: wechseln, umbenennen, löschen."
+text = "Galerie"
 
 [node name="ShowerButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
@@ -77,25 +80,20 @@ focus_mode = 0
 tooltip_text = "Wäscht alle Spritzer und Beulen ab. Der Fortschritt bleibt."
 text = "Duschen"
 
-[node name="SoundButton" type="CheckButton" parent="Margin/Layout/TopBar/TopRow"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-text = "Ton"
-
-[node name="EffectsButton" type="CheckButton" parent="Margin/Layout/TopBar/TopRow"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-tooltip_text = "Kein Wackeln, keine Sternchen, weniger Comic-Wörter."
-text = "Weniger Effekte"
-
 [node name="AchievementsButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Alle Erfolge und dein Fortschritt."
 text = "Erfolge"
+
+[node name="LaurelButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+tooltip_text = "Lorbeeren und Beulen-Marken dauerhaft investieren."
+text = "Lorbeer-Baum"
 
 [node name="MenuButton" type="MenuButton" parent="Margin/Layout/TopBar/TopRow"]
 unique_name_in_owner = true
@@ -216,6 +214,16 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
+
+[node name="BumpOverlay" type="Control" parent="Margin/Layout/Columns/TargetArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_bumps")
 
 [node name="Effects" type="Control" parent="Margin/Layout/Columns/TargetArea"]
 layout_mode = 1

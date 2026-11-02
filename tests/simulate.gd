@@ -2,10 +2,14 @@ extends SceneTree
 ## Balancing-Simulation: Ein gieriger Spieler kauft immer das Angebot mit der kürzesten Amortisation.
 ## Prüft die Tempo-Zielwerte aus docs/konzept.md (Abschnitt 11.2). Goldene Schuhe werden ignoriert.
 ## Aufruf: godot --headless --path . --script res://tests/simulate.gd
+##        godot --headless --path . --script res://tests/simulate.gd -- --days 7   (mit Neuanfängen)
 ##
-## Spielermodell: in der ersten Stunde 4 Klicks/s, danach 1 Klick/s im Schnitt.
+## Spielermodell: in der ersten Stunde jedes Durchlaufs 4 Klicks/s, danach 1 Klick/s im Schnitt.
+## Mehrtägig: Neuanfang, sobald er die Lorbeeren mindestens verdoppelt; Lorbeeren werden sofort
+## in den günstigsten Knoten des Lorbeer-Baums gesteckt.
 
-const HOURS := 24.0
+var hours := 24.0
+var _run_start := 0.0
 
 var gs: Node
 var _first_owned: Dictionary = {}
@@ -13,19 +17,33 @@ var _log: Array[String] = []
 
 
 func _initialize() -> void:
+	var args := OS.get_cmdline_user_args()
+	var days_at := args.find("--days")
+	if days_at >= 0 and days_at + 1 < args.size():
+		hours = float(args[days_at + 1]) * 24.0
 	gs = load("res://scripts/core/game_state.gd").new()
+	gs.persist = false
 	gs.load_data()
 	var t := 0.0
-	var next_report := [60.0, 600.0, 3600.0, 4 * 3600.0, 12 * 3600.0, 24 * 3600.0]
-	while t < HOURS * 3600.0:
-		var step := 1.0 if t < 600.0 else (5.0 if t < 3600.0 else 30.0)
-		var cps := _clicks_per_second(t)
+	var next_report := [60.0, 600.0, 3600.0, 4 * 3600.0, 12 * 3600.0]
+	for d in range(1, int(ceil(hours / 24.0)) + 1):
+		next_report.append(d * 24.0 * 3600.0)
+	var multi_day := hours > 24.0
+	while t < hours * 3600.0:
+		var run_t := t - _run_start
+		var step := 1.0 if run_t < 600.0 else (5.0 if run_t < 3600.0 else (30.0 if not multi_day else 60.0))
+		var cps := _clicks_per_second(run_t)
 		gs.earn(gs.click_value() * cps * step)
 		gs.total_hits += int(cps * step)
 		gs.tick(step)
 		t += step
 		_buy_greedy(t)
 		gs.check_achievements()
+		if multi_day and gs.can_prestige() and gs.prestige_gain() >= maxi(1, gs.laurels_total):
+			var gain: int = gs.perform_prestige()
+			_run_start = t
+			_log.append("  → Neuanfang nach %s: +%d Lorbeeren (gesamt %d)" % [Num.duration(t), gain, gs.laurels_total])
+			_spend_laurels()
 		if not next_report.is_empty() and t >= next_report[0]:
 			_report(next_report.pop_front())
 	print("\n".join(_log))
@@ -36,6 +54,20 @@ func _initialize() -> void:
 		print("Gerät %2d %-30s zuerst nach %s" % [i + 1, gs.device_defs[i].name, when])
 	gs.free()
 	quit()
+
+
+func _spend_laurels() -> void:
+	for guard in 50:
+		var best := {}
+		for n in gs.laurel_defs:
+			if gs.has_laurel_node(n.id):
+				continue
+			if gs.laurel_requirements_met(n) and gs.can_afford_laurel_node(n):
+				if best.is_empty() or int(n.cost) < int(best.cost):
+					best = n
+		if best.is_empty():
+			return
+		gs.buy_laurel_node(best.id)
 
 
 func _clicks_per_second(t: float) -> float:
@@ -94,6 +126,7 @@ func _report(at: float) -> void:
 		if gs.device_count(gs.device_defs[i].id) > 0:
 			types += 1
 			highest = i + 1
-	_log.append("%-8s Wumms gesamt %-12s WPS %-12s Gerätetypen %2d (höchstes: %2d)  Upgrades %2d  Erfolge %2d  Lorbeeren bei Neuanfang %d" % [
-		Num.duration(at), Num.fmt(gs.total_wumms), Num.fmt(gs.wps()), types, highest,
-		gs.upgrades.size(), gs.achievement_count(), Balance.laurels_for(gs.total_wumms)])
+	_log.append("%-8s Wumms gesamt %-12s WPS %-12s Gerätetypen %2d (höchstes: %2d)  Upgrades %2d  Erfolge %2d  Lorbeeren %d (+%d möglich)  Baum %d/%d  Marken %d" % [
+		Num.duration(at), Num.fmt(gs.lifetime_wumms), Num.fmt(gs.wps()), types, highest,
+		gs.upgrades.size(), gs.achievement_count(), gs.laurels_total, gs.prestige_gain(),
+		gs.laurel_nodes.size(), gs.laurel_defs.size(), gs.beulen_marken])
