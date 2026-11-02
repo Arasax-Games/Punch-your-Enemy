@@ -29,6 +29,7 @@ const MAX_IMAGE_EDGE := 1024
 const AUTOSAVE_INTERVAL := 30.0
 const ACHIEVEMENT_CHECK_INTERVAL := 0.5
 const DEFAULT_TARGET := "bombastus"
+# i18n
 const DEFAULT_TARGET_NAME := "Generalissimo Bombastus von Größenwahn"
 const DEFAULT_TEXTURE_PATH := "res://assets/figures/bombastus.svg"
 const DEVICES_PATH := "res://data/devices.json"
@@ -44,9 +45,14 @@ const COSMETICS_PATH := "res://data/cosmetics.json"
 const CHALLENGES_PATH := "res://data/challenges.json"
 const MARKET_PATH := "res://data/market.json"
 const SLOW_MOTION_SCALE := 0.4
+const LANGUAGES := {"de": "Deutsch", "en": "English"}
+## Datenfelder, die beim Laden übersetzt werden (Quelltext Deutsch = msgid in locale/*.po).
+## Pokalnamen werden bewusst erst bei der Anzeige übersetzt, weil sie im Spielstand stehen.
+const LOCALIZED_FIELDS: Array[String] = ["name", "description", "text", "intro"]
 const QUESTS_PER_DAY := 3
 const DAY_CHECK_INTERVAL := 5.0
 const MAX_STATS: Array[String] = ["max_combo", "best_streak", "dojo_best", "pie_best"]
+# i18n
 const MINIGAMES := {
 	"dojo": {"name": "Reaktions-Dojo", "points_per_marke": 8, "stat": "dojo_best"},
 	"pie": {"name": "Tortenwurf-Schießbude", "points_per_marke": 12, "stat": "pie_best"},
@@ -139,6 +145,7 @@ var time_warp: bool = false
 var background: String = "standard"
 var fist_skin: String = "standard"
 var sound_pack: String = "standard"
+var language: String = ""               # "" = Systemsprache, sonst "de" oder "en"
 
 # --- Laufzeit (wird nicht gespeichert) ---
 var buffs: Array = []       # {id, name, remaining, duration, wps_mult, click_mult}
@@ -172,7 +179,9 @@ func _ready() -> void:
 	load_data()
 	_reset_stats()
 	_migrate_user_dir()
-	if load_game():
+	var loaded := load_game()
+	set_language(language)
+	if loaded:
 		_apply_offline_since_save()
 	reset_shoe_timers()
 	check_new_day()
@@ -253,6 +262,31 @@ func load_data() -> void:
 		challenge_defs.append(c)
 	var market: Variant = JSON.parse_string(FileAccess.get_file_as_string(MARKET_PATH))
 	market_config = market if market is Dictionary else {}
+	_localize_data()
+
+
+## Übersetzt die Anzeigetexte aller Daten in die aktuelle Sprache.
+func _localize_data() -> void:
+	var lists: Array = [device_defs, upgrade_defs, achievement_defs, laurel_defs, figure_defs, quest_defs,
+		event_defs, cosmetic_defs, challenge_defs, boss_config.get("gimmicks", []), market_config.get("goods", [])]
+	for list in lists:
+		for entry in list:
+			for field in LOCALIZED_FIELDS:
+				if entry.has(field) and entry[field] is String:
+					entry[field] = tr(entry[field])
+
+
+## Sprache setzen ("" = Systemsprache) und alle Daten neu laden.
+func set_language(lang: String) -> void:
+	language = lang
+	TranslationServer.set_locale(effective_language())
+	load_data()
+
+
+func effective_language() -> String:
+	if LANGUAGES.has(language):
+		return language
+	return "de" if OS.get_locale_language() == "de" else "en"
 
 
 func _read_json_array(path: String) -> Array:
@@ -655,23 +689,23 @@ func claim_shoe(kind: String, roll: float = -1.0) -> Dictionary:
 	elif roll < 0.07:
 		add_stat("bad_luck")
 		beulen_marken += 3
-		add_buff("pech", "Pech-Schuh", 66.0, 0.5)
-		result = {"title": "Pech-Schuh!", "text": "Halbe WPS für 66 s. Trostpreis: 3 Beulen-Marken.", "good": false}
+		add_buff("pech", tr("Pech-Schuh"), 66.0, 0.5)
+		result = {"title": tr("Pech-Schuh!"), "text": tr("Halbe WPS für 66 s. Trostpreis: 3 Beulen-Marken."), "good": false}
 	elif roll < 0.50:
 		var gain := Balance.blessing(wps(), wumms, 15.0, 0.15, 13.0)
 		earn(gain)
-		result = {"title": "Wumms-Segen!", "text": "+%s Wumms" % Num.whole(gain), "good": true}
+		result = {"title": tr("Wumms-Segen!"), "text": tr("+%s Wumms") % Num.whole(gain), "good": true}
 	elif roll < 0.80:
 		add_stat("frenzies")
-		add_buff("raserei", "Raserei", 77.0, 7.0)
-		result = {"title": "Raserei!", "text": "Alle Geräte ×7 für 77 s.", "good": true}
+		add_buff("raserei", tr("Raserei"), 77.0, 7.0)
+		result = {"title": tr("Raserei!"), "text": tr("Alle Geräte ×7 für 77 s."), "good": true}
 	elif roll < 0.92:
 		add_stat("frenzies")
-		add_buff("klick_raserei", "Klick-Raserei", 13.0, 1.0, 777.0)
-		result = {"title": "Klick-Raserei!", "text": "Klick-Wert ×777 für 13 s. Hau drauf!", "good": true}
+		add_buff("klick_raserei", tr("Klick-Raserei"), 13.0, 1.0, 777.0)
+		result = {"title": tr("Klick-Raserei!"), "text": tr("Klick-Wert ×777 für 13 s. Hau drauf!"), "good": true}
 	elif roll >= 0.97:
-		add_buff("zeitlupe", "Zeitlupe", 10.0, 1.0, 3.0)
-		result = {"title": "Zeitlupe!", "text": "Alles ganz langsam … und jeder Klick zählt dreifach.", "good": true}
+		add_buff("zeitlupe", tr("Zeitlupe"), 10.0, 1.0, 3.0)
+		result = {"title": tr("Zeitlupe!"), "text": tr("Alles ganz langsam … und jeder Klick zählt dreifach."), "good": true}
 	else:
 		_chain_count = 0
 		result = _chain_effect()
@@ -684,24 +718,24 @@ func _chain_effect() -> Dictionary:
 	_chain_count += 1
 	var gain := Balance.blessing(wps(), wumms, float(_chain_count), 0.05, 13.0 * _chain_count)
 	earn(gain)
-	var text := "Glied %d: +%s Wumms" % [_chain_count, Num.whole(gain)]
+	var text := tr("Glied %d: +%s Wumms") % [_chain_count, Num.whole(gain)]
 	if _chain_count < CHAIN_MAX and _rng.randf() < 0.75:
 		_shoe_timers[SHOE_GOLDEN] = 1.2
-		text += " … da kommt noch einer!"
+		text += tr(" … da kommt noch einer!")
 	else:
-		text += " Die Kette ist gerissen."
+		text += tr(" Die Kette ist gerissen.")
 		_chain_count = 0
 		_restart_shoe_timer(SHOE_GOLDEN)
-	return {"title": "Kettenreaktion!", "text": text, "good": true}
+	return {"title": tr("Kettenreaktion!"), "text": text, "good": true}
 
 
 func _silver_effect(roll: float) -> Dictionary:
 	if roll < 0.7:
 		var gain := Balance.blessing(wps(), wumms, 1.0, 0.05, 7.0)
 		earn(gain)
-		return {"title": "Silberner Pantoffel!", "text": "+%s Wumms" % Num.whole(gain), "good": true}
-	add_buff("mini_raserei", "Kleine Raserei", 30.0, 2.0)
-	return {"title": "Silberner Pantoffel!", "text": "Alle Geräte ×2 für 30 s.", "good": true}
+		return {"title": tr("Silberner Pantoffel!"), "text": tr("+%s Wumms") % Num.whole(gain), "good": true}
+	add_buff("mini_raserei", tr("Kleine Raserei"), 30.0, 2.0)
+	return {"title": tr("Silberner Pantoffel!"), "text": tr("Alle Geräte ×2 für 30 s."), "good": true}
 
 
 # =====================================================================
@@ -832,27 +866,27 @@ func upgrade_effect_text(u: Dictionary) -> String:
 	var e: Dictionary = u.effect
 	match e.type:
 		"click_mult":
-			return "Klick-Wert ×%s" % Num.fmt(float(e.factor))
+			return tr("Klick-Wert ×%s") % Num.fmt(float(e.factor))
 		"device_mult":
-			return "%s produziert ×%s" % [_device_name(e.device), Num.fmt(float(e.factor))]
+			return tr("%s produziert ×%s") % [_device_name(e.device), Num.fmt(float(e.factor))]
 		"wps_mult":
-			return "Alle Geräte +%d %%" % roundi((float(e.factor) - 1.0) * 100.0)
+			return tr("Alle Geräte +%d %%") % roundi((float(e.factor) - 1.0) * 100.0)
 		"click_wps":
-			return "Jeder Klick bringt zusätzlich %s %% deiner WPS" % Num.fmt(float(e.percent) * 100.0)
+			return tr("Jeder Klick bringt zusätzlich %s %% deiner WPS") % Num.fmt(float(e.percent) * 100.0)
 		"crit":
-			return "%d %% Chance auf ×%s-Treffer" % [roundi(float(e.chance) * 100.0), Num.fmt(float(e.factor))]
+			return tr("%d %% Chance auf ×%s-Treffer") % [roundi(float(e.chance) * 100.0), Num.fmt(float(e.factor))]
 		"autofire":
-			return "Maus gedrückt halten schlägt %d× pro Sekunde" % int(e.rate)
+			return tr("Maus gedrückt halten schlägt %d× pro Sekunde") % int(e.rate)
 		"synergy":
-			return "%s: +%d %% je %d %s" % [_device_name(e.target), roundi(float(e.percent) * 100.0),
+			return tr("%s: +%d %% je %d %s") % [_device_name(e.target), roundi(float(e.percent) * 100.0),
 				int(e.per), _device_name(e.source)]
 		"achievement_wps":
-			return "Alle Geräte +%s %% pro Erfolg (aktuell %d Erfolge)" % [
+			return tr("Alle Geräte +%s %% pro Erfolg (aktuell %d Erfolge)") % [
 				Num.fmt(float(e.percent) * 100.0), achievement_count()]
 		"fanclub":
-			return "Alle Geräte +%d %% je %d Erfolge" % [roundi(float(e.percent) * 100.0), int(e.per)]
+			return tr("Alle Geräte +%d %% je %d Erfolge") % [roundi(float(e.percent) * 100.0), int(e.per)]
 		"golden_luck":
-			return "Goldene Schuhe und Silberne Pantoffel erscheinen %d %% häufiger" % roundi((float(e.factor) - 1.0) * 100.0)
+			return tr("Goldene Schuhe und Silberne Pantoffel erscheinen %d %% häufiger") % roundi((float(e.factor) - 1.0) * 100.0)
 	return ""
 
 
@@ -997,7 +1031,7 @@ func _update_autobuy(delta: float) -> void:
 
 ## Lesbare Wirkung eines Lorbeer-Knotens.
 func laurel_cost_text(n: Dictionary) -> String:
-	var unit := "Beulen-Marken" if n.get("currency", "laurels") == "marken" else ("Lorbeer" if int(n.cost) == 1 else "Lorbeeren")
+	var unit := tr("Beulen-Marken") if n.get("currency", "laurels") == "marken" else (tr("Lorbeer") if int(n.cost) == 1 else tr("Lorbeeren"))
 	return "%d %s" % [int(n.cost), unit]
 
 
@@ -1252,7 +1286,7 @@ func _finish_boss(won: bool) -> void:
 	if won:
 		var defeated := int(stat("bosses_defeated"))
 		var marken := int(boss_config.get("reward_marken_base", 5)) + int(boss_config.get("reward_marken_per_boss", 2)) * defeated
-		var list: Array = boss_config.get("trophies", ["Pokal"])
+		var list: Array = boss_config.get("trophies", [tr("Pokal")])
 		var trophy := String(list[defeated % list.size()])
 		if defeated >= list.size():
 			trophy += " (%d.)" % (defeated / list.size() + 1)
@@ -1438,7 +1472,7 @@ func minigame_unlocked(game: String) -> bool:
 
 
 func minigame_unlock_text(game: String) -> String:
-	return "Ab 5.000 Treffern" if game == "dojo" else "Ab der ersten Tortenwurf-Kanone"
+	return tr("Ab 5.000 Treffern") if game == "dojo" else tr("Ab der ersten Tortenwurf-Kanone")
 
 
 ## Wertet ein Mini-Spiel aus. Gibt die heute neu verdienten Beulen-Marken zurück (max. 5 pro Spiel und Tag).
@@ -1531,10 +1565,10 @@ func unlock_achievement(id: String) -> void:
 
 func target_name() -> String:
 	if target_id == DEFAULT_TARGET:
-		return DEFAULT_TARGET_NAME
+		return tr(DEFAULT_TARGET_NAME)
 	if is_figure(target_id):
 		return String(figure_def(target_id).name)
-	return String(target_names.get(target_id, "Unbekanntes Opfer"))
+	return String(target_names.get(target_id, tr("Unbekanntes Opfer")))
 
 
 func current_target_hits() -> int:
@@ -1593,7 +1627,7 @@ func select_target(id: String) -> void:
 
 ## Alle Opfer für die Galerie: Standardfigur zuerst, dann eigene Bilder (neueste zuerst).
 func gallery_entries() -> Array[Dictionary]:
-	var out: Array[Dictionary] = [{"id": DEFAULT_TARGET, "name": DEFAULT_TARGET_NAME,
+	var out: Array[Dictionary] = [{"id": DEFAULT_TARGET, "name": tr(DEFAULT_TARGET_NAME),
 		"hits": int(target_hits.get(DEFAULT_TARGET, 0)), "level": bump_level_of(DEFAULT_TARGET), "custom": false}]
 	for f in figure_defs:
 		if f.id != DEFAULT_TARGET and f.id != CUSTOM_FIGURE and figure_available(f.id):
@@ -1657,7 +1691,7 @@ func import_image(img: Image, display_name: String) -> bool:
 		push_error("Bild konnte nicht gespeichert werden.")
 		return false
 	target_id = id
-	target_names[id] = display_name if display_name != "" else "Neues Opfer"
+	target_names[id] = display_name if display_name != "" else tr("Neues Opfer")
 	add_stat("images_imported")
 	target_changed.emit()
 	save_game()
@@ -1750,7 +1784,8 @@ func to_dict() -> Dictionary:
 
 func _settings_dict() -> Dictionary:
 	return {"reduced_effects": reduced_effects, "sound_on": sound_on, "autobuy_enabled": autobuy_enabled,
-		"time_warp": time_warp, "background": background, "fist_skin": fist_skin, "sound_pack": sound_pack}
+		"time_warp": time_warp, "background": background, "fist_skin": fist_skin, "sound_pack": sound_pack,
+		"language": language}
 
 
 func from_dict(data: Dictionary) -> void:
@@ -1826,6 +1861,7 @@ func from_dict(data: Dictionary) -> void:
 	background = String(settings.get("background", "standard"))
 	fist_skin = String(settings.get("fist_skin", "standard"))
 	sound_pack = String(settings.get("sound_pack", "standard"))
+	language = String(settings.get("language", language))
 	buffs.clear()
 	idle_time = 0.0
 	combo = 0.0
@@ -1943,7 +1979,7 @@ func import_save_code(code: String) -> bool:
 ## Setzt den Spielstand komplett zurück (Bilder bleiben erhalten).
 func reset_progress() -> void:
 	var names := target_names.duplicate()
-	var keep_settings := {"reduced_effects": reduced_effects, "sound_on": sound_on}
+	var keep_settings := {"reduced_effects": reduced_effects, "sound_on": sound_on, "language": language}
 	from_dict({"version": SAVE_VERSION, "settings": keep_settings})
 	target_names = names
 	reset_shoe_timers()

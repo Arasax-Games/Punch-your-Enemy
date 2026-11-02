@@ -121,7 +121,7 @@ func _draw() -> void:
 	draw_rect(Rect2(bar.position, Vector2(bar.size.x * frac, bar.size.y)), Color("fa5252"))
 	draw_rect(bar, INK, false, 3.0)
 	var font := get_theme_default_font()
-	var label := "BOSS · %s · %d s" % [GameState.boss_gimmick.get("name", ""), ceili(GameState.boss_time)]
+	var label := tr("BOSS · %s · %d s") % [GameState.boss_gimmick.get("name", ""), ceili(GameState.boss_time)]
 	draw_string_outline(font, bar.position + Vector2(10, 20), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, 6, INK)
 	draw_string(font, bar.position + Vector2(10, 20), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
 

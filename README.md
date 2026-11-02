@@ -23,7 +23,14 @@ Gebaut mit **Godot 4.7** für **Steam** (Windows, macOS, Linux).
 | Strg+V | Bild aus der Zwischenablage als neues Opfer |
 | Bild ins Fenster ziehen | Neues Opfer |
 
-## Stand: Phase 5 (Inhalt & Feinschliff)
+## Stand: Phase 6 (Englisch)
+
+Das Spiel ist **zweisprachig: Deutsch und Englisch** (Menü → „Sprache / Language“; Standard ist die Systemsprache). Zahlen werden passend formatiert (1.234 / 1,23 Mio. bzw. 1,234 / 1.23 M).
+
+**Phase 6**
+- Alle 692 Texte übersetzt (Oberfläche, Geräte, Upgrades, Erfolge, Lorbeer-Baum, Aufträge, Events …) in `locale/en.po`
+- `tools/i18n.py` sammelt neue Texte ein und prüft auf fehlende Übersetzungen
+- Steam-Erfolgsliste (`docs/steam_achievements.csv`) jetzt mit deutschen und englischen Namen
 
 **Phase 5**
 - **Drei neue Standardfiguren** mit je 3 Mimik-Stufen: Dr. Doomsday Dieter (mit Katze), Baron von Blamage (mit Monokel) und Sir Fiesling der Dritte (Stummfilm-Schurke in Schwarz-Weiß)

@@ -6,6 +6,7 @@ const PAPER := Color("fff8ec")
 const AMOUNT_MODES: Array[int] = [1, 10, 100, -1]
 const TICKER_INTERVAL := 9.0
 const MAX_ACHIEVEMENT_TOASTS := 3
+# i18n: Texte werden bei der Anzeige mit tr() übersetzt
 const TICKER_LINES: Array[String] = [
 	"Nachbarn beschweren sich über Quietschen.",
 	"Der Mond sagt, er sei bereit.",
@@ -29,11 +30,14 @@ const MENU_EXPORT := 1
 const MENU_IMPORT := 2
 const MENU_RESET := 3
 const MENU_PHOTO := 4
+const MENU_LANGUAGE := 5
 const MENU_SOUND := 10
 const MENU_EFFECTS := 11
 const MENU_TIME_WARP := 12
 const MENU_AUTOBUY := 13
+# i18n
 const SHOP_SLOTS := [["fist", "Fäuste"], ["background", "Hintergründe"], ["sound", "Sounds"]]
+# i18n
 const BRANCHES := [["handwerk", "Handwerk"], ["glueck", "Glück"], ["komfort", "Komfort"], ["show", "Show"]]
 
 @onready var target_area: TargetArea = %TargetArea
@@ -120,12 +124,12 @@ func _ready() -> void:
 	if not GameState.pending_offline.is_empty() or (not GameState.pending_login.is_empty() and GameState.total_hits > 0):
 		_show_welcome_back.call_deferred(GameState.pending_offline, GameState.pending_login)
 	elif GameState.total_hits == 0:
-		show_toast("Hau drauf! Klicken oder Leertaste.")
+		show_toast(tr("Hau drauf! Klicken oder Leertaste."))
 	GameState.pending_offline = {}
 	GameState.pending_login = {}
 	var event := GameState.active_event()
 	if not event.is_empty() and not GameState.events_done.has(GameState.event_key(event)):
-		_ticker_override = "Saison-Event: %s – zu finden in der Galerie!" % event.name
+		_ticker_override = tr("Saison-Event: %s – zu finden in der Galerie!") % event.name
 
 
 func _process(delta: float) -> void:
@@ -236,7 +240,7 @@ func _style_labels() -> void:
 	marken_label.add_theme_color_override("font_color", Color("c2255c"))
 	%HelpLabel.add_theme_font_size_override("font_size", 14)
 	%HelpLabel.add_theme_color_override("font_color", Color(INK, 0.65))
-	%HelpLabel.text = "Klick oder Leertaste: hauen\nR: Wutmodus entfesseln\n1–9: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer\nGoldene Schuhe anklicken!"
+	%HelpLabel.text = tr("Klick oder Leertaste: hauen\nR: Wutmodus entfesseln\n1–9: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer\nGoldene Schuhe anklicken!")
 
 
 func _comic(label: Label, font_size: int, color: Color) -> void:
@@ -250,7 +254,7 @@ func _build_amount_buttons() -> void:
 	var group := ButtonGroup.new()
 	for mode in AMOUNT_MODES:
 		var b := Button.new()
-		b.text = "Max" if mode < 0 else "×%d" % mode
+		b.text = tr("Max") if mode < 0 else "×%d" % mode
 		b.toggle_mode = true
 		b.button_group = group
 		b.focus_mode = Control.FOCUS_NONE
@@ -296,7 +300,7 @@ func _build_device_rows() -> void:
 
 		var sell := Button.new()
 		sell.text = "−"
-		sell.tooltip_text = "Eins verkaufen (25 % zurück)"
+		sell.tooltip_text = tr("Eins verkaufen (25 % zurück)")
 		sell.focus_mode = Control.FOCUS_NONE
 		sell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		sell.pressed.connect(func() -> void: GameState.sell_device(d.id))
@@ -315,10 +319,10 @@ func _build_device_rows() -> void:
 
 func _build_file_dialog() -> void:
 	_file_dialog = FileDialog.new()
-	_file_dialog.title = "Neues Opfer wählen – nimm Bilder, bei denen alle Beteiligten Spaß verstehen"
+	_file_dialog.title = tr("Neues Opfer wählen – nimm Bilder, bei denen alle Beteiligten Spaß verstehen")
 	_file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	_file_dialog.access = FileDialog.ACCESS_FILESYSTEM
-	_file_dialog.filters = PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Bilder"])
+	_file_dialog.filters = PackedStringArray([tr("*.png, *.jpg, *.jpeg, *.webp ; Bilder")])
 	_file_dialog.use_native_dialog = true
 	_file_dialog.file_selected.connect(_on_file_selected)
 	add_child(_file_dialog)
@@ -336,23 +340,24 @@ func _build_menu() -> void:
 func _fill_menu() -> void:
 	var popup: PopupMenu = (%MenuButton as MenuButton).get_popup()
 	popup.clear()
-	popup.add_check_item("Ton", MENU_SOUND)
+	popup.add_check_item(tr("Ton"), MENU_SOUND)
 	popup.set_item_checked(popup.get_item_index(MENU_SOUND), GameState.sound_on)
-	popup.add_check_item("Weniger Effekte", MENU_EFFECTS)
+	popup.add_check_item(tr("Weniger Effekte"), MENU_EFFECTS)
 	popup.set_item_checked(popup.get_item_index(MENU_EFFECTS), GameState.reduced_effects)
 	if GameState.time_warp_unlocked():
-		popup.add_check_item("Zeitraffer (Geräte ×2 schneller)", MENU_TIME_WARP)
+		popup.add_check_item(tr("Zeitraffer (Geräte ×2 schneller)"), MENU_TIME_WARP)
 		popup.set_item_checked(popup.get_item_index(MENU_TIME_WARP), GameState.time_warp)
 	if GameState.has_autobuy():
-		popup.add_check_item("Upgrades automatisch kaufen", MENU_AUTOBUY)
+		popup.add_check_item(tr("Upgrades automatisch kaufen"), MENU_AUTOBUY)
 		popup.set_item_checked(popup.get_item_index(MENU_AUTOBUY), GameState.autobuy_enabled)
+	popup.add_item("Sprache / Language: %s" % GameState.LANGUAGES[GameState.effective_language()], MENU_LANGUAGE)
 	popup.add_separator()
-	popup.add_item("Foto speichern", MENU_PHOTO)
-	popup.add_item("Speichern", MENU_SAVE)
-	popup.add_item("Spielstand exportieren (Textcode)", MENU_EXPORT)
-	popup.add_item("Spielstand importieren …", MENU_IMPORT)
+	popup.add_item(tr("Foto speichern"), MENU_PHOTO)
+	popup.add_item(tr("Speichern"), MENU_SAVE)
+	popup.add_item(tr("Spielstand exportieren (Textcode)"), MENU_EXPORT)
+	popup.add_item(tr("Spielstand importieren …"), MENU_IMPORT)
 	popup.add_separator()
-	popup.add_item("Alles löschen und neu anfangen …", MENU_RESET)
+	popup.add_item(tr("Alles löschen und neu anfangen …"), MENU_RESET)
 
 
 ## Combo-, Wut- und Neuanfang-Anzeigen in der Statistik-Spalte.
@@ -378,10 +383,10 @@ func _build_stats_extras() -> void:
 	_rage_bar.max_value = GameState.RAGE_MAX
 	_rage_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_rage_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_rage_bar.tooltip_text = "Wut-Leiste: füllt sich mit jedem Treffer.\nVoll? Mit R oder dem Knopf 10 s Wutmodus entfesseln:\nalles ×3, aber keine Goldenen Schuhe."
+	_rage_bar.tooltip_text = tr("Wut-Leiste: füllt sich mit jedem Treffer.\nVoll? Mit R oder dem Knopf 10 s Wutmodus entfesseln:\nalles ×3, aber keine Goldenen Schuhe.")
 	rage_row.add_child(_rage_bar)
 	_rage_button = Button.new()
-	_rage_button.text = "WUT!"
+	_rage_button.text = tr("WUT!")
 	_rage_button.focus_mode = Control.FOCUS_NONE
 	_rage_button.add_theme_font_size_override("font_size", 14)
 	_rage_button.add_theme_stylebox_override("normal", _box(Color("ff8787"), 8, 3, 4))
@@ -410,12 +415,12 @@ func _build_stats_extras() -> void:
 	_challenge_label.add_theme_color_override("font_color", Color("c2255c"))
 	challenge_row.add_child(_challenge_label)
 	_challenge_abort = Button.new()
-	_challenge_abort.text = "Abbrechen"
+	_challenge_abort.text = tr("Abbrechen")
 	_challenge_abort.focus_mode = Control.FOCUS_NONE
 	_challenge_abort.add_theme_font_size_override("font_size", 12)
 	_challenge_abort.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_challenge_abort.pressed.connect(func() -> void:
-		var m := Modal.open(self, "Herausforderung abbrechen?", "Du spielst normal weiter, bekommst aber keine Extra-Lorbeeren.", ["Abbrechen", "Weiterkämpfen"])
+		var m := Modal.open(self, tr("Herausforderung abbrechen?"), tr("Du spielst normal weiter, bekommst aber keine Extra-Lorbeeren."), [tr("Abbrechen"), tr("Weiterkämpfen")])
 		m.closed.connect(func(index: int) -> void:
 			if index == 0:
 				GameState.abort_challenge()))
@@ -448,7 +453,7 @@ func _connect_ui() -> void:
 	%ShowerButton.pressed.connect(func() -> void:
 		target_area.effects.clear()
 		GameState.add_stat("showers")
-		show_toast("Frisch geduscht!"))
+		show_toast(tr("Frisch geduscht!")))
 	%AchievementsButton.pressed.connect(_show_achievements)
 
 
@@ -458,20 +463,20 @@ func _connect_ui() -> void:
 
 func _refresh() -> void:
 	wumms_label.text = Num.whole(GameState.wumms)
-	wps_label.text = "pro Sekunde: %s" % Num.fmt(GameState.wps())
-	click_label.text = "pro Klick: %s" % Num.fmt(GameState.click_value())
+	wps_label.text = tr("pro Sekunde: %s") % Num.fmt(GameState.wps())
+	click_label.text = tr("pro Klick: %s") % Num.fmt(GameState.click_value())
 	if GameState.time_warp_active():
-		wps_label.text += " (Zeitraffer ×2)"
+		wps_label.text += tr(" (Zeitraffer ×2)")
 	marken_label.visible = GameState.beulen_marken > 0
-	marken_label.text = "Beulen-Marken: %d" % GameState.beulen_marken
-	target_label.text = "Opfer: %s" % GameState.target_name()
-	target_hits_label.text = "Insgesamt verhauen: %s" % Num.whole(GameState.current_target_hits())
-	total_label.text = "Insgesamt erzeugt: %s Wumms" % Num.whole(GameState.total_wumms)
-	hits_label.text = "Treffer gesamt: %s" % Num.whole(GameState.total_hits)
-	%AchievementsButton.text = "Erfolge %d/%d" % [GameState.achievement_count(), GameState.achievement_defs.size()]
+	marken_label.text = tr("Beulen-Marken: %d") % GameState.beulen_marken
+	target_label.text = tr("Opfer: %s") % GameState.target_name()
+	target_hits_label.text = tr("Insgesamt verhauen: %s") % Num.whole(GameState.current_target_hits())
+	total_label.text = tr("Insgesamt erzeugt: %s Wumms") % Num.whole(GameState.total_wumms)
+	hits_label.text = tr("Treffer gesamt: %s") % Num.whole(GameState.total_hits)
+	%AchievementsButton.text = tr("Erfolge %d/%d") % [GameState.achievement_count(), GameState.achievement_defs.size()]
 	%LaurelButton.visible = GameState.laurel_tree_unlocked()
 	var claimable := GameState.claimable_quests()
-	%QuestsButton.text = "Aufträge (%d!)" % claimable if claimable > 0 else "Aufträge"
+	%QuestsButton.text = tr("Aufträge (%d!)") % claimable if claimable > 0 else tr("Aufträge")
 	%GamesButton.visible = GameState.minigame_unlocked("dojo") or GameState.minigame_unlocked("pie") or GameState.market_unlocked()
 	_refresh_progress_widgets()
 	_refresh_buffs()
@@ -481,7 +486,7 @@ func _refresh() -> void:
 
 func _refresh_progress_widgets() -> void:
 	_combo_bar.value = GameState.combo
-	_combo_label.text = "Combo %d · Klick ×%s" % [roundi(GameState.combo), Num.fmt(Balance.combo_multiplier(GameState.combo))]
+	_combo_label.text = tr("Combo %d · Klick ×%s") % [roundi(GameState.combo), Num.fmt(Balance.combo_multiplier(GameState.combo))]
 	if GameState.rage_active():
 		_rage_bar.max_value = GameState.RAGE_DURATION
 		_rage_bar.value = GameState.rage_time
@@ -490,18 +495,18 @@ func _refresh_progress_widgets() -> void:
 	else:
 		_rage_bar.max_value = GameState.RAGE_MAX
 		_rage_bar.value = GameState.rage_meter
-		_rage_button.text = "WUT!"
+		_rage_button.text = tr("WUT!")
 		_rage_button.disabled = not GameState.rage_ready()
 	_laurel_label.visible = GameState.laurels_total > 0
-	_laurel_label.text = "Lorbeeren: %d (+%d %% auf alles)" % [GameState.laurels_total, GameState.laurels_total]
+	_laurel_label.text = tr("Lorbeeren: %d (+%d %% auf alles)") % [GameState.laurels_total, GameState.laurels_total]
 	var active_challenge := GameState.challenge_def(GameState.challenge_active)
 	_challenge_label.get_parent().visible = not active_challenge.is_empty()
 	if not active_challenge.is_empty():
-		_challenge_label.text = "Herausforderung „%s“: %s / %s Wumms" % [active_challenge.name,
+		_challenge_label.text = tr("Herausforderung „%s“: %s / %s Wumms") % [active_challenge.name,
 			Num.whole(GameState.total_wumms), Num.whole(float(active_challenge.goal_wumms))]
 	var gain := GameState.prestige_gain()
 	_prestige_button.visible = GameState.can_prestige()
-	_prestige_button.text = "Neuanfang: +%s Lorbeer%s" % [Num.whole(gain), "" if gain == 1 else "en"]
+	_prestige_button.text = tr("Neuanfang: %s") % laurels_text(gain, true)
 
 
 func _refresh_buffs() -> void:
@@ -520,9 +525,9 @@ func _refresh_buffs() -> void:
 		var b: Dictionary = buffs[i]
 		var effect := ""
 		if not is_equal_approx(float(b.wps_mult), 1.0):
-			effect = "WPS ×%s" % Num.fmt(float(b.wps_mult))
+			effect = tr("WPS ×%s") % Num.fmt(float(b.wps_mult))
 		if not is_equal_approx(float(b.click_mult), 1.0):
-			effect = "Klick ×%s" % Num.fmt(float(b.click_mult))
+			effect = tr("Klick ×%s") % Num.fmt(float(b.click_mult))
 		var label: Label = buff_box.get_child(i)
 		label.text = "%s · %s · %d s" % [b.name, effect, ceili(float(b.remaining))]
 		var bad := float(b.wps_mult) < 1.0
@@ -543,14 +548,14 @@ func _refresh_devices() -> void:
 		var shown_amount := maxi(amount, 1)
 		var cost := GameState.device_cost(id, shown_amount)
 		var unit_wps := GameState.device_unit_wps(id)
-		row.info.text = "Besitz: %s · je %s WPS" % [Num.whole(owned), Num.fmt(unit_wps)]
-		var label := "Kaufen" if _buy_mode == 1 else "×%s" % Num.whole(shown_amount)
+		row.info.text = tr("Besitz: %s · je %s WPS") % [Num.whole(owned), Num.fmt(unit_wps)]
+		var label := tr("Kaufen") if _buy_mode == 1 else "×%s" % Num.whole(shown_amount)
 		row.buy.text = "%s\n%s" % [label, Num.whole(cost)]
 		row.buy.disabled = amount <= 0 or GameState.wumms < cost
 		row.sell.disabled = owned <= 0
 		var share := 0.0 if total_wps <= 0.0 else GameState.device_total_wps(id) / total_wps * 100.0
 		var payback := INF if unit_wps <= 0.0 else GameState.device_cost(id, 1) / unit_wps
-		row.panel.tooltip_text = "%s\n\n%s\nJedes Gerät: %s WPS (×%s durch Upgrades)\nAlle zusammen: %s WPS (%s %% deiner Produktion)\nAmortisation: %s" % [
+		row.panel.tooltip_text = tr("%s\n\n%s\nJedes Gerät: %s WPS (×%s durch Upgrades)\nAlle zusammen: %s WPS (%s %% deiner Produktion)\nAmortisation: %s") % [
 			d.name, d.description, Num.fmt(unit_wps), Num.fmt(GameState.device_multiplier(id)),
 			Num.fmt(GameState.device_total_wps(id)), Num.fmt(share), Num.duration(payback)]
 
@@ -583,12 +588,12 @@ func _rebuild_upgrades(list: Array[Dictionary]) -> void:
 		var color := _upgrade_color(u)
 		b.add_theme_stylebox_override("normal", _box(color, 10, 3, 5))
 		b.add_theme_stylebox_override("hover", _box(color.lightened(0.3), 10, 3, 5))
-		b.tooltip_text = "%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms" % [
+		b.tooltip_text = tr("%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms") % [
 			u.name, u.description, GameState.upgrade_effect_text(u), Num.whole(float(u.cost))]
 		var id: String = u.id
 		b.pressed.connect(func() -> void:
 			if GameState.buy_upgrade(id):
-				show_toast("Upgrade gekauft: %s" % u.name))
+				show_toast(tr("Upgrade gekauft: %s") % u.name))
 		upgrade_flow.add_child(b)
 		_upgrade_buttons[id] = b
 
@@ -610,7 +615,13 @@ func _show_ticker() -> void:
 	if _ticker_override != "" and _ticker_index % 3 == 0:
 		ticker_label.text = "+++ %s +++" % _ticker_override
 		return
-	ticker_label.text = "+++ %s +++" % TICKER_LINES[_ticker_index % TICKER_LINES.size()]
+	ticker_label.text = "+++ %s +++" % tr(TICKER_LINES[_ticker_index % TICKER_LINES.size()])
+
+
+## "1 Lorbeer" / "3 Lorbeeren" (mit Plus-Zeichen: "+1 Lorbeer") – übersetzbar.
+func laurels_text(n: int, plus: bool = false) -> String:
+	var text := tr("1 Lorbeer") if n == 1 else tr("%d Lorbeeren") % n
+	return ("+" + text) if plus else text
 
 
 func show_toast(text: String) -> void:
@@ -637,14 +648,14 @@ func _buy(id: String) -> void:
 func _on_target_hit(uv: Vector2) -> void:
 	var boss_mult := boss.filter_hit(uv) if GameState.boss_active else 1.0
 	if boss_mult < 0.0:
-		target_area.effects.popup_text("Geblockt!", target_area.uv_to_local(uv), Color("adb5bd"))
+		target_area.effects.popup_text(tr("Geblockt!"), target_area.uv_to_local(uv), Color("adb5bd"))
 		Sfx.play("squeak", 0.2, -6.0)
 		return
 	var result := GameState.hit()
 	if GameState.boss_active:
 		GameState.boss_damage(boss_mult)
 		if boss_mult > 1.0:
-			target_area.effects.popup_text("SCHWACHSTELLE! ×%d" % int(boss_mult), target_area.uv_to_local(uv) + Vector2(0, -60), Color("ff922b"))
+			target_area.effects.popup_text(tr("SCHWACHSTELLE! ×%d") % int(boss_mult), target_area.uv_to_local(uv) + Vector2(0, -60), Color("ff922b"))
 	target_area.effects.add_hit(uv, result.value, result.crit)
 	target_area.squash()
 	Sfx.play_hit(result.crit)
@@ -667,7 +678,7 @@ func _apply_cosmetics() -> void:
 func _try_rage() -> void:
 	if GameState.start_rage():
 		Sfx.play("rage", 0.0, 0.0)
-		show_toast("WUTMODUS! Alles ×3 für 10 Sekunden!")
+		show_toast(tr("WUTMODUS! Alles ×3 für 10 Sekunden!"))
 		target_area.shake()
 
 
@@ -676,7 +687,7 @@ func _on_rage_changed(active: bool) -> void:
 		_rage_tween.kill()
 	_rage_tint.visible = active
 	if not active:
-		show_toast("Puh. Durchatmen.")
+		show_toast(tr("Puh. Durchatmen."))
 		return
 	_rage_tint.color.a = 0.16
 	if not GameState.reduced_effects:
@@ -688,9 +699,9 @@ func _on_rage_changed(active: bool) -> void:
 func _on_bump_level_up(target: String, level: int) -> void:
 	if target != GameState.target_id:
 		return
-	var texts := ["", "Erstes Pflaster!", "Ein Veilchen!", "Riesenbeule!", "Jetzt ist er genervt.", "Er sieht Sterne!",
-		"Noch ein Veilchen!", "Kopfverband!", "Am Ende seiner Kräfte.", "Die Ohren qualmen!", "Vögelchen zwitschern. Maximum erreicht!"]
-	show_toast("Beulen-Level %d: %s (+1 Beulen-Marke)" % [level, texts[mini(level, texts.size() - 1)]])
+	var texts := ["", tr("Erstes Pflaster!"), tr("Ein Veilchen!"), tr("Riesenbeule!"), tr("Jetzt ist er genervt."), tr("Er sieht Sterne!"),
+		tr("Noch ein Veilchen!"), tr("Kopfverband!"), tr("Am Ende seiner Kräfte."), tr("Die Ohren qualmen!"), tr("Vögelchen zwitschern. Maximum erreicht!")]
+	show_toast(tr("Beulen-Level %d: %s (+1 Beulen-Marke)") % [level, texts[mini(level, texts.size() - 1)]])
 	Sfx.play("achievement", 0.05, -6.0)
 	# Bei der Standardfigur wechselt ab Level 4 und 8 die Mimik.
 	target_area.set_texture(GameState.target_texture())
@@ -698,9 +709,9 @@ func _on_bump_level_up(target: String, level: int) -> void:
 
 func _on_file_selected(path: String) -> void:
 	if GameState.import_image_file(path):
-		show_toast("Neues Opfer: %s" % GameState.target_name())
+		show_toast(tr("Neues Opfer: %s") % GameState.target_name())
 	else:
-		show_toast("Dieses Bild konnte nicht geladen werden.")
+		show_toast(tr("Dieses Bild konnte nicht geladen werden."))
 
 
 func _on_files_dropped(files: PackedStringArray) -> void:
@@ -711,10 +722,10 @@ func _on_files_dropped(files: PackedStringArray) -> void:
 
 func _paste_image() -> void:
 	if not DisplayServer.clipboard_has_image():
-		show_toast("In der Zwischenablage ist kein Bild.")
+		show_toast(tr("In der Zwischenablage ist kein Bild."))
 		return
-	if GameState.import_image(DisplayServer.clipboard_get_image(), "Aus der Zwischenablage"):
-		show_toast("Neues Opfer aus der Zwischenablage!")
+	if GameState.import_image(DisplayServer.clipboard_get_image(), tr("Aus der Zwischenablage")):
+		show_toast(tr("Neues Opfer aus der Zwischenablage!"))
 
 
 # =====================================================================
@@ -762,7 +773,7 @@ func _on_achievement_unlocked(id: String) -> void:
 	box.add_theme_constant_override("separation", 2)
 	panel.add_child(box)
 	var head := Label.new()
-	head.text = "Erfolg freigeschaltet!"
+	head.text = tr("Erfolg freigeschaltet!")
 	head.add_theme_font_size_override("font_size", 13)
 	head.add_theme_color_override("font_color", Color(INK, 0.65))
 	var title := Label.new()
@@ -791,9 +802,9 @@ func _show_achievements() -> void:
 	content.add_theme_constant_override("separation", 10)
 	var summary := Label.new()
 	summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	summary.text = "%d von %d freigeschaltet" % [GameState.achievement_count(), GameState.achievement_defs.size()]
+	summary.text = tr("%d von %d freigeschaltet") % [GameState.achievement_count(), GameState.achievement_defs.size()]
 	if GameState.has_upgrade("milchtuete_der_wut"):
-		summary.text += " · Wutmilch: +%s %% WPS" % Num.fmt(GameState.achievement_count() * 0.5)
+		summary.text += tr(" · Wutmilch: +%s %% WPS") % Num.fmt(GameState.achievement_count() * 0.5)
 	content.add_child(summary)
 
 	var scroll := ScrollContainer.new()
@@ -823,7 +834,7 @@ func _show_achievements() -> void:
 		if not unlocked:
 			name_label.add_theme_color_override("font_color", Color(INK, 0.55))
 		var desc := Label.new()
-		desc.text = "Versteckter Erfolg" if hidden else String(a.description)
+		desc.text = tr("Versteckter Erfolg") if hidden else String(a.description)
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc.custom_minimum_size = Vector2(236, 0)
 		desc.add_theme_font_size_override("font_size", 12)
@@ -840,7 +851,7 @@ func _show_achievements() -> void:
 			bar.tooltip_text = "%s / %s" % [Num.whole(p.x), Num.whole(p.y)]
 			box.add_child(bar)
 		grid.add_child(tile)
-	Modal.open(self, "Erfolge", content, ["Schließen"], 860.0)
+	Modal.open(self, tr("Erfolge"), content, [tr("Schließen")], 860.0)
 
 
 # =====================================================================
@@ -855,14 +866,18 @@ func _on_menu(id: int) -> void:
 			GameState.reduced_effects = not GameState.reduced_effects
 		MENU_TIME_WARP:
 			GameState.time_warp = not GameState.time_warp
-			show_toast("Zeitraffer an: Geräte arbeiten doppelt so schnell." if GameState.time_warp else "Zeitraffer aus.")
+			show_toast(tr("Zeitraffer an: Geräte arbeiten doppelt so schnell.") if GameState.time_warp else tr("Zeitraffer aus."))
 		MENU_AUTOBUY:
 			GameState.autobuy_enabled = not GameState.autobuy_enabled
 		MENU_SAVE:
 			if GameState.save_game():
-				show_toast("Gespeichert.")
+				show_toast(tr("Gespeichert."))
 		MENU_PHOTO:
 			_take_photo()
+		MENU_LANGUAGE:
+			GameState.set_language("en" if GameState.effective_language() == "de" else "de")
+			GameState.save_game()
+			get_tree().reload_current_scene.call_deferred()
 		MENU_EXPORT:
 			var code := GameState.export_save_code()
 			DisplayServer.clipboard_set(code)
@@ -870,25 +885,25 @@ func _on_menu(id: int) -> void:
 			field.text = code
 			field.editable = false
 			field.select_all_on_focus = true
-			Modal.open(self, "Spielstand exportieren",
-				_column(["Der Textcode ist in deiner Zwischenablage. Heb ihn gut auf!"], field), ["OK"])
+			Modal.open(self, tr("Spielstand exportieren"),
+				_column([tr("Der Textcode ist in deiner Zwischenablage. Heb ihn gut auf!")], field), ["OK"])
 		MENU_IMPORT:
 			var field := LineEdit.new()
-			field.placeholder_text = "Textcode hier einfügen"
+			field.placeholder_text = tr("Textcode hier einfügen")
 			if DisplayServer.clipboard_has():
 				field.text = DisplayServer.clipboard_get().strip_edges()
-			var m := Modal.open(self, "Spielstand importieren",
-				_column(["Achtung: Dein aktueller Spielstand wird ersetzt."], field), ["Laden", "Abbrechen"])
+			var m := Modal.open(self, tr("Spielstand importieren"),
+				_column([tr("Achtung: Dein aktueller Spielstand wird ersetzt.")], field), [tr("Jetzt laden"), tr("Abbrechen")])
 			m.closed.connect(func(index: int) -> void:
 				if index == 0:
 					if GameState.import_save_code(field.text):
-						show_toast("Spielstand geladen!")
+						show_toast(tr("Spielstand geladen!"))
 					else:
-						show_toast("Dieser Code funktioniert leider nicht."))
+						show_toast(tr("Dieser Code funktioniert leider nicht.")))
 		MENU_RESET:
-			var m := Modal.open(self, "Alles löschen?",
-				"Wirklich ALLES wird gelöscht: Wumms, Geräte, Upgrades, Erfolge, Lorbeeren und der Lorbeer-Baum. Deine Bilder bleiben erhalten.\n\n(Für einen Neuanfang mit Lorbeeren nimm den grünen Knopf in der Statistik.)",
-				["Ja, alles löschen", "Abbrechen"])
+			var m := Modal.open(self, tr("Alles löschen?"),
+				tr("Wirklich ALLES wird gelöscht: Wumms, Geräte, Upgrades, Erfolge, Lorbeeren und der Lorbeer-Baum. Deine Bilder bleiben erhalten.\n\n(Für einen Neuanfang mit Lorbeeren nimm den grünen Knopf in der Statistik.)"),
+				[tr("Ja, alles löschen"), tr("Abbrechen")])
 			m.closed.connect(func(index: int) -> void:
 				if index == 0:
 					GameState.reset_progress()
@@ -896,7 +911,7 @@ func _on_menu(id: int) -> void:
 					target_area.effects.clear()
 					for shoe in shoe_layer.get_children():
 						shoe.queue_free()
-					show_toast("Alles auf Anfang. Bombastus atmet auf."))
+					show_toast(tr("Alles auf Anfang. Bombastus atmet auf.")))
 
 
 func _column(texts: Array, extra: Control = null) -> VBoxContainer:
@@ -918,16 +933,16 @@ func _show_welcome_back(info: Dictionary, login: Dictionary = {}) -> void:
 	var text := ""
 	if not info.is_empty():
 		var seconds := float(info.seconds)
-		text = "Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Wumms\nerwirtschaftet." % [
+		text = tr("Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Wumms\nerwirtschaftet.") % [
 			Num.duration(seconds), Num.whole(float(info.gain))]
 		if seconds > GameState.offline_cap():
-			text += "\n\n(Ohne Aufsicht arbeiten sie höchstens %s.)" % Num.duration(GameState.offline_cap())
+			text += tr("\n\n(Ohne Aufsicht arbeiten sie höchstens %s.)") % Num.duration(GameState.offline_cap())
 	if not login.is_empty():
 		if text != "":
 			text += "\n\n"
-		text += "Login-Serie: Tag %d von 7%s\nTagesbonus: +%s Wumms und +%d Beulen-Marken" % [
-			int(login.day), " – Hauptgewinn!" if int(login.day) == 7 else "", Num.whole(float(login.wumms)), int(login.marken)]
-	Modal.open(self, "Willkommen zurück!", text, ["Weiter hauen!"])
+		text += tr("Login-Serie: Tag %d von 7%s\nTagesbonus: +%s Wumms und +%d Beulen-Marken") % [
+			int(login.day), tr(" – Hauptgewinn!") if int(login.day) == 7 else "", Num.whole(float(login.wumms)), int(login.marken)]
+	Modal.open(self, tr("Willkommen zurück!"), text, [tr("Weiter hauen!")])
 
 
 # =====================================================================
@@ -938,11 +953,11 @@ func _show_prestige() -> void:
 	if not GameState.can_prestige():
 		return
 	var gain := GameState.prestige_gain()
-	var text := "Du fängst von vorne an und bekommst dafür %d Lorbeer%s.\n\n" % [gain, "" if gain == 1 else "en"]
-	text += "Jeder Lorbeer gibt dauerhaft +1 %% auf Produktion und Klicks – insgesamt dann +%d %%.\n" % (GameState.laurels_total + gain)
-	text += "Lorbeeren kannst du zusätzlich im Lorbeer-Baum ausgeben, der Bonus bleibt trotzdem.\n\n"
-	text += "Weg sind: Wumms, Geräte und Upgrades.\nBleiben: Erfolge, Statistiken, Bilder, Beulen-Marken und der Lorbeer-Baum."
-	var m := Modal.open(self, "Neuanfang?", text, ["Neu anfangen!", "Noch nicht"], 600.0)
+	var text := tr("Du fängst von vorne an und bekommst dafür %s.\n\n") % laurels_text(gain)
+	text += tr("Jeder Lorbeer gibt dauerhaft +1 %% auf Produktion und Klicks – insgesamt dann +%d %%.\n") % (GameState.laurels_total + gain)
+	text += tr("Lorbeeren kannst du zusätzlich im Lorbeer-Baum ausgeben, der Bonus bleibt trotzdem.\n\n")
+	text += tr("Weg sind: Wumms, Geräte und Upgrades.\nBleiben: Erfolge, Statistiken, Bilder, Beulen-Marken und der Lorbeer-Baum.")
+	var m := Modal.open(self, tr("Neuanfang?"), text, [tr("Neu anfangen!"), tr("Noch nicht")], 600.0)
 	m.closed.connect(func(index: int) -> void:
 		if index == 0:
 			GameState.perform_prestige())
@@ -956,8 +971,7 @@ func _on_prestiged(gain: int) -> void:
 	if not GameState.reduced_effects:
 		Confetti.burst(self, size * Vector2(0.5, 0.35), 120)
 	_refresh()
-	var m := Modal.open(self, "Lorbeeren!", "+%d Lorbeer%s. Bombastus hat sich erholt – und du bist stärker als vorher.\n\nMagst du gleich etwas im Lorbeer-Baum freischalten?" % [
-		gain, "" if gain == 1 else "en"], ["Zum Lorbeer-Baum", "Später"])
+	var m := Modal.open(self, tr("Lorbeeren!"), tr("+%s. Bombastus hat sich erholt – und du bist stärker als vorher.\n\nMagst du gleich etwas im Lorbeer-Baum freischalten?") % laurels_text(gain), [tr("Zum Lorbeer-Baum"), tr("Später")])
 	m.closed.connect(func(index: int) -> void:
 		if index == 0:
 			_show_laurel_tree())
@@ -972,15 +986,15 @@ func _show_laurel_tree() -> void:
 	content.add_theme_constant_override("separation", 12)
 	var head := Label.new()
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	head.text = "Verfügbar: %d Lorbeer%s  ·  %d Beulen-Marken  ·  Lorbeer-Bonus: +%d %%" % [
-		GameState.laurels_available(), "" if GameState.laurels_available() == 1 else "en",
+	head.text = tr("Verfügbar: %s  ·  %d Beulen-Marken  ·  Lorbeer-Bonus: +%d %%") % [
+		laurels_text(GameState.laurels_available()),
 		GameState.beulen_marken, GameState.laurels_total]
 	content.add_child(head)
 	var hint := Label.new()
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(INK, 0.65))
-	hint.text = "Lorbeeren gibt es beim Neuanfang. Beulen-Marken gibt es für Erfolge, Beulen-Level und Pech-Schuhe."
+	hint.text = tr("Lorbeeren gibt es beim Neuanfang. Beulen-Marken gibt es für Erfolge, Beulen-Level und Pech-Schuhe.")
 	content.add_child(hint)
 
 	var columns := HBoxContainer.new()
@@ -992,7 +1006,7 @@ func _show_laurel_tree() -> void:
 		col.custom_minimum_size = Vector2(210, 0)
 		col.add_theme_constant_override("separation", 8)
 		var title := Label.new()
-		title.text = branch[1]
+		title.text = tr(branch[1])
 		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_comic(title, 24, Color("69db7c") if branch[0] != "show" else Color("da77f2"))
 		col.add_child(title)
@@ -1002,10 +1016,10 @@ func _show_laurel_tree() -> void:
 			col.add_child(_laurel_node_button(n, modal_ref))
 		columns.add_child(col)
 	if GameState.challenges_unlocked():
-		content.add_child(_section_title("Herausforderungen – Extra-Lorbeeren"))
+		content.add_child(_section_title(tr("Herausforderungen – Extra-Lorbeeren")))
 		for c in GameState.challenge_defs:
 			content.add_child(_challenge_row(c, modal_ref))
-	var m := Modal.open(self, "Lorbeer-Baum", content, ["Schließen"], 940.0)
+	var m := Modal.open(self, tr("Lorbeer-Baum"), content, [tr("Schließen")], 940.0)
 	modal_ref.append(m)
 
 
@@ -1015,31 +1029,31 @@ func _challenge_row(c: Dictionary, modal_ref: Array) -> HBoxContainer:
 	var label := Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.text = "%s: %s Ziel: %s Wumms → +%d Lorbeer%s" % [c.name, c.description, Num.whole(float(c.goal_wumms)),
-		int(c.reward_laurels), "" if int(c.reward_laurels) == 1 else "en"]
+	label.text = tr("%s: %s Ziel: %s Wumms → %s") % [c.name, c.description, Num.whole(float(c.goal_wumms)),
+		laurels_text(int(c.reward_laurels), true)]
 	row.add_child(label)
 	var b := Button.new()
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(160, 0)
 	var id: String = c.id
 	if GameState.challenges_done.has(id):
-		b.text = "Geschafft ✓"
+		b.text = tr("Geschafft ✓")
 		b.disabled = true
 	elif GameState.challenge_active == id:
-		b.text = "Läuft …"
+		b.text = tr("Läuft …")
 		b.disabled = true
 	else:
-		b.text = "Starten"
+		b.text = tr("Starten")
 		b.disabled = GameState.challenge_active != ""
 		b.pressed.connect(func() -> void:
-			var m := Modal.open(self, "„%s“ starten?" % c.name,
-				"Dein Durchlauf beginnt von vorn – wie bei einem Neuanfang, nur ohne neue Lorbeeren.\nLorbeeren, Erfolge und der Lorbeer-Baum bleiben.\n\n%s\nZiel: %s Wumms" % [c.description, Num.whole(float(c.goal_wumms))],
-				["Los geht's!", "Doch nicht"])
+			var m := Modal.open(self, tr("„%s“ starten?") % c.name,
+				tr("Dein Durchlauf beginnt von vorn – wie bei einem Neuanfang, nur ohne neue Lorbeeren.\nLorbeeren, Erfolge und der Lorbeer-Baum bleiben.\n\n%s\nZiel: %s Wumms") % [c.description, Num.whole(float(c.goal_wumms))],
+				[tr("Los geht's!"), tr("Doch nicht")])
 			m.closed.connect(func(index: int) -> void:
 				if index == 0 and GameState.start_challenge(id):
 					modal_ref[0].close()
 					target_area.effects.clear()
-					show_toast("Herausforderung „%s“ läuft!" % c.name)))
+					show_toast(tr("Herausforderung „%s“ läuft!") % c.name)))
 	row.add_child(b)
 	return row
 
@@ -1052,13 +1066,13 @@ func _laurel_node_button(n: Dictionary, modal_ref: Array) -> Button:
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(210, 64)
 	b.add_theme_font_size_override("font_size", 14)
-	var status := "✓ freigeschaltet" if owned else GameState.laurel_cost_text(n)
+	var status := tr("✓ freigeschaltet") if owned else GameState.laurel_cost_text(n)
 	b.text = "%s\n%s" % [n.name, status]
 	var req_names: Array[String] = []
 	for r in n.get("requires", []):
 		req_names.append(String(GameState.laurel_def(r).get("name", r)))
 	b.tooltip_text = "%s\n\n%s%s" % [n.name, n.description,
-		"" if req_names.is_empty() else "\n\nBraucht: " + ", ".join(req_names)]
+		"" if req_names.is_empty() else tr("\n\nBraucht: ") + ", ".join(req_names)]
 	if owned:
 		b.add_theme_stylebox_override("normal", _box(Color("ffe066"), 10, 3, 6))
 		b.add_theme_stylebox_override("disabled", _box(Color("ffe066"), 10, 3, 6))
@@ -1066,7 +1080,7 @@ func _laurel_node_button(n: Dictionary, modal_ref: Array) -> Button:
 		b.disabled = true
 	elif not unlocked:
 		b.disabled = true
-		b.text = "%s\ngesperrt · %s" % [n.name, GameState.laurel_cost_text(n)]
+		b.text = tr("%s\ngesperrt · %s") % [n.name, GameState.laurel_cost_text(n)]
 	else:
 		b.disabled = not affordable
 		b.add_theme_stylebox_override("normal", _box(Color("d3f9d8"), 10, 3, 6))
@@ -1075,7 +1089,7 @@ func _laurel_node_button(n: Dictionary, modal_ref: Array) -> Button:
 		b.pressed.connect(func() -> void:
 			if GameState.buy_laurel_node(id):
 				Sfx.play("buy", 0.0, -3.0)
-				show_toast("Freigeschaltet: %s" % n.name)
+				show_toast(tr("Freigeschaltet: %s") % n.name)
 				if not modal_ref.is_empty():
 					modal_ref[0].close()
 				_show_laurel_tree())
@@ -1093,7 +1107,7 @@ func _show_gallery() -> void:
 	var top := HBoxContainer.new()
 	top.alignment = BoxContainer.ALIGNMENT_CENTER
 	var import_button := Button.new()
-	import_button.text = "Neues Bild importieren …"
+	import_button.text = tr("Neues Bild importieren …")
 	import_button.focus_mode = Control.FOCUS_NONE
 	import_button.pressed.connect(func() -> void:
 		modal_ref[0].close()
@@ -1112,7 +1126,7 @@ func _show_gallery() -> void:
 	scroll.add_child(grid)
 	for entry in GameState.gallery_entries():
 		grid.add_child(_gallery_tile(entry, modal_ref))
-	modal_ref.append(Modal.open(self, "Galerie", content, ["Schließen"], 900.0))
+	modal_ref.append(Modal.open(self, tr("Galerie"), content, [tr("Schließen")], 900.0))
 
 
 func _gallery_tile(entry: Dictionary, modal_ref: Array) -> PanelContainer:
@@ -1142,7 +1156,7 @@ func _gallery_tile(entry: Dictionary, modal_ref: Array) -> PanelContainer:
 	name_label.add_theme_font_size_override("font_size", 15)
 	box.add_child(name_label)
 	var info := Label.new()
-	info.text = "%s Treffer · Beulen-Level %d" % [Num.whole(entry.hits), entry.level]
+	info.text = tr("%s Treffer · Beulen-Level %d") % [Num.whole(entry.hits), entry.level]
 	info.add_theme_font_size_override("font_size", 12)
 	info.add_theme_color_override("font_color", Color(INK, 0.7))
 	box.add_child(info)
@@ -1150,17 +1164,17 @@ func _gallery_tile(entry: Dictionary, modal_ref: Array) -> PanelContainer:
 	row.add_theme_constant_override("separation", 4)
 	box.add_child(row)
 	var id: String = entry.id
-	var pick := _small_button("Aktiv" if current else "Hauen!", not current)
+	var pick := _small_button(tr("Aktiv") if current else tr("Hauen!"), not current)
 	pick.pressed.connect(func() -> void:
 		GameState.select_target(id)
 		modal_ref[0].close()
-		show_toast("Neues Opfer: %s" % GameState.target_name()))
+		show_toast(tr("Neues Opfer: %s") % GameState.target_name()))
 	row.add_child(pick)
 	if entry.custom:
-		var rename := _small_button("Name", true)
+		var rename := _small_button(tr("Name"), true)
 		rename.pressed.connect(func() -> void: _rename_dialog(id, modal_ref))
 		row.add_child(rename)
-		var delete := _small_button("Löschen", true)
+		var delete := _small_button(tr("Löschen"), true)
 		delete.pressed.connect(func() -> void: _delete_dialog(id, modal_ref))
 		row.add_child(delete)
 	return tile
@@ -1180,7 +1194,7 @@ func _rename_dialog(id: String, gallery_ref: Array) -> void:
 	field.text = String(GameState.target_names.get(id, ""))
 	field.max_length = 40
 	field.select_all_on_focus = true
-	var m := Modal.open(self, "Umbenennen", _column(["Wie soll das Opfer heißen?"], field), ["Speichern", "Abbrechen"])
+	var m := Modal.open(self, tr("Umbenennen"), _column([tr("Wie soll das Opfer heißen?")], field), [tr("Speichern"), tr("Abbrechen")])
 	field.grab_focus.call_deferred()
 	m.closed.connect(func(index: int) -> void:
 		if index == 0 and GameState.rename_target(id, field.text):
@@ -1189,8 +1203,8 @@ func _rename_dialog(id: String, gallery_ref: Array) -> void:
 
 
 func _delete_dialog(id: String, gallery_ref: Array) -> void:
-	var m := Modal.open(self, "Bild löschen?", "„%s“ und seine Treffer werden gelöscht." % GameState.target_names.get(id, ""),
-		["Löschen", "Abbrechen"])
+	var m := Modal.open(self, tr("Bild löschen?"), tr("„%s“ und seine Treffer werden gelöscht.") % GameState.target_names.get(id, ""),
+		[tr("Löschen"), tr("Abbrechen")])
 	m.closed.connect(func(index: int) -> void:
 		if index == 0 and GameState.delete_target(id):
 			gallery_ref[0].close()
@@ -1204,7 +1218,7 @@ func _delete_dialog(id: String, gallery_ref: Array) -> void:
 func _on_boss_started() -> void:
 	boss.start()
 	Sfx.play("rage", 0.0, 0.0)
-	show_toast("BOSS-KAMPF! %s" % GameState.boss_gimmick.get("text", ""))
+	show_toast(tr("BOSS-KAMPF! %s") % GameState.boss_gimmick.get("text", ""))
 	target_area.shake()
 
 
@@ -1214,11 +1228,11 @@ func _on_boss_finished(won: bool, reward: Dictionary) -> void:
 		Sfx.play("prestige", 0.0, -2.0)
 		if not GameState.reduced_effects:
 			Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
-		Modal.open(self, "Boss besiegt!", "Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Beulen-Marken" % [
-			reward.trophy, int(reward.marken)], ["Hurra!"])
+		Modal.open(self, tr("Boss besiegt!"), tr("Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Beulen-Marken") % [
+			tr(reward.trophy), int(reward.marken)], [tr("Hurra!")])
 	else:
 		Sfx.play("bad", 0.0, -2.0)
-		show_toast("Der Boss ist entkommen! In %s Treffern kommt er wieder." % Num.whole(GameState.next_boss_at - GameState.total_hits))
+		show_toast(tr("Der Boss ist entkommen! In %s Treffern kommt er wieder.") % Num.whole(GameState.next_boss_at - GameState.total_hits))
 
 
 # =====================================================================
@@ -1230,7 +1244,7 @@ func _show_quests() -> void:
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 12)
 	var modal_ref: Array = []
-	content.add_child(_section_title("Tagesaufträge"))
+	content.add_child(_section_title(tr("Tagesaufträge")))
 	for i in GameState.quests.size():
 		var q: Dictionary = GameState.quests[i]
 		var row := HBoxContainer.new()
@@ -1252,37 +1266,38 @@ func _show_quests() -> void:
 		b.custom_minimum_size = Vector2(170, 0)
 		var index := i
 		if q.claimed:
-			b.text = "Erledigt ✓"
+			b.text = tr("Erledigt ✓")
 			b.disabled = true
 		elif GameState.quest_done(q):
-			b.text = "Abholen: %d Marken" % int(q.reward)
+			b.text = tr("Abholen: %d Marken") % int(q.reward)
 			b.pressed.connect(func() -> void:
 				var gain := GameState.claim_quest(index)
 				if gain > 0:
 					Sfx.play("achievement", 0.0, -4.0)
-					show_toast("+%d Beulen-Marken" % gain)
+					show_toast(tr("+%d Beulen-Marken") % gain)
 				modal_ref[0].close()
 				_show_quests())
 		else:
-			b.text = "%s / %s · %d Marken" % [Num.whole(GameState.quest_progress(q)), Num.whole(float(q.amount)), int(q.reward)]
+			b.text = tr("%s / %s · %d Marken") % [Num.whole(GameState.quest_progress(q)), Num.whole(float(q.amount)), int(q.reward)]
 			b.disabled = true
 		row.add_child(b)
 		content.add_child(row)
 	var streak := Label.new()
-	streak.text = "Login-Serie: %d Tag%s in Folge · Morgen gibt es %d Beulen-Marken" % [GameState.login_streak,
-		"" if GameState.login_streak == 1 else "e", Balance.login_marken(GameState.login_streak + 1)]
+	streak.text = (tr("Login-Serie: 1 Tag · Morgen gibt es %d Beulen-Marken") % Balance.login_marken(GameState.login_streak + 1)) \
+		if GameState.login_streak == 1 else (tr("Login-Serie: %d Tage in Folge · Morgen gibt es %d Beulen-Marken") % [
+		GameState.login_streak, Balance.login_marken(GameState.login_streak + 1)])
 	streak.add_theme_color_override("font_color", Color(INK, 0.7))
 	content.add_child(streak)
 
 	var event := GameState.active_event()
 	if not event.is_empty():
-		content.add_child(_section_title("Saison-Event: %s" % event.name))
+		content.add_child(_section_title(tr("Saison-Event: %s") % event.name))
 		var key := GameState.event_key(event)
 		var done := GameState.events_done.has(key)
 		var info := Label.new()
 		info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		info.custom_minimum_size = Vector2(640, 0)
-		info.text = "Geschafft! %s gehört dir." % event.trophy if done else String(event.intro)
+		info.text = tr("Geschafft! %s gehört dir.") % tr(event.trophy) if done else String(event.intro)
 		content.add_child(info)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 10)
@@ -1296,7 +1311,7 @@ func _show_quests() -> void:
 		row.add_child(bar)
 		var go := Button.new()
 		go.focus_mode = Control.FOCUS_NONE
-		go.text = "Zur Figur!" if GameState.target_id != event.figure else "Ist aktiv"
+		go.text = tr("Zur Figur!") if GameState.target_id != event.figure else tr("Ist aktiv")
 		go.disabled = GameState.target_id == event.figure
 		var fig: String = event.figure
 		go.pressed.connect(func() -> void:
@@ -1305,18 +1320,18 @@ func _show_quests() -> void:
 		row.add_child(go)
 		content.add_child(row)
 
-	content.add_child(_section_title("Vitrine"))
+	content.add_child(_section_title(tr("Vitrine")))
 	var shelf := Label.new()
 	shelf.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	shelf.custom_minimum_size = Vector2(640, 0)
-	shelf.text = "Noch leer. Pokale gibt es für Boss-Kämpfe (alle 100.000 Treffer) und Saison-Events." \
-		if GameState.trophies.is_empty() else "🏆 " + " · ".join(GameState.trophies)
+	shelf.text = tr("Noch leer. Pokale gibt es für Boss-Kämpfe (alle 100.000 Treffer) und Saison-Events.") \
+		if GameState.trophies.is_empty() else "🏆 " + " · ".join(GameState.trophies.map(func(t: String) -> String: return tr(t)))
 	content.add_child(shelf)
 	var next_boss := Label.new()
 	next_boss.add_theme_color_override("font_color", Color(INK, 0.7))
-	next_boss.text = "Nächster Boss in %s Treffern." % Num.whole(maxf(0.0, GameState.next_boss_at - GameState.total_hits))
+	next_boss.text = tr("Nächster Boss in %s Treffern.") % Num.whole(maxf(0.0, GameState.next_boss_at - GameState.total_hits))
 	content.add_child(next_boss)
-	modal_ref.append(Modal.open(self, "Aufträge", content, ["Schließen"], 720.0))
+	modal_ref.append(Modal.open(self, tr("Aufträge"), content, [tr("Schließen")], 720.0))
 
 
 func _section_title(text: String) -> Label:
@@ -1331,8 +1346,8 @@ func _on_event_completed(event: Dictionary) -> void:
 	if not GameState.reduced_effects:
 		Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
 	_ticker_override = ""
-	Modal.open(self, "Event geschafft!", "%s gibt auf!\n\nPokal: %s\n+%d Beulen-Marken\n\nDie Figur bleibt für immer in deiner Galerie." % [
-		event.name, event.trophy, int(event.reward_marken)], ["Hurra!"])
+	Modal.open(self, tr("Event geschafft!"), tr("%s gibt auf!\n\nPokal: %s\n+%d Beulen-Marken\n\nDie Figur bleibt für immer in deiner Galerie.") % [
+		event.name, tr(event.trophy), int(event.reward_marken)], [tr("Hurra!")])
 
 
 # =====================================================================
@@ -1350,14 +1365,14 @@ func _show_games() -> void:
 		var col := VBoxContainer.new()
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var title := Label.new()
-		title.text = info.name
+		title.text = tr(info.name)
 		title.add_theme_font_size_override("font_size", 20)
 		col.add_child(title)
 		var desc := Label.new()
 		desc.add_theme_font_size_override("font_size", 14)
 		desc.add_theme_color_override("font_color", Color(INK, 0.7))
 		var today_marken := int(GameState.minigame_rewards_today.get(game, 0))
-		desc.text = "Rekord: %d Punkte · heute verdient: %d/5 Beulen-Marken (je %d Punkte eine)" % [
+		desc.text = tr("Rekord: %d Punkte · heute verdient: %d/5 Beulen-Marken (je %d Punkte eine)") % [
 			int(GameState.stat(info.stat)), today_marken, int(info.points_per_marke)]
 		col.add_child(desc)
 		row.add_child(col)
@@ -1365,7 +1380,7 @@ func _show_games() -> void:
 		b.focus_mode = Control.FOCUS_NONE
 		b.custom_minimum_size = Vector2(180, 0)
 		var unlocked := GameState.minigame_unlocked(game)
-		b.text = "Spielen!" if unlocked else GameState.minigame_unlock_text(game)
+		b.text = tr("Spielen!") if unlocked else GameState.minigame_unlock_text(game)
 		b.disabled = not unlocked
 		var which: String = game
 		b.pressed.connect(func() -> void:
@@ -1378,26 +1393,26 @@ func _show_games() -> void:
 	var market_col := VBoxContainer.new()
 	market_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var market_title := Label.new()
-	market_title.text = "Börse für Beulen"
+	market_title.text = tr("Börse für Beulen")
 	market_title.add_theme_font_size_override("font_size", 20)
 	market_col.add_child(market_title)
 	var market_desc := Label.new()
 	market_desc.add_theme_font_size_override("font_size", 14)
 	market_desc.add_theme_color_override("font_color", Color(INK, 0.7))
-	market_desc.text = "Pflaster, Eisbeutel, Torten und Gummienten handeln – billig kaufen, teuer verkaufen."
+	market_desc.text = tr("Pflaster, Eisbeutel, Torten und Gummienten handeln – billig kaufen, teuer verkaufen.")
 	market_col.add_child(market_desc)
 	market_row.add_child(market_col)
 	var market_button := Button.new()
 	market_button.focus_mode = Control.FOCUS_NONE
 	market_button.custom_minimum_size = Vector2(180, 0)
-	market_button.text = "Zur Börse!" if GameState.market_unlocked() else "Ab 10 Mio. Wumms"
+	market_button.text = tr("Zur Börse!") if GameState.market_unlocked() else tr("Ab 10 Mio. Wumms")
 	market_button.disabled = not GameState.market_unlocked()
 	market_button.pressed.connect(func() -> void:
 		modal_ref[0].close()
-		Modal.open(self, "Börse für Beulen", MarketPanel.new(), ["Schließen"], 900.0))
+		Modal.open(self, tr("Börse für Beulen"), MarketPanel.new(), [tr("Schließen")], 900.0))
 	market_row.add_child(market_button)
 	content.add_child(market_row)
-	modal_ref.append(Modal.open(self, "Mini-Spiele", content, ["Schließen"], 680.0))
+	modal_ref.append(Modal.open(self, tr("Mini-Spiele"), content, [tr("Schließen")], 680.0))
 
 
 # =====================================================================
@@ -1420,12 +1435,12 @@ func _take_photo() -> void:
 	var stamp := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
 	var path := "%s/punch_%s.png" % [dir, stamp]
 	if img.save_png(path) != OK:
-		show_toast("Foto konnte nicht gespeichert werden.")
+		show_toast(tr("Foto konnte nicht gespeichert werden."))
 		return
 	GameState.add_stat("screenshots")
 	Sfx.play("buy", 0.0, -4.0)
-	var m := Modal.open(self, "Foto gespeichert!", "Gespeichert als\n%s\n\nDas Foto bleibt auf deinem Rechner – teilen kannst du es, wenn alle Abgebildeten einverstanden sind." % path.get_file(),
-		["Ordner öffnen", "OK"])
+	var m := Modal.open(self, tr("Foto gespeichert!"), tr("Gespeichert als\n%s\n\nDas Foto bleibt auf deinem Rechner – teilen kannst du es, wenn alle Abgebildeten einverstanden sind.") % path.get_file(),
+		[tr("Ordner öffnen"), "OK"])
 	m.closed.connect(func(index: int) -> void:
 		if index == 0:
 			OS.shell_open(ProjectSettings.globalize_path(dir)))
@@ -1441,10 +1456,10 @@ func _show_shop() -> void:
 	var modal_ref: Array = []
 	var head := Label.new()
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	head.text = "Du hast %d Beulen-Marken. Gekauftes kannst du jederzeit wechseln." % GameState.beulen_marken
+	head.text = tr("Du hast %d Beulen-Marken. Gekauftes kannst du jederzeit wechseln.") % GameState.beulen_marken
 	content.add_child(head)
 	for slot in SHOP_SLOTS:
-		content.add_child(_section_title(slot[1]))
+		content.add_child(_section_title(tr(slot[1])))
 		var flow := HFlowContainer.new()
 		flow.add_theme_constant_override("h_separation", 8)
 		flow.add_theme_constant_override("v_separation", 8)
@@ -1452,7 +1467,7 @@ func _show_shop() -> void:
 			if c.slot == slot[0]:
 				flow.add_child(_shop_item(c, modal_ref))
 		content.add_child(flow)
-	modal_ref.append(Modal.open(self, "Kosmetik-Laden", content, ["Schließen"], 940.0))
+	modal_ref.append(Modal.open(self, tr("Kosmetik-Laden"), content, [tr("Schließen")], 940.0))
 
 
 func _shop_item(c: Dictionary, modal_ref: Array) -> PanelContainer:
@@ -1485,10 +1500,10 @@ func _shop_item(c: Dictionary, modal_ref: Array) -> PanelContainer:
 	b.add_theme_font_size_override("font_size", 13)
 	var id: String = c.id
 	if equipped:
-		b.text = "Angelegt ✓"
+		b.text = tr("Angelegt ✓")
 		b.disabled = true
 	elif owned:
-		b.text = "Anlegen"
+		b.text = tr("Anlegen")
 		b.pressed.connect(func() -> void:
 			GameState.apply_cosmetic(id)
 			if c.slot == "sound":
@@ -1496,15 +1511,15 @@ func _shop_item(c: Dictionary, modal_ref: Array) -> PanelContainer:
 			modal_ref[0].close()
 			_show_shop())
 	elif c.get("source", "") == "laurel":
-		b.text = "Im Lorbeer-Baum"
+		b.text = tr("Im Lorbeer-Baum")
 		b.disabled = true
 	else:
-		b.text = "Kaufen: %d Marken" % int(c.cost)
+		b.text = tr("Kaufen: %d Marken") % int(c.cost)
 		b.disabled = GameState.beulen_marken < int(c.cost)
 		b.pressed.connect(func() -> void:
 			if GameState.buy_cosmetic(id):
 				Sfx.play("buy", 0.0, -3.0)
-				show_toast("Neu im Schrank: %s" % c.name)
+				show_toast(tr("Neu im Schrank: %s") % c.name)
 			modal_ref[0].close()
 			_show_shop())
 	box.add_child(b)
@@ -1525,8 +1540,8 @@ func _on_challenge_changed() -> void:
 				Sfx.play("prestige", 0.0, -2.0)
 				if not GameState.reduced_effects:
 					Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
-				Modal.open(self, "Herausforderung gemeistert!", "„%s“ geschafft!\n+%d Lorbeer%s – ab sofort dauerhaft." % [
-					c.name, int(c.reward_laurels), "" if int(c.reward_laurels) == 1 else "en"], ["Hurra!"])
+				Modal.open(self, tr("Herausforderung gemeistert!"), tr("„%s“ geschafft!\n%s – ab sofort dauerhaft.") % [
+					c.name, laurels_text(int(c.reward_laurels), true)], [tr("Hurra!")])
 
 
 var _celebrated_challenges: Dictionary = {}

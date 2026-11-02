@@ -119,7 +119,7 @@ func _end_game() -> void:
 	box.add_theme_constant_override("separation", 10)
 	_result_box.add_child(box)
 	var title := Label.new()
-	title.text = "%d Punkte!" % _score
+	title.text = tr("%d Punkte!") % _score
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 48)
 	title.add_theme_color_override("font_color", Color("ffd43b"))
@@ -130,14 +130,14 @@ func _end_game() -> void:
 	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(400, 0)
-	text.text = ("Neuer Rekord!\n" if _score > best_before else "Rekord: %d\n" % best_before) + \
-		("+%d Beulen-Marken" % gain if gain > 0 else "Heute gibt es dafür keine weiteren Beulen-Marken.")
+	text.text = (tr("Neuer Rekord!\n") if _score > best_before else tr("Rekord: %d\n") % best_before) + \
+		(tr("+%d Beulen-Marken") % gain if gain > 0 else tr("Heute gibt es dafür keine weiteren Beulen-Marken."))
 	box.add_child(text)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 12)
 	box.add_child(row)
-	for label in ["Nochmal", "Fertig"]:
+	for label in [tr("Nochmal"), tr("Fertig")]:
 		var b := Button.new()
 		b.text = label
 		b.focus_mode = Control.FOCUS_NONE
@@ -183,11 +183,11 @@ func _draw() -> void:
 			var y := _area_rect.position.y + 140.0 + lane * 140.0 + 44.0
 			draw_rect(Rect2(_area_rect.position.x, y, AREA_SIZE.x, 14), Color("c92a2a"))
 	var font := get_theme_default_font()
-	var title := "Reaktions-Dojo" if game == "dojo" else "Tortenwurf-Schießbude"
+	var title := tr("Reaktions-Dojo") if game == "dojo" else tr("Tortenwurf-Schießbude")
 	_text(font, _area_rect.position + Vector2(20, 44), title, 34, Color("3bc9db"))
-	_text(font, _area_rect.position + Vector2(AREA_SIZE.x - 300, 44), "Punkte %d · %d s" % [_score, ceili(maxf(_time_left, 0.0))], 28, Color("ffd43b"))
+	_text(font, _area_rect.position + Vector2(AREA_SIZE.x - 300, 44), tr("Punkte %d · %d s") % [_score, ceili(maxf(_time_left, 0.0))], 28, Color("ffd43b"))
 	if _running and _time_left > DURATION - 2.0:
-		var hint := "Triff die Ziele, bevor sie schrumpfen!" if game == "dojo" else "Wirf Torten auf die Pappfiguren! Schnelle Reihen geben mehr Punkte."
+		var hint := tr("Triff die Ziele, bevor sie schrumpfen!") if game == "dojo" else tr("Wirf Torten auf die Pappfiguren! Schnelle Reihen geben mehr Punkte.")
 		_text(font, _area_rect.position + Vector2(20, AREA_SIZE.y - 24), hint, 18, Color.WHITE)
 	for t in _targets:
 		var rad: float = t.radius * _scale_of(t)

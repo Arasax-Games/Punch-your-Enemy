@@ -26,7 +26,7 @@ Die Erfolge des Spiels stehen in `data/achievements.json`. Für Steamworks gibt 
 godot --headless --path . --script res://tools/steam_achievements.gd
 ```
 
-Das schreibt `docs/steam_achievements.csv` (API-Name; Anzeigename; Beschreibung; versteckt). In Steamworks unter **Stats & Achievements** jeden Erfolg mit genau diesem **API-Namen** anlegen (Großbuchstaben, z. B. `ERSTES_AUA`), Bilder hochladen (je 64×64 px, farbig und grau) und veröffentlichen.
+Das schreibt `docs/steam_achievements.csv` (API-Name; Name und Beschreibung auf Deutsch und Englisch; versteckt). In Steamworks für beide Sprachen eintragen. In Steamworks unter **Stats & Achievements** jeden Erfolg mit genau diesem **API-Namen** anlegen (Großbuchstaben, z. B. `ERSTES_AUA`), Bilder hochladen (je 64×64 px, farbig und grau) und veröffentlichen.
 
 Das Spiel meldet Erfolge sofort beim Freischalten und beim Start noch einmal alle bereits verdienten (falls jemand vorher ohne Steam gespielt hat).
 
@@ -59,6 +59,7 @@ Der Ordner `PunchYourEnemy` kommt aus `project.godot` (`application/config/custo
 - [ ] Alle Erfolge aus `docs/steam_achievements.csv` in Steamworks angelegt und veröffentlicht
 - [ ] Auto-Cloud nur für `savegame*.json`
 - [ ] Store-Seite: Hinweis, dass importierte Bilder lokal bleiben und man nur Bilder nimmt, bei denen alle Beteiligten Spaß verstehen
+- [ ] Unterstützte Sprachen auf der Store-Seite: **Deutsch** und **Englisch** (Oberfläche und Untertitel; keine Sprachausgabe)
 - [ ] Altersfreigabe-Fragebogen in Steamworks ausgefüllt (Comic-Slapstick, keine realistische Gewalt)
 
 ## Noch nicht umgesetzt
