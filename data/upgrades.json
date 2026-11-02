@@ -4,75 +4,800 @@
 		"name": "Boxhandschuh-Training",
 		"description": "Drei Runden Seilspringen und ein ernster Blick in den Spiegel.",
 		"cost": 100,
-		"effect": { "type": "click_mult", "factor": 2 }
-	},
-	{
-		"id": "knoechelpolster",
-		"name": "Knöchelpolster",
-		"description": "Weich für dich, hart für ihn. Fäuste arbeiten doppelt so fleißig.",
-		"cost": 150,
-		"requires": { "device": "faust", "count": 1 },
-		"effect": { "type": "device_mult", "device": "faust", "factor": 2 }
+		"effect": {
+			"type": "click_mult",
+			"factor": 2
+		}
 	},
 	{
 		"id": "stahlkappenhandschuh",
 		"name": "Stahlkappenhandschuh",
 		"description": "Eigentlich für Baustellen gedacht. Eigentlich.",
 		"cost": 500,
-		"requires": { "upgrade": "boxhandschuh_training" },
-		"effect": { "type": "click_mult", "factor": 2 }
-	},
-	{
-		"id": "flauschfutter",
-		"name": "Flauschfutter",
-		"description": "Pantoffel mit Teddyfell. Kuschelig – und doppelt so schwungvoll.",
-		"cost": 1000,
-		"requires": { "device": "pantoffel", "count": 1 },
-		"effect": { "type": "device_mult", "device": "pantoffel", "factor": 2 }
+		"requires": {
+			"upgrade": "boxhandschuh_training"
+		},
+		"effect": {
+			"type": "click_mult",
+			"factor": 2
+		}
 	},
 	{
 		"id": "karate_kurs",
 		"name": "Karate-Kurs (Volkshochschule)",
 		"description": "Dienstags 19 Uhr, Raum 104. Bitte Hausschuhe mitbringen.",
 		"cost": 10000,
-		"requires": { "upgrade": "stahlkappenhandschuh" },
-		"effect": { "type": "click_mult", "factor": 2 }
-	},
-	{
-		"id": "extra_quietscher",
-		"name": "Extra-Quietscher",
-		"description": "Ein zweites Quietsch-Ventil. Die Nachbarn sind begeistert.",
-		"cost": 11000,
-		"requires": { "device": "gummihammer", "count": 1 },
-		"effect": { "type": "device_mult", "device": "gummihammer", "factor": 2 }
+		"requires": {
+			"upgrade": "stahlkappenhandschuh"
+		},
+		"effect": {
+			"type": "click_mult",
+			"factor": 2
+		}
 	},
 	{
 		"id": "kritische_treffer",
 		"name": "Kritische Treffer",
 		"description": "Genau auf die Nase. Manchmal. Mit Glück.",
 		"cost": 25000,
-		"effect": { "type": "crit", "chance": 0.05, "factor": 10 }
+		"effect": {
+			"type": "crit",
+			"chance": 0.05,
+			"factor": 10
+		}
 	},
 	{
 		"id": "dauerfeuer",
 		"name": "Dauerfeuer",
 		"description": "Wer braucht schon Pausen? Maus gedrückt halten und zusehen.",
 		"cost": 50000,
-		"effect": { "type": "autofire", "rate": 10 }
+		"effect": {
+			"type": "autofire",
+			"rate": 10
+		}
 	},
 	{
 		"id": "sponsorenvertrag",
 		"name": "Sponsorenvertrag",
 		"description": "Eine Pflasterfirma zahlt pro Beule. Alle Geräte arbeiten motivierter.",
 		"cost": 75000,
-		"requires": { "total_wumms": 20000 },
-		"effect": { "type": "wps_mult", "factor": 1.1 }
+		"requires": {
+			"total_wumms": 20000
+		},
+		"effect": {
+			"type": "wps_mult",
+			"factor": 1.1
+		}
 	},
 	{
 		"id": "klick_wps_1",
 		"name": "Klick = 1 % deiner WPS",
 		"description": "Deine Geräte feuern dich an. Jeder Klick bekommt etwas von ihrer Arbeit ab.",
 		"cost": 100000,
-		"effect": { "type": "click_wps", "percent": 0.01 }
+		"effect": {
+			"type": "click_wps",
+			"percent": 0.01
+		}
+	},
+	{
+		"id": "klick_wps_5",
+		"name": "Klick = 5 % deiner WPS",
+		"description": "Die Geräte klatschen jetzt im Takt mit.",
+		"cost": 10000000,
+		"requires": {
+			"upgrade": "klick_wps_1"
+		},
+		"effect": {
+			"type": "click_wps",
+			"percent": 0.05
+		}
+	},
+	{
+		"id": "milchtuete_der_wut",
+		"name": "Milchtüte der Wut",
+		"description": "Wutmilch! Jeder Erfolg macht deine Geräte ein bisschen wütender.",
+		"cost": 250000,
+		"requires": {
+			"achievements": 5
+		},
+		"effect": {
+			"type": "achievement_wps",
+			"percent": 0.005
+		}
+	},
+	{
+		"id": "fanclub",
+		"name": "Fanclub",
+		"description": "Mit Schal, Trommel und selbstgemaltem Transparent.",
+		"cost": 5000000,
+		"requires": {
+			"achievements": 20
+		},
+		"effect": {
+			"type": "fanclub",
+			"percent": 0.05,
+			"per": 10
+		}
+	},
+	{
+		"id": "kamerateam",
+		"name": "Kamerateam",
+		"description": "Wo eine Kamera ist, taucht auch ein Goldener Schuh auf.",
+		"cost": 777777,
+		"requires": {
+			"golden_shoes": 1
+		},
+		"effect": {
+			"type": "golden_luck",
+			"factor": 1.2
+		}
+	},
+	{
+		"id": "paparazzi",
+		"name": "Paparazzi",
+		"description": "Noch mehr Kameras. Die Goldenen Schuhe fühlen sich geschmeichelt.",
+		"cost": 77000000,
+		"requires": {
+			"upgrade": "kamerateam",
+			"golden_shoes": 7
+		},
+		"effect": {
+			"type": "golden_luck",
+			"factor": 1.2
+		}
+	},
+	{
+		"id": "knoechelpolster",
+		"name": "Knöchelpolster",
+		"description": "Weich für dich, hart für ihn.",
+		"cost": 150,
+		"requires": {
+			"device": "faust",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "faust",
+			"factor": 2
+		}
+	},
+	{
+		"id": "turbo_knoechel",
+		"name": "Turbo-Knöchel",
+		"description": "Mit Rückstoßdämpfer und Rennstreifen.",
+		"cost": 750,
+		"requires": {
+			"device": "faust",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "faust",
+			"factor": 2
+		}
+	},
+	{
+		"id": "faust_des_monats",
+		"name": "Faust des Monats",
+		"description": "Ihr Foto hängt jetzt im Pausenraum.",
+		"cost": 7500,
+		"requires": {
+			"device": "faust",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "faust",
+			"factor": 2
+		}
+	},
+	{
+		"id": "flauschfutter",
+		"name": "Flauschfutter",
+		"description": "Pantoffel mit Teddyfell. Kuschelig und schwungvoll.",
+		"cost": 1000,
+		"requires": {
+			"device": "pantoffel",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "pantoffel",
+			"factor": 2
+		}
+	},
+	{
+		"id": "stahlkappen_pantoffel",
+		"name": "Stahlkappen-Pantoffel",
+		"description": "Oma hat aufgerüstet.",
+		"cost": 5000,
+		"requires": {
+			"device": "pantoffel",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "pantoffel",
+			"factor": 2
+		}
+	},
+	{
+		"id": "raketen_pantoffel",
+		"name": "Pantoffel mit Raketenantrieb",
+		"description": "Bitte nicht in geschlossenen Räumen zünden.",
+		"cost": 50000,
+		"requires": {
+			"device": "pantoffel",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "pantoffel",
+			"factor": 2
+		}
+	},
+	{
+		"id": "extra_quietscher",
+		"name": "Extra-Quietscher",
+		"description": "Ein zweites Quietsch-Ventil. Die Nachbarn sind begeistert.",
+		"cost": 11000,
+		"requires": {
+			"device": "gummihammer",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "gummihammer",
+			"factor": 2
+		}
+	},
+	{
+		"id": "doppelkopf_hammer",
+		"name": "Doppelkopf-Hammer",
+		"description": "Zwei Köpfe quietschen mehr als einer.",
+		"cost": 55000,
+		"requires": {
+			"device": "gummihammer",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "gummihammer",
+			"factor": 2
+		}
+	},
+	{
+		"id": "hammer_hammer",
+		"name": "Hammer-Hammer-Hammer",
+		"description": "Ein Hammer, der mit Hämmern hämmert.",
+		"cost": 550000,
+		"requires": {
+			"device": "gummihammer",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "gummihammer",
+			"factor": 2
+		}
+	},
+	{
+		"id": "staerkere_feder",
+		"name": "Stärkere Feder",
+		"description": "Aus einer sehr motivierten Matratze ausgebaut.",
+		"cost": 120000,
+		"requires": {
+			"device": "katapult",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "katapult",
+			"factor": 2
+		}
+	},
+	{
+		"id": "doppelfeder",
+		"name": "Doppelfeder-Getriebe",
+		"description": "Feder, Feder, Hebel, Handschuh.",
+		"cost": 600000,
+		"requires": {
+			"device": "katapult",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "katapult",
+			"factor": 2
+		}
+	},
+	{
+		"id": "katapult_tarifvertrag",
+		"name": "Katapult-Tarifvertrag",
+		"description": "Längere Federn, kürzere Pausen. Alle sind zufrieden.",
+		"cost": 6000000,
+		"requires": {
+			"device": "katapult",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "katapult",
+			"factor": 2
+		}
+	},
+	{
+		"id": "sahnesteif",
+		"name": "Sahnesteif",
+		"description": "Hält die Form auch bei Mach 2.",
+		"cost": 1300000,
+		"requires": {
+			"device": "tortenkanone",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "tortenkanone",
+			"factor": 2
+		}
+	},
+	{
+		"id": "schwarzwaelder_munition",
+		"name": "Schwarzwälder Munition",
+		"description": "Mit Kirsche obendrauf. Als Zielhilfe.",
+		"cost": 6500000,
+		"requires": {
+			"device": "tortenkanone",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "tortenkanone",
+			"factor": 2
+		}
+	},
+	{
+		"id": "hochzeitstorten_salve",
+		"name": "Hochzeitstorten-Salve",
+		"description": "Sieben Etagen, ein Ziel.",
+		"cost": 65000000,
+		"requires": {
+			"device": "tortenkanone",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "tortenkanone",
+			"factor": 2
+		}
+	},
+	{
+		"id": "extra_schaumstoff",
+		"name": "Extra-Schaumstoff",
+		"description": "Noch weicher. Noch beeindruckender.",
+		"cost": 14000000,
+		"requires": {
+			"device": "abrissbirne",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "abrissbirne",
+			"factor": 2
+		}
+	},
+	{
+		"id": "riesenbirne",
+		"name": "Riesenbirne",
+		"description": "Passt kaum noch durchs Tor.",
+		"cost": 70000000,
+		"requires": {
+			"device": "abrissbirne",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "abrissbirne",
+			"factor": 2
+		}
+	},
+	{
+		"id": "glitzerbirne",
+		"name": "Birne mit Glitzer",
+		"description": "Hinterlässt Beulen und gute Laune.",
+		"cost": 700000000,
+		"requires": {
+			"device": "abrissbirne",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "abrissbirne",
+			"factor": 2
+		}
+	},
+	{
+		"id": "handgelenk_schmierfett",
+		"name": "Handgelenk-Schmierfett",
+		"description": "Flutscht wie geölt. Weil es geölt ist.",
+		"cost": 200000000,
+		"requires": {
+			"device": "fliessband",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "fliessband",
+			"factor": 2
+		}
+	},
+	{
+		"id": "zweite_schicht",
+		"name": "Zweite Schicht",
+		"description": "Die Nachtschicht-Hände sind besonders motiviert.",
+		"cost": 1000000000,
+		"requires": {
+			"device": "fliessband",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "fliessband",
+			"factor": 2
+		}
+	},
+	{
+		"id": "akkord_ohrfeigen",
+		"name": "Akkord-Ohrfeigen",
+		"description": "Bezahlt wird pro Klatsch.",
+		"cost": 10000000000,
+		"requires": {
+			"device": "fliessband",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "fliessband",
+			"factor": 2
+		}
+	},
+	{
+		"id": "amboss_zielfernrohr",
+		"name": "Amboss-Zielfernrohr",
+		"description": "Trifft jetzt auch, wenn das Ziel zur Seite tritt.",
+		"cost": 3300000000,
+		"requires": {
+			"device": "amboss",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "amboss",
+			"factor": 2
+		}
+	},
+	{
+		"id": "amboss_abo",
+		"name": "Amboss-Abo",
+		"description": "Jeden Morgen frisch vom Himmel.",
+		"cost": 16500000000,
+		"requires": {
+			"device": "amboss",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "amboss",
+			"factor": 2
+		}
+	},
+	{
+		"id": "wolken_ambossfabrik",
+		"name": "Wolken-Ambossfabrik",
+		"description": "Die Wettervorhersage sagt: 90 % Amboss.",
+		"cost": 165000000000,
+		"requires": {
+			"device": "amboss",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "amboss",
+			"factor": 2
+		}
+	},
+	{
+		"id": "software_update",
+		"name": "Software-Update 1.1",
+		"description": "Behebt einen Fehler, bei dem der Roboter höflich war.",
+		"cost": 51000000000,
+		"requires": {
+			"device": "boxroboter",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "boxroboter",
+			"factor": 2
+		}
+	},
+	{
+		"id": "humor_modul",
+		"name": "Humor-Modul (deaktiviert)",
+		"description": "Sicher ist sicher.",
+		"cost": 255000000000,
+		"requires": {
+			"device": "boxroboter",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "boxroboter",
+			"factor": 2
+		}
+	},
+	{
+		"id": "mk2_faeuste",
+		"name": "Mk.-II-Fäuste",
+		"description": "Jetzt mit doppelt so vielen Fäusten.",
+		"cost": 2550000000000,
+		"requires": {
+			"device": "boxroboter",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "boxroboter",
+			"factor": 2
+		}
+	},
+	{
+		"id": "mondphasen_kalender",
+		"name": "Mondphasen-Kalender",
+		"description": "Bei Vollmond trifft es sich einfach besser.",
+		"cost": 750000000000,
+		"requires": {
+			"device": "mondkatapult",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "mondkatapult",
+			"factor": 2
+		}
+	},
+	{
+		"id": "vollmond_modus",
+		"name": "Vollmond-Modus",
+		"description": "Immer Vollmond. Die Werwölfe sind verwirrt.",
+		"cost": 3750000000000,
+		"requires": {
+			"device": "mondkatapult",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "mondkatapult",
+			"factor": 2
+		}
+	},
+	{
+		"id": "zweiter_mond",
+		"name": "Zweiter Mond",
+		"description": "Gebraucht gekauft. Läuft noch super.",
+		"cost": 37500000000000,
+		"requires": {
+			"device": "mondkatapult",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "mondkatapult",
+			"factor": 2
+		}
+	},
+	{
+		"id": "flux_handschuh",
+		"name": "Flux-Handschuh",
+		"description": "Funktioniert erst ab 88 Klicks pro Minute.",
+		"cost": 10000000000000,
+		"requires": {
+			"device": "zeitreise",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "zeitreise",
+			"factor": 2
+		}
+	},
+	{
+		"id": "vorgestern_paket",
+		"name": "Vorgestern-Paket",
+		"description": "Jetzt auch für vorgestern und übermorgen.",
+		"cost": 50000000000000,
+		"requires": {
+			"device": "zeitreise",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "zeitreise",
+			"factor": 2
+		}
+	},
+	{
+		"id": "zeitschleife",
+		"name": "Zeitschleife",
+		"description": "Dieselbe Backpfeife, immer und immer wieder.",
+		"cost": 500000000000000,
+		"requires": {
+			"device": "zeitreise",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "zeitreise",
+			"factor": 2
+		}
+	},
+	{
+		"id": "paralleluniversum_abo",
+		"name": "Paralleluniversum-Abo",
+		"description": "Jedes Universum hat eine Backpfeife frei.",
+		"cost": 140000000000000,
+		"requires": {
+			"device": "universell",
+			"count": 1
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "universell",
+			"factor": 2
+		}
+	},
+	{
+		"id": "multiversum_gewerkschaft",
+		"name": "Multiversum-Gewerkschaft",
+		"description": "Alle Ichs aller Welten streiken nie.",
+		"cost": 700000000000000,
+		"requires": {
+			"device": "universell",
+			"count": 10
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "universell",
+			"factor": 2
+		}
+	},
+	{
+		"id": "ohrfeige_aller_ohrfeigen",
+		"name": "Die Ohrfeige aller Ohrfeigen",
+		"description": "Man hört sie noch in drei Universen weiter.",
+		"cost": 7000000000000000,
+		"requires": {
+			"device": "universell",
+			"count": 25
+		},
+		"effect": {
+			"type": "device_mult",
+			"device": "universell",
+			"factor": 2
+		}
+	},
+	{
+		"id": "fuss_hand_koordination",
+		"name": "Fuß-Hand-Koordination",
+		"description": "Pantoffel geben den Takt vor, Fäuste folgen.",
+		"cost": 20000,
+		"requires": {
+			"devices": {
+				"pantoffel": 15,
+				"faust": 15
+			}
+		},
+		"effect": {
+			"type": "synergy",
+			"source": "pantoffel",
+			"target": "faust",
+			"percent": 0.05,
+			"per": 10
+		}
+	},
+	{
+		"id": "quietsch_chor",
+		"name": "Quietsch-Chor",
+		"description": "Gummihämmer quietschen den Pantoffeln Mut zu.",
+		"cost": 200000,
+		"requires": {
+			"devices": {
+				"gummihammer": 15,
+				"pantoffel": 15
+			}
+		},
+		"effect": {
+			"type": "synergy",
+			"source": "gummihammer",
+			"target": "pantoffel",
+			"percent": 0.05,
+			"per": 10
+		}
+	},
+	{
+		"id": "tortenkatapult",
+		"name": "Tortenkatapult",
+		"description": "Das Katapult wirft jetzt auch Torten. Und umgekehrt.",
+		"cost": 20000000,
+		"requires": {
+			"devices": {
+				"tortenkanone": 15,
+				"katapult": 15
+			}
+		},
+		"effect": {
+			"type": "synergy",
+			"source": "tortenkanone",
+			"target": "katapult",
+			"percent": 0.05,
+			"per": 10
+		}
+	},
+	{
+		"id": "schaumstoff_fliessband",
+		"name": "Schaumstoff-Fließband",
+		"description": "Das Fließband liefert frische Abrissbirnen.",
+		"cost": 2000000000,
+		"requires": {
+			"devices": {
+				"fliessband": 15,
+				"abrissbirne": 15
+			}
+		},
+		"effect": {
+			"type": "synergy",
+			"source": "fliessband",
+			"target": "abrissbirne",
+			"percent": 0.05,
+			"per": 10
+		}
+	},
+	{
+		"id": "mondroboter",
+		"name": "Mondroboter",
+		"description": "Die Boxroboter laden den Mond nach.",
+		"cost": 1000000000000,
+		"requires": {
+			"devices": {
+				"boxroboter": 15,
+				"mondkatapult": 15
+			}
+		},
+		"effect": {
+			"type": "synergy",
+			"source": "boxroboter",
+			"target": "mondkatapult",
+			"percent": 0.05,
+			"per": 10
+		}
+	},
+	{
+		"id": "zeitschleifen_amboss",
+		"name": "Zeitschleifen-Amboss",
+		"description": "Derselbe Amboss fällt einfach öfter.",
+		"cost": 100000000000000,
+		"requires": {
+			"devices": {
+				"zeitreise": 15,
+				"amboss": 15
+			}
+		},
+		"effect": {
+			"type": "synergy",
+			"source": "zeitreise",
+			"target": "amboss",
+			"percent": 0.05,
+			"per": 10
+		}
 	}
 ]

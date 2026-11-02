@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Der Silberne Pantoffel: kleinerer, häufigerer Bruder des Goldenen Schuhs -->
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="96" viewBox="0 0 128 96">
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#ced4da"/>
+      <stop offset="1" stop-color="#868e96"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#2b2118" stroke-width="5" stroke-linejoin="round">
+    <path d="M10 70 C10 54 26 46 44 44 L84 40 C104 38 120 50 120 64 C120 76 108 82 92 82 L24 82 C14 82 10 78 10 70 Z" fill="url(#silver)"/>
+    <path d="M60 42 C66 26 96 24 104 44 C92 50 72 50 60 42 Z" fill="#f783ac"/>
+    <circle cx="82" cy="30" r="9" fill="#ffffff"/>
+  </g>
+  <path d="M24 58 L60 52 L60 58 L26 64 Z" fill="#ffffff" opacity="0.7"/>
+</svg>

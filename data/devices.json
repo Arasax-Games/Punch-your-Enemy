@@ -38,5 +38,61 @@
 		"base_wps": 260,
 		"color": "#da77f2",
 		"description": "Sahne in Überschallgeschwindigkeit."
+	},
+	{
+		"id": "abrissbirne",
+		"name": "Abrissbirne (aus Schaumstoff)",
+		"base_cost": 1400000,
+		"base_wps": 1400,
+		"color": "#ff8787",
+		"description": "Groß, weich, beeindruckend."
+	},
+	{
+		"id": "fliessband",
+		"name": "Ohrfeigen-Fließband",
+		"base_cost": 20000000,
+		"base_wps": 7800,
+		"color": "#ffd43b",
+		"description": "400 mechanische Hände im Takt."
+	},
+	{
+		"id": "amboss",
+		"name": "Amboss-Regen-Anlage",
+		"base_cost": 330000000,
+		"base_wps": 44000,
+		"color": "#adb5bd",
+		"description": "Ein Klassiker aus dem Zeichentrick, jetzt in Serie."
+	},
+	{
+		"id": "boxroboter",
+		"name": "Boxroboter Mk. I",
+		"base_cost": 5100000000,
+		"base_wps": 260000,
+		"color": "#74c0fc",
+		"description": "Gelenkig, humorlos, effektiv."
+	},
+	{
+		"id": "mondkatapult",
+		"name": "Mond-Katapult",
+		"base_cost": 75000000000,
+		"base_wps": 1600000,
+		"color": "#e5dbff",
+		"description": "Der Mond holt aus."
+	},
+	{
+		"id": "zeitreise",
+		"name": "Zeitreise-Backpfeife",
+		"base_cost": 1000000000000,
+		"base_wps": 10000000,
+		"color": "#63e6be",
+		"description": "Haut gestern, heute und morgen gleichzeitig."
+	},
+	{
+		"id": "universell",
+		"name": "Die Universelle Backpfeife",
+		"base_cost": 14000000000000,
+		"base_wps": 65000000,
+		"color": "#9775fa",
+		"description": "Eine Ohrfeige, die durch das Multiversum hallt."
 	}
 ]
