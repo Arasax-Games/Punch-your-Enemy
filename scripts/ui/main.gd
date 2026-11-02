@@ -33,10 +33,7 @@ const MENU_SOUND := 10
 const MENU_EFFECTS := 11
 const MENU_TIME_WARP := 12
 const MENU_AUTOBUY := 13
-const MENU_BACKGROUND := 14
-const MENU_FIST := 15
-const MENU_RETRO := 16
-const BACKGROUND_NAMES := {"standard": "Standard", "zirkus": "Zirkuszelt", "weltraum": "Weltraum"}
+const SHOP_SLOTS := [["fist", "Fäuste"], ["background", "Hintergründe"], ["sound", "Sounds"]]
 const BRANCHES := [["handwerk", "Handwerk"], ["glueck", "Glück"], ["komfort", "Komfort"], ["show", "Show"]]
 
 @onready var target_area: TargetArea = %TargetArea
@@ -77,6 +74,8 @@ var _laurel_label: Label
 var _rage_tint: ColorRect
 var _rage_tween: Tween
 var _ticker_override := ""
+var _challenge_label: Label
+var _challenge_abort: Button
 
 
 func _ready() -> void:
@@ -105,9 +104,15 @@ func _ready() -> void:
 	GameState.event_completed.connect(_on_event_completed)
 	%QuestsButton.pressed.connect(_show_quests)
 	%GamesButton.pressed.connect(_show_games)
+	%ShopButton.pressed.connect(_show_shop)
+	GameState.cosmetics_changed.connect(_apply_cosmetics)
+	GameState.challenge_changed.connect(_on_challenge_changed)
+	GameState.buffs_changed.connect(_update_slow_motion)
 	get_window().files_dropped.connect(_on_files_dropped)
 
 	_apply_cosmetics()
+	for id in GameState.challenges_done:
+		_celebrated_challenges[id] = true
 	_on_target_changed()
 	_refresh()
 	_ticker_index = randi() % TICKER_LINES.size()
@@ -341,14 +346,6 @@ func _fill_menu() -> void:
 	if GameState.has_autobuy():
 		popup.add_check_item("Upgrades automatisch kaufen", MENU_AUTOBUY)
 		popup.set_item_checked(popup.get_item_index(MENU_AUTOBUY), GameState.autobuy_enabled)
-	if GameState.available_backgrounds().size() > 1:
-		popup.add_item("Hintergrund: %s" % BACKGROUND_NAMES.get(GameState.background, GameState.background), MENU_BACKGROUND)
-	if GameState.has_cosmetic("fist_gold"):
-		popup.add_check_item("Goldene Faust", MENU_FIST)
-		popup.set_item_checked(popup.get_item_index(MENU_FIST), GameState.fist_skin == "gold")
-	if GameState.has_cosmetic("sound_retro"):
-		popup.add_check_item("Retro-Sounds", MENU_RETRO)
-		popup.set_item_checked(popup.get_item_index(MENU_RETRO), GameState.sound_pack == "retro")
 	popup.add_separator()
 	popup.add_item("Foto speichern", MENU_PHOTO)
 	popup.add_item("Speichern", MENU_SAVE)
@@ -404,6 +401,27 @@ func _build_stats_extras() -> void:
 	_prestige_button.pressed.connect(_show_prestige)
 	box.add_child(_prestige_button)
 
+	var challenge_row := HBoxContainer.new()
+	challenge_row.add_theme_constant_override("separation", 6)
+	_challenge_label = Label.new()
+	_challenge_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_challenge_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_challenge_label.add_theme_font_size_override("font_size", 14)
+	_challenge_label.add_theme_color_override("font_color", Color("c2255c"))
+	challenge_row.add_child(_challenge_label)
+	_challenge_abort = Button.new()
+	_challenge_abort.text = "Abbrechen"
+	_challenge_abort.focus_mode = Control.FOCUS_NONE
+	_challenge_abort.add_theme_font_size_override("font_size", 12)
+	_challenge_abort.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_challenge_abort.pressed.connect(func() -> void:
+		var m := Modal.open(self, "Herausforderung abbrechen?", "Du spielst normal weiter, bekommst aber keine Extra-Lorbeeren.", ["Abbrechen", "Weiterkämpfen"])
+		m.closed.connect(func(index: int) -> void:
+			if index == 0:
+				GameState.abort_challenge()))
+	challenge_row.add_child(_challenge_abort)
+	box.add_child(challenge_row)
+
 
 func _bar(fill: Color) -> ProgressBar:
 	var bar := ProgressBar.new()
@@ -454,7 +472,7 @@ func _refresh() -> void:
 	%LaurelButton.visible = GameState.laurel_tree_unlocked()
 	var claimable := GameState.claimable_quests()
 	%QuestsButton.text = "Aufträge (%d!)" % claimable if claimable > 0 else "Aufträge"
-	%GamesButton.visible = GameState.minigame_unlocked("dojo") or GameState.minigame_unlocked("pie")
+	%GamesButton.visible = GameState.minigame_unlocked("dojo") or GameState.minigame_unlocked("pie") or GameState.market_unlocked()
 	_refresh_progress_widgets()
 	_refresh_buffs()
 	_refresh_devices()
@@ -476,6 +494,11 @@ func _refresh_progress_widgets() -> void:
 		_rage_button.disabled = not GameState.rage_ready()
 	_laurel_label.visible = GameState.laurels_total > 0
 	_laurel_label.text = "Lorbeeren: %d (+%d %% auf alles)" % [GameState.laurels_total, GameState.laurels_total]
+	var active_challenge := GameState.challenge_def(GameState.challenge_active)
+	_challenge_label.get_parent().visible = not active_challenge.is_empty()
+	if not active_challenge.is_empty():
+		_challenge_label.text = "Herausforderung „%s“: %s / %s Wumms" % [active_challenge.name,
+			Num.whole(GameState.total_wumms), Num.whole(float(active_challenge.goal_wumms))]
 	var gain := GameState.prestige_gain()
 	_prestige_button.visible = GameState.can_prestige()
 	_prestige_button.text = "Neuanfang: +%s Lorbeer%s" % [Num.whole(gain), "" if gain == 1 else "en"]
@@ -835,15 +858,6 @@ func _on_menu(id: int) -> void:
 			show_toast("Zeitraffer an: Geräte arbeiten doppelt so schnell." if GameState.time_warp else "Zeitraffer aus.")
 		MENU_AUTOBUY:
 			GameState.autobuy_enabled = not GameState.autobuy_enabled
-		MENU_BACKGROUND:
-			var list := GameState.available_backgrounds()
-			GameState.background = list[(list.find(GameState.background) + 1) % list.size()]
-			_apply_cosmetics()
-		MENU_FIST:
-			GameState.fist_skin = "standard" if GameState.fist_skin == "gold" else "gold"
-			_apply_cosmetics()
-		MENU_RETRO:
-			GameState.sound_pack = "standard" if GameState.sound_pack == "retro" else "retro"
 		MENU_SAVE:
 			if GameState.save_game():
 				show_toast("Gespeichert.")
@@ -987,8 +1001,47 @@ func _show_laurel_tree() -> void:
 				continue
 			col.add_child(_laurel_node_button(n, modal_ref))
 		columns.add_child(col)
+	if GameState.challenges_unlocked():
+		content.add_child(_section_title("Herausforderungen – Extra-Lorbeeren"))
+		for c in GameState.challenge_defs:
+			content.add_child(_challenge_row(c, modal_ref))
 	var m := Modal.open(self, "Lorbeer-Baum", content, ["Schließen"], 940.0)
 	modal_ref.append(m)
+
+
+func _challenge_row(c: Dictionary, modal_ref: Array) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	var label := Label.new()
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.text = "%s: %s Ziel: %s Wumms → +%d Lorbeer%s" % [c.name, c.description, Num.whole(float(c.goal_wumms)),
+		int(c.reward_laurels), "" if int(c.reward_laurels) == 1 else "en"]
+	row.add_child(label)
+	var b := Button.new()
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(160, 0)
+	var id: String = c.id
+	if GameState.challenges_done.has(id):
+		b.text = "Geschafft ✓"
+		b.disabled = true
+	elif GameState.challenge_active == id:
+		b.text = "Läuft …"
+		b.disabled = true
+	else:
+		b.text = "Starten"
+		b.disabled = GameState.challenge_active != ""
+		b.pressed.connect(func() -> void:
+			var m := Modal.open(self, "„%s“ starten?" % c.name,
+				"Dein Durchlauf beginnt von vorn – wie bei einem Neuanfang, nur ohne neue Lorbeeren.\nLorbeeren, Erfolge und der Lorbeer-Baum bleiben.\n\n%s\nZiel: %s Wumms" % [c.description, Num.whole(float(c.goal_wumms))],
+				["Los geht's!", "Doch nicht"])
+			m.closed.connect(func(index: int) -> void:
+				if index == 0 and GameState.start_challenge(id):
+					modal_ref[0].close()
+					target_area.effects.clear()
+					show_toast("Herausforderung „%s“ läuft!" % c.name)))
+	row.add_child(b)
+	return row
 
 
 func _laurel_node_button(n: Dictionary, modal_ref: Array) -> Button:
@@ -1320,6 +1373,30 @@ func _show_games() -> void:
 			MiniGame.open(self, which))
 		row.add_child(b)
 		content.add_child(row)
+	var market_row := HBoxContainer.new()
+	market_row.add_theme_constant_override("separation", 12)
+	var market_col := VBoxContainer.new()
+	market_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var market_title := Label.new()
+	market_title.text = "Börse für Beulen"
+	market_title.add_theme_font_size_override("font_size", 20)
+	market_col.add_child(market_title)
+	var market_desc := Label.new()
+	market_desc.add_theme_font_size_override("font_size", 14)
+	market_desc.add_theme_color_override("font_color", Color(INK, 0.7))
+	market_desc.text = "Pflaster, Eisbeutel, Torten und Gummienten handeln – billig kaufen, teuer verkaufen."
+	market_col.add_child(market_desc)
+	market_row.add_child(market_col)
+	var market_button := Button.new()
+	market_button.focus_mode = Control.FOCUS_NONE
+	market_button.custom_minimum_size = Vector2(180, 0)
+	market_button.text = "Zur Börse!" if GameState.market_unlocked() else "Ab 10 Mio. Wumms"
+	market_button.disabled = not GameState.market_unlocked()
+	market_button.pressed.connect(func() -> void:
+		modal_ref[0].close()
+		Modal.open(self, "Börse für Beulen", MarketPanel.new(), ["Schließen"], 900.0))
+	market_row.add_child(market_button)
+	content.add_child(market_row)
 	modal_ref.append(Modal.open(self, "Mini-Spiele", content, ["Schließen"], 680.0))
 
 
@@ -1352,3 +1429,112 @@ func _take_photo() -> void:
 	m.closed.connect(func(index: int) -> void:
 		if index == 0:
 			OS.shell_open(ProjectSettings.globalize_path(dir)))
+
+
+# =====================================================================
+# Kosmetik-Laden
+# =====================================================================
+
+func _show_shop() -> void:
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 10)
+	var modal_ref: Array = []
+	var head := Label.new()
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	head.text = "Du hast %d Beulen-Marken. Gekauftes kannst du jederzeit wechseln." % GameState.beulen_marken
+	content.add_child(head)
+	for slot in SHOP_SLOTS:
+		content.add_child(_section_title(slot[1]))
+		var flow := HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 8)
+		flow.add_theme_constant_override("v_separation", 8)
+		for c in GameState.cosmetic_defs:
+			if c.slot == slot[0]:
+				flow.add_child(_shop_item(c, modal_ref))
+		content.add_child(flow)
+	modal_ref.append(Modal.open(self, "Kosmetik-Laden", content, ["Schließen"], 940.0))
+
+
+func _shop_item(c: Dictionary, modal_ref: Array) -> PanelContainer:
+	var owned := GameState.has_cosmetic(c.id)
+	var equipped := GameState.cosmetic_equipped(c.id)
+	var tile := PanelContainer.new()
+	tile.custom_minimum_size = Vector2(210, 0)
+	tile.add_theme_stylebox_override("panel", _box(Color("fff3bf") if equipped else Color("fffdf7"), 10, 3 if equipped else 2, 6))
+	tile.tooltip_text = String(c.description)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	tile.add_child(box)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 6)
+	if c.slot == "fist":
+		var icon := TextureRect.new()
+		var suffix := "" if c.value == "standard" else "_" + String(c.value)
+		icon.texture = load("res://assets/cursor/fist_open%s.svg" % suffix)
+		icon.custom_minimum_size = Vector2(40, 40)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		top.add_child(icon)
+	var name_label := Label.new()
+	name_label.text = c.name
+	name_label.add_theme_font_size_override("font_size", 16)
+	top.add_child(name_label)
+	box.add_child(top)
+	var b := Button.new()
+	b.focus_mode = Control.FOCUS_NONE
+	b.add_theme_font_size_override("font_size", 13)
+	var id: String = c.id
+	if equipped:
+		b.text = "Angelegt ✓"
+		b.disabled = true
+	elif owned:
+		b.text = "Anlegen"
+		b.pressed.connect(func() -> void:
+			GameState.apply_cosmetic(id)
+			if c.slot == "sound":
+				Sfx.play_hit(false)
+			modal_ref[0].close()
+			_show_shop())
+	elif c.get("source", "") == "laurel":
+		b.text = "Im Lorbeer-Baum"
+		b.disabled = true
+	else:
+		b.text = "Kaufen: %d Marken" % int(c.cost)
+		b.disabled = GameState.beulen_marken < int(c.cost)
+		b.pressed.connect(func() -> void:
+			if GameState.buy_cosmetic(id):
+				Sfx.play("buy", 0.0, -3.0)
+				show_toast("Neu im Schrank: %s" % c.name)
+			modal_ref[0].close()
+			_show_shop())
+	box.add_child(b)
+	return tile
+
+
+# =====================================================================
+# Herausforderungen und Zeitlupe
+# =====================================================================
+
+func _on_challenge_changed() -> void:
+	_refresh()
+	var done := GameState.challenges_done
+	if GameState.challenge_active == "" and not done.is_empty():
+		for c in GameState.challenge_defs:
+			if done.has(c.id) and not _celebrated_challenges.has(c.id):
+				_celebrated_challenges[c.id] = true
+				Sfx.play("prestige", 0.0, -2.0)
+				if not GameState.reduced_effects:
+					Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
+				Modal.open(self, "Herausforderung gemeistert!", "„%s“ geschafft!\n+%d Lorbeer%s – ab sofort dauerhaft." % [
+					c.name, int(c.reward_laurels), "" if int(c.reward_laurels) == 1 else "en"], ["Hurra!"])
+
+
+var _celebrated_challenges: Dictionary = {}
+
+
+func _update_slow_motion() -> void:
+	var slow := false
+	for b in GameState.buffs:
+		if b.id == "zeitlupe":
+			slow = true
+	Engine.time_scale = GameState.SLOW_MOTION_SCALE if slow and not GameState.reduced_effects else 1.0
