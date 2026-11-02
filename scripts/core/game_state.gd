@@ -23,9 +23,12 @@ signal cosmetics_changed
 signal minigame_finished(game: String, score: int)
 
 const SAVE_VERSION := 5
-const SAVE_PATH := "user://savegame.json"
-const BACKUP_PATH := "user://savegame.bak.json"
-const IMAGE_DIR := "user://images"
+## Speicherorte: Das fertige Spiel speichert direkt in user:// (Ordner "PunchYourEnemy", für Steam Cloud).
+## Läuft das Spiel im Godot-Editor, landet alles in user://dev – so geraten Test-Spielstände nie ins fertige Spiel.
+const RELEASE_DIR := "user://"
+const DEV_DIR := "user://dev"
+const CHANNEL_RELEASE := "release"
+const CHANNEL_DEV := "dev"
 const MAX_IMAGE_EDGE := 1024
 const AUTOSAVE_INTERVAL := 30.0
 const ACHIEVEMENT_CHECK_INTERVAL := 0.5
@@ -174,6 +177,23 @@ var _market_timer: float = 0.0
 var _autosave_timer: float = 0.0
 ## false in Tests und Simulationen, damit der echte Spielstand nie überschrieben wird.
 var persist: bool = true
+var channel: String = CHANNEL_RELEASE
+var data_dir: String = RELEASE_DIR
+var save_path: String = "user://savegame.json"
+var backup_path: String = "user://savegame.bak.json"
+var image_dir: String = "user://images"
+
+
+func _init() -> void:
+	set_channel(CHANNEL_DEV if OS.has_feature("editor") else CHANNEL_RELEASE)
+
+
+func set_channel(new_channel: String) -> void:
+	channel = new_channel
+	data_dir = DEV_DIR if channel == CHANNEL_DEV else RELEASE_DIR
+	save_path = data_dir.path_join("savegame.json")
+	backup_path = data_dir.path_join("savegame.bak.json")
+	image_dir = data_dir.path_join("images")
 var _achievement_timer: float = 0.0
 var _rng := RandomNumberGenerator.new()
 
@@ -182,7 +202,7 @@ func _ready() -> void:
 	_rng.randomize()
 	load_data()
 	_reset_stats()
-	_migrate_user_dir()
+	_prepare_save_location()
 	var loaded := load_game()
 	set_language(language)
 	if loaded:
@@ -1708,7 +1728,7 @@ func import_image(img: Image, display_name: String) -> bool:
 	if longest > MAX_IMAGE_EDGE:
 		var s := float(MAX_IMAGE_EDGE) / float(longest)
 		copy.resize(maxi(1, roundi(w * s)), maxi(1, roundi(h * s)), Image.INTERPOLATE_LANCZOS)
-	DirAccess.make_dir_recursive_absolute(IMAGE_DIR)
+	DirAccess.make_dir_recursive_absolute(image_dir)
 	var id := "img_%d_%d" % [int(Time.get_unix_time_from_system()), _rng.randi() % 100000]
 	if copy.save_png(_image_path(id)) != OK:
 		push_error("Bild konnte nicht gespeichert werden.")
@@ -1729,7 +1749,7 @@ func import_image_file(path: String) -> bool:
 
 
 func _image_path(id: String) -> String:
-	return "%s/%s.png" % [IMAGE_DIR, id]
+	return "%s/%s.png" % [image_dir, id]
 
 
 # =====================================================================
@@ -1766,6 +1786,7 @@ var _last_loaded: Dictionary = {}
 func to_dict() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
+		"channel": channel,
 		"saved_at": Time.get_unix_time_from_system(),
 		"wumms": wumms,
 		"total_wumms": total_wumms,
@@ -1934,31 +1955,62 @@ func _migrate(data: Dictionary) -> Dictionary:
 	return data
 
 
-## Früher lag der Spielstand im Standard-Ordner von Godot. Seit Version 4 nutzt das Spiel einen eigenen
-## Ordner (für Steam Cloud). Alte Spielstände und Bilder werden einmalig herüberkopiert.
-func _migrate_user_dir() -> void:
-	if not persist or FileAccess.file_exists(SAVE_PATH):
+## Entwickler- und Spieler-Spielstände trennen.
+## - Im Editor (Kanal "dev"): Gibt es noch keinen Entwickler-Spielstand, wird ein älterer Test-Spielstand
+##   (aus user:// oder dem früheren Godot-Standardordner) samt Bildern nach user://dev übernommen.
+## - Im fertigen Spiel (Kanal "release"): Ein Spielstand, der nicht aus dem fertigen Spiel stammt
+##   (z. B. vom Testen), wird als old-dev-savegame.json beiseitegelegt – das Spiel startet frisch.
+func _prepare_save_location() -> void:
+	if not persist:
 		return
-	var old_dir := OS.get_data_dir().path_join("Godot/app_userdata/Punch your Enemy")
-	var new_dir := ProjectSettings.globalize_path("user://")
-	if old_dir.simplify_path() == new_dir.simplify_path().trim_suffix("/") or not DirAccess.dir_exists_absolute(old_dir):
+	if channel == CHANNEL_DEV:
+		if FileAccess.file_exists(save_path):
+			return
+		var root := ProjectSettings.globalize_path(RELEASE_DIR)
+		var old_godot_dir := OS.get_data_dir().path_join("Godot/app_userdata/Punch your Enemy")
+		for source in [root, old_godot_dir]:
+			var data := _read_save(String(source).path_join("savegame.json"))
+			if not data.is_empty() and is_foreign_save(data, CHANNEL_DEV):
+				_copy_save_files(source, ProjectSettings.globalize_path(DEV_DIR))
+				return
 		return
+	var current := _read_save(save_path)
+	if not current.is_empty() and is_foreign_save(current, CHANNEL_RELEASE):
+		var dir := ProjectSettings.globalize_path(RELEASE_DIR)
+		DirAccess.rename_absolute(dir.path_join("savegame.json"), dir.path_join("old-dev-savegame.json"))
+		if FileAccess.file_exists(backup_path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(backup_path))
+
+
+## Stammt der Spielstand aus einem anderen Kanal? Ältere Spielstände ohne Kanal kommen immer vom Testen.
+static func is_foreign_save(data: Dictionary, my_channel: String) -> bool:
+	return String(data.get("channel", CHANNEL_DEV)) != my_channel
+
+
+func _read_save(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return parsed if parsed is Dictionary else {}
+
+
+func _copy_save_files(from_dir: String, to_dir: String) -> void:
+	DirAccess.make_dir_recursive_absolute(to_dir.path_join("images"))
 	for file in ["savegame.json", "savegame.bak.json"]:
-		if FileAccess.file_exists(old_dir.path_join(file)):
-			DirAccess.copy_absolute(old_dir.path_join(file), new_dir.path_join(file))
-	var old_images := old_dir.path_join("images")
-	if DirAccess.dir_exists_absolute(old_images):
-		DirAccess.make_dir_recursive_absolute(IMAGE_DIR)
-		for file in DirAccess.get_files_at(old_images):
-			DirAccess.copy_absolute(old_images.path_join(file), ProjectSettings.globalize_path(IMAGE_DIR).path_join(file))
+		if FileAccess.file_exists(from_dir.path_join(file)):
+			DirAccess.copy_absolute(from_dir.path_join(file), to_dir.path_join(file))
+	var images := from_dir.path_join("images")
+	if DirAccess.dir_exists_absolute(images):
+		for file in DirAccess.get_files_at(images):
+			DirAccess.copy_absolute(images.path_join(file), to_dir.path_join("images").path_join(file))
 
 
 func save_game() -> bool:
 	if not persist:
 		return true
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.copy_absolute(SAVE_PATH, BACKUP_PATH)
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if FileAccess.file_exists(save_path):
+		DirAccess.copy_absolute(save_path, backup_path)
+	var file := FileAccess.open(save_path, FileAccess.WRITE)
 	if file == null:
 		push_error("Speichern fehlgeschlagen: %s" % error_string(FileAccess.get_open_error()))
 		return false
@@ -1968,7 +2020,7 @@ func save_game() -> bool:
 
 
 func load_game() -> bool:
-	for path in [SAVE_PATH, BACKUP_PATH]:
+	for path in [save_path, backup_path]:
 		if not FileAccess.file_exists(path):
 			continue
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))

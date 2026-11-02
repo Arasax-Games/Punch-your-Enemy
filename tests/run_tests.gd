@@ -35,6 +35,7 @@ func _initialize() -> void:
 	test_slow_motion_and_v5()
 	test_english()
 	test_phase7()
+	test_save_channels()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -801,3 +802,21 @@ func test_phase7() -> void:
 	state.validate_cosmetics()
 	check_eq(state.fist_skin, "standard", "Nicht gekaufter Skin wird zurückgesetzt")
 	state.free()
+
+
+func test_save_channels() -> void:
+	print("Getrennte Spielstände (Editor / fertiges Spiel)")
+	var gs := new_state()
+	var script: GDScript = gs.get_script()
+	gs.set_channel("release")
+	check_eq(gs.save_path, "user://savegame.json", "Fertiges Spiel speichert in user://")
+	check_eq(gs.image_dir, "user://images", "Bilder des fertigen Spiels in user://images")
+	gs.set_channel("dev")
+	check_eq(gs.save_path, "user://dev/savegame.json", "Editor speichert in user://dev")
+	check_eq(gs.to_dict().channel, "dev", "Spielstand merkt sich den Kanal")
+	check(script.is_foreign_save({"version": 5}, "release"), "Alter Spielstand ohne Kanal ist ein Test-Spielstand")
+	check(script.is_foreign_save({"channel": "dev"}, "release"), "Editor-Spielstand gehört nicht ins fertige Spiel")
+	check(not script.is_foreign_save({"channel": "release"}, "release"), "Eigener Spielstand bleibt")
+	check(not script.is_foreign_save({"version": 5}, "dev"), "Editor übernimmt alte Test-Spielstände")
+	check(script.is_foreign_save({"channel": "release"}, "dev"), "Editor fasst Spieler-Spielstände nicht an")
+	gs.free()
