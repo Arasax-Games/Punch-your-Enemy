@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Faust-Cursor: zugeschlagen (gestaucht, mit Aufprall-Strichen) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-linecap="round" stroke-width="3">
+    <path d="M6 10 L13 16 M30 2 L30 9 M54 10 L47 16 M2 30 L9 30" fill="none" stroke="#e8590c"/>
+  </g>
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round">
+    <rect x="18" y="40" width="24" height="20" rx="5" fill="#e03131"/>
+    <path d="M10 22 C10 16 16 14 20 14 L46 14 C52 14 56 18 56 24 L56 34 C56 42 50 44 44 44 L18 44 C12 44 10 40 10 34 Z" fill="#f6c39b"/>
+    <path d="M21 14 L21 26 M32 14 L32 26 M44 14 L44 26" fill="none" stroke-width="2.5"/>
+    <path d="M10 30 C18 28 24 30 28 36" fill="none" stroke-width="2.5"/>
+  </g>
+</svg>

@@ -1,0 +1,78 @@
+[
+	{
+		"id": "boxhandschuh_training",
+		"name": "Boxhandschuh-Training",
+		"description": "Drei Runden Seilspringen und ein ernster Blick in den Spiegel.",
+		"cost": 100,
+		"effect": { "type": "click_mult", "factor": 2 }
+	},
+	{
+		"id": "knoechelpolster",
+		"name": "Knöchelpolster",
+		"description": "Weich für dich, hart für ihn. Fäuste arbeiten doppelt so fleißig.",
+		"cost": 150,
+		"requires": { "device": "faust", "count": 1 },
+		"effect": { "type": "device_mult", "device": "faust", "factor": 2 }
+	},
+	{
+		"id": "stahlkappenhandschuh",
+		"name": "Stahlkappenhandschuh",
+		"description": "Eigentlich für Baustellen gedacht. Eigentlich.",
+		"cost": 500,
+		"requires": { "upgrade": "boxhandschuh_training" },
+		"effect": { "type": "click_mult", "factor": 2 }
+	},
+	{
+		"id": "flauschfutter",
+		"name": "Flauschfutter",
+		"description": "Pantoffel mit Teddyfell. Kuschelig – und doppelt so schwungvoll.",
+		"cost": 1000,
+		"requires": { "device": "pantoffel", "count": 1 },
+		"effect": { "type": "device_mult", "device": "pantoffel", "factor": 2 }
+	},
+	{
+		"id": "karate_kurs",
+		"name": "Karate-Kurs (Volkshochschule)",
+		"description": "Dienstags 19 Uhr, Raum 104. Bitte Hausschuhe mitbringen.",
+		"cost": 10000,
+		"requires": { "upgrade": "stahlkappenhandschuh" },
+		"effect": { "type": "click_mult", "factor": 2 }
+	},
+	{
+		"id": "extra_quietscher",
+		"name": "Extra-Quietscher",
+		"description": "Ein zweites Quietsch-Ventil. Die Nachbarn sind begeistert.",
+		"cost": 11000,
+		"requires": { "device": "gummihammer", "count": 1 },
+		"effect": { "type": "device_mult", "device": "gummihammer", "factor": 2 }
+	},
+	{
+		"id": "kritische_treffer",
+		"name": "Kritische Treffer",
+		"description": "Genau auf die Nase. Manchmal. Mit Glück.",
+		"cost": 25000,
+		"effect": { "type": "crit", "chance": 0.05, "factor": 10 }
+	},
+	{
+		"id": "dauerfeuer",
+		"name": "Dauerfeuer",
+		"description": "Wer braucht schon Pausen? Maus gedrückt halten und zusehen.",
+		"cost": 50000,
+		"effect": { "type": "autofire", "rate": 10 }
+	},
+	{
+		"id": "sponsorenvertrag",
+		"name": "Sponsorenvertrag",
+		"description": "Eine Pflasterfirma zahlt pro Beule. Alle Geräte arbeiten motivierter.",
+		"cost": 75000,
+		"requires": { "total_wumms": 20000 },
+		"effect": { "type": "wps_mult", "factor": 1.1 }
+	},
+	{
+		"id": "klick_wps_1",
+		"name": "Klick = 1 % deiner WPS",
+		"description": "Deine Geräte feuern dich an. Jeder Klick bekommt etwas von ihrer Arbeit ab.",
+		"cost": 100000,
+		"effect": { "type": "click_wps", "percent": 0.01 }
+	}
+]

@@ -1,0 +1,42 @@
+[
+	{
+		"id": "faust",
+		"name": "Faust",
+		"base_cost": 15,
+		"base_wps": 0.1,
+		"color": "#ffa94d",
+		"description": "Der Klassiker. Haut einfach mal drauf."
+	},
+	{
+		"id": "pantoffel",
+		"name": "Pantoffel",
+		"base_cost": 100,
+		"base_wps": 1,
+		"color": "#f783ac",
+		"description": "Oma-Schlappen mit viel Schwung."
+	},
+	{
+		"id": "gummihammer",
+		"name": "Gummihammer",
+		"base_cost": 1100,
+		"base_wps": 8,
+		"color": "#69db7c",
+		"description": "Quietscht bei jedem Treffer."
+	},
+	{
+		"id": "katapult",
+		"name": "Boxhandschuh-Katapult",
+		"base_cost": 12000,
+		"base_wps": 47,
+		"color": "#4dabf7",
+		"description": "Feder, Hebel, Handschuh."
+	},
+	{
+		"id": "tortenkanone",
+		"name": "Tortenwurf-Kanone",
+		"base_cost": 130000,
+		"base_wps": 260,
+		"color": "#da77f2",
+		"description": "Sahne in Überschallgeschwindigkeit."
+	}
+]

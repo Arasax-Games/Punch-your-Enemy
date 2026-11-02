@@ -1,0 +1,18 @@
+# Godot 4
+.godot/
+/android/
+*.translation
+
+# Export-Ergebnisse
+/build/
+/export/
+*.exe
+*.pck
+*.x86_64
+*.dmg
+*.zip
+
+# Sonstiges
+.DS_Store
+Thumbs.db
+*.tmp

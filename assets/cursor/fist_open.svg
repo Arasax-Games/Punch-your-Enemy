@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Faust-Cursor: ausgeholt -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" transform="rotate(-12 32 32)">
+    <rect x="14" y="34" width="22" height="22" rx="5" fill="#e03131"/>
+    <path d="M12 22 C12 14 18 12 22 12 L44 12 C52 12 54 18 54 24 L54 34 C54 42 48 44 42 44 L20 44 C14 44 12 40 12 34 Z" fill="#f6c39b"/>
+    <path d="M22 12 L22 26 M32 12 L32 26 M42 12 L42 26" fill="none" stroke-width="2.5"/>
+    <path d="M12 30 C20 28 26 30 30 36" fill="none" stroke-width="2.5"/>
+  </g>
+</svg>

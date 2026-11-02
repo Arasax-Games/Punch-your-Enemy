@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Spiel-Icon: Faust im Comic-Stern -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="48" fill="#ffec99"/>
+  <path d="M128 14 L152 72 L214 44 L190 104 L246 128 L190 152 L214 212 L152 184 L128 242 L104 184 L42 212 L66 152 L10 128 L66 104 L42 44 L104 72 Z"
+        fill="#ff6fae" stroke="#2b2118" stroke-width="8" stroke-linejoin="round"/>
+  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" transform="translate(48 40) scale(2.5)">
+    <rect x="14" y="34" width="22" height="22" rx="5" fill="#e03131"/>
+    <path d="M12 22 C12 14 18 12 22 12 L44 12 C52 12 54 18 54 24 L54 34 C54 42 48 44 42 44 L20 44 C14 44 12 40 12 34 Z" fill="#f6c39b"/>
+    <path d="M22 12 L22 26 M32 12 L32 26 M42 12 L42 26" fill="none" stroke-width="2.5"/>
+    <path d="M12 30 C20 28 26 30 30 36" fill="none" stroke-width="2.5"/>
+  </g>
+</svg>
