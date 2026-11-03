@@ -271,7 +271,7 @@ Drei-Spalten-Layout (Desktop):
 ## 13. Audio und Effekte
 
 - **Treffer-Sounds:** 8–12 Variationen pro Gerät, zufällig, leichter Pitch-Shift. Stil: Cartoon-Quietschen, Boing, Klatsch, Kazoo.
-- **Musik:** Schräge Big-Band-/Ragtime-Schleife, die mit dem Fortschritt um Instrumentenschichten wächst. Im Wutmodus schneller.
+- **Musik:** Fünf entspannte, chillige Titel (Lo-Fi, Bossa nova, Jazz-Lounge, Strand-Chill, Ambient), die sich abwechseln; jeder wächst mit dem Fortschritt um Instrumentenschichten. Im Wutmodus schneller. (Früher: schräge Ragtime-Schleife – nach Spielertests durch ruhigere Musik ersetzt.)
 - **Ambient:** Publikumsgelächter und Applaus bei Meilensteinen.
 - **Mixer:** Getrennte Regler für Musik, Effekte, Ambient. Stummschalter.
 - **Juice:** Screen-Shake, Hitstop (2 Frames), Partikel, Zahl-Popups mit Skalierung, Konfetti beim Achievement, Zeitlupe bei kritischen Treffern.

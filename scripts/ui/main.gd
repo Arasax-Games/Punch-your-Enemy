@@ -213,6 +213,19 @@ func _dev_preview() -> void:
 			"--level":
 				GameState.target_hits[GameState.target_id] = int(value) * 1000
 				_on_target_changed()
+			"--music":
+				# Titel wechseln (mit Überblendung) und Ergebnis ausgeben
+				await get_tree().create_timer(1.0).timeout
+				Music.select_track(value)
+				await get_tree().create_timer(5.0).timeout
+				print("MUSIC now=%s" % Music.track_name(Music.current_track()))
+			"--music-skip":
+				# Ans Ende des laufenden Titels springen: prüft den automatischen Wechsel
+				await get_tree().create_timer(1.0).timeout
+				var before := Music.track_name(Music.current_track())
+				Music._track_time = Music._track_length * Music.LOOPS_PER_TRACK - Music.CROSSFADE - 0.5
+				await get_tree().create_timer(6.0).timeout
+				print("MUSIC %s -> %s" % [before, Music.track_name(Music.current_track())])
 			"--prof":
 				for label in ["tick", "refresh", "achievements", "wps", "upgrades"]:
 					var t0 := Time.get_ticks_usec()
@@ -666,7 +679,7 @@ func _fill_menu() -> void:
 	popup.clear()
 	popup.add_check_item(tr("Ton"), MENU_SOUND)
 	popup.set_item_checked(popup.get_item_index(MENU_SOUND), GameState.sound_on)
-	popup.add_item(tr("Lautstärke …"), MENU_VOLUME)
+	popup.add_item(tr("Lautstärke und Musik …"), MENU_VOLUME)
 	popup.add_check_item(tr("Weniger Effekte"), MENU_EFFECTS)
 	popup.set_item_checked(popup.get_item_index(MENU_EFFECTS), GameState.reduced_effects)
 	if GameState.time_warp_unlocked():
@@ -2124,5 +2137,44 @@ func _show_volume() -> void:
 				Sfx.applause(false))
 		row.add_child(slider)
 		content.add_child(row)
-	Modal.open(self, tr("Lautstärke"), content, [tr("Fertig")], 520.0).closed.connect(func(_i: int) -> void:
+	content.add_child(_music_picker())
+	Modal.open(self, tr("Lautstärke und Musik"), content, [tr("Fertig")], 560.0).closed.connect(func(_i: int) -> void:
 		GameState.save_game())
+
+
+## Titelauswahl: alle abwechselnd oder ein Lieblingstitel in Dauerschleife, dazu „Läuft gerade“.
+func _music_picker() -> Control:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	box.add_child(HSeparator.new())
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var label := Label.new()
+	label.text = tr("Titel")
+	label.custom_minimum_size = Vector2(120, 0)
+	row.add_child(label)
+	var picker := OptionButton.new()
+	picker.focus_mode = Control.FOCUS_NONE
+	picker.custom_minimum_size = Vector2(320, 0)
+	picker.add_item(tr("Alle abwechselnd"))
+	for t in Music.TRACKS:
+		picker.add_item("%s (%s)" % [tr(String(t.name)), tr(String(t.style))])
+	picker.select(Music.track_index(GameState.music_track) + 1)
+	row.add_child(picker)
+	box.add_child(row)
+	var now := Label.new()
+	now.add_theme_font_size_override("font_size", 13)
+	now.add_theme_color_override("font_color", MUTED)
+	var show_now := func(index: int) -> void:
+		now.text = tr("Läuft gerade: %s") % Music.track_name(index) if index >= 0 else ""
+	show_now.call(Music.current_track())
+	if Music.has_custom_music():
+		picker.disabled = true
+		now.text = tr("Es läuft deine eigene Musik (assets/audio/music/loop).")
+	Music.track_changed.connect(show_now)
+	box.tree_exiting.connect(func() -> void: Music.track_changed.disconnect(show_now))
+	picker.item_selected.connect(func(index: int) -> void:
+		Music.select_track("" if index == 0 else String(Music.TRACKS[index - 1].id))
+		GameState.save_game())
+	box.add_child(now)
+	return box

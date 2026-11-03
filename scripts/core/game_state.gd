@@ -154,6 +154,7 @@ var fist_skin: String = "standard"
 var sound_pack: String = "standard"
 var language: String = ""               # "" = Systemsprache, sonst "de" oder "en"
 var music_volume: float = 0.6
+var music_track: String = ""   # "" = alle Titel abwechselnd, sonst Titel-ID in Dauerschleife (siehe Music.TRACKS)
 var sfx_volume: float = 0.9
 var ambient_volume: float = 0.8
 
@@ -1903,7 +1904,7 @@ func _settings_dict() -> Dictionary:
 	return {"reduced_effects": reduced_effects, "sound_on": sound_on, "autobuy_enabled": autobuy_enabled,
 		"auto_rage_enabled": auto_rage_enabled,
 		"time_warp": time_warp, "background": background, "fist_skin": fist_skin, "sound_pack": sound_pack,
-		"language": language, "music_volume": music_volume, "sfx_volume": sfx_volume,
+		"language": language, "music_volume": music_volume, "music_track": music_track, "sfx_volume": sfx_volume,
 		"ambient_volume": ambient_volume}
 
 
@@ -1989,6 +1990,7 @@ func from_dict(data: Dictionary) -> void:
 	sound_pack = String(settings.get("sound_pack", "standard"))
 	language = String(settings.get("language", language))
 	music_volume = float(settings.get("music_volume", 0.6))
+	music_track = String(settings.get("music_track", ""))
 	sfx_volume = float(settings.get("sfx_volume", 0.9))
 	ambient_volume = float(settings.get("ambient_volume", 0.8))
 	buffs.clear()

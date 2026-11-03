@@ -37,6 +37,7 @@ func _initialize() -> void:
 	test_phase7()
 	test_save_channels()
 	test_improvements_nov()
+	test_music()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -783,7 +784,7 @@ func test_phase7() -> void:
 	check_eq(Balance.milestone_tier(25), 3, "25 Stück: Stufe 3")
 	check_eq(Balance.milestone_tier(500), 7, "Ab 200 Stück: Höchststufe")
 	var music: GDScript = load("res://scripts/audio/music.gd")
-	check_eq(music.layers_for(0, 0), 1, "Musik am Anfang: nur Schlagzeug")
+	check_eq(music.layers_for(0, 0), 1, "Musik am Anfang: nur die Tasten")
 	check_eq(music.layers_for(3, 0), 3, "3 Gerätetypen: 3 Instrumente")
 	check_eq(music.layers_for(1, 1), 5, "Nach dem Neuanfang spielt alles")
 	var gs := new_state()
@@ -901,4 +902,32 @@ func test_improvements_nov() -> void:
 	lang.language = ""
 	check_eq(lang.effective_language(), "en", "Standardsprache ist Englisch")
 	lang.free()
+	gs.free()
+
+
+func test_music() -> void:
+	print("Musik: fünf Titel mit je fünf Schichten")
+	var music: GDScript = load("res://scripts/audio/music.gd")
+	check(music.TRACKS.size() >= 5, "Mindestens fünf Titel")
+	check_eq(music.track_index("tortenstrand"), 3, "Titel per ID finden")
+	check_eq(music.track_index("gibt_es_nicht"), -1, "Unbekannter Titel")
+	check_eq(music.next_track(4, 5), 0, "Nach dem letzten Titel kommt wieder der erste")
+	for t in music.TRACKS:
+		var length := -1.0
+		for layer in music.LAYERS:
+			var path := "%s/%s_%s.ogg" % [music.TRACK_DIR, t.id, layer]
+			check(ResourceLoader.exists(path), "Schicht vorhanden: %s_%s" % [t.id, layer])
+			if not ResourceLoader.exists(path):
+				continue
+			var stream: AudioStream = load(path)
+			if length < 0.0:
+				length = stream.get_length()
+			check(absf(stream.get_length() - length) < 0.001, "Gleich lang (synchron): %s_%s" % [t.id, layer])
+		check(length > 60.0, "Titel dauert über eine Minute: %s" % t.id)
+	var gs := new_state()
+	gs.music_track = "eisbeutel_lounge"
+	var restored := new_state()
+	restored.from_dict(gs.to_dict())
+	check_eq(restored.music_track, "eisbeutel_lounge", "Lieblingstitel bleibt gespeichert")
+	restored.free()
 	gs.free()
