@@ -799,5 +799,17 @@
 			"percent": 0.05,
 			"per": 10
 		}
+	},
+	{
+		"id": "cholerischer_wecker",
+		"name": "Cholerischer Wecker",
+		"description": "Klingelt, sobald die Wut voll ist. Und zwar richtig laut.",
+		"cost": 5000000000,
+		"requires": {
+			"total_wumms": 1000000000
+		},
+		"effect": {
+			"type": "auto_rage"
+		}
 	}
 ]

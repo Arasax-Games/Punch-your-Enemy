@@ -68,8 +68,10 @@ static func synergy_bonus(source_count: int, percent: float, per: int) -> float:
 	return 1.0 + percent * floorf(float(source_count) / float(maxi(per, 1)))
 
 
+## Lorbeeren = floor(∛(Gesamt-Wumms ÷ LAUREL_UNIT)). Der erste Lorbeer kommt nach einigen Stunden Spiel.
+const LAUREL_UNIT := 1e10
 ## Ab so viel insgesamt erzeugtem Wumms ist ein Neuanfang möglich.
-const PRESTIGE_THRESHOLD := 1e12
+const PRESTIGE_THRESHOLD := LAUREL_UNIT
 
 
 ## Wie viele Lorbeeren ein Neuanfang jetzt zusätzlich bringen würde.
@@ -139,4 +141,46 @@ static func milestone_tier(count: int) -> int:
 static func laurels_for(total_wumms: float) -> int:
 	if total_wumms <= 0.0:
 		return 0
-	return int(floor(pow(total_wumms / 1e12, 1.0 / 3.0) + 1e-9))
+	return int(floor(pow(total_wumms / LAUREL_UNIT, 1.0 / 3.0) + 1e-9))
+
+
+## Ab wie viel Gesamt-Wumms es den n-ten Lorbeer gibt.
+static func wumms_for_laurels(n: int) -> float:
+	return LAUREL_UNIT * pow(float(n), 3.0)
+
+
+## Anker-Punkte für Beulen, Pflaster, Veilchen und Kopfverband aus der Lage der beiden Augen (UV 0..1).
+## Die Abstände sind in Augenabständen gemessen und stammen von Bombastus; `image_size` gleicht
+## nicht-quadratische Bilder aus, damit das Gesicht nicht verzerrt wird.
+static func face_anchors(eye_left: Vector2, eye_right: Vector2, image_size: Vector2) -> Dictionary:
+	var l := eye_left * image_size
+	var r := eye_right * image_size
+	if l.x > r.x:
+		var swap := l
+		l = r
+		r = swap
+	var e := r - l
+	var d := maxf(e.length(), 1.0)
+	var right := e / d
+	var up := Vector2(right.y, -right.x)
+	var c := (l + r) * 0.5
+	var points := {
+		"eye_left": l,
+		"eye_right": r,
+		"forehead": c + up * 0.34 * d,
+		"cheek": l - right * 0.39 * d - up * 0.7 * d,
+		"head_top": c + right * 0.62 * d + up * 1.18 * d,
+		"ear_left": c - right * 1.4 * d - up * 0.26 * d,
+		"ear_right": c + right * 1.4 * d - up * 0.26 * d,
+		"crown": c + up * 2.0 * d,
+	}
+	var out := {}
+	for key in points:
+		var uv: Vector2 = points[key] / image_size
+		out[key] = [snappedf(uv.x, 0.001), snappedf(uv.y, 0.001)]
+	return out
+
+
+## Wumms-Bonus für einen Erfolg: einige Minuten der aktuellen Produktion, am Anfang mindestens 50 je Minute.
+static func achievement_bonus(wps: float, minutes: float) -> float:
+	return maxf(wps * 60.0 * minutes, 50.0 * minutes)

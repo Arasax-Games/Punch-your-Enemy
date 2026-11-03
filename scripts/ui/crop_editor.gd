@@ -72,7 +72,7 @@ func setup(img: Image) -> void:
 	hint.text = tr("Ziehen zum Verschieben, Mausrad zum Zoomen.")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 13)
-	hint.add_theme_color_override("font_color", Color(INK, 0.6))
+	hint.add_theme_color_override("font_color", Color("a99fdc"))
 	add_child(hint)
 
 
@@ -122,7 +122,7 @@ func _view_input(event: InputEvent) -> void:
 
 func _draw_view() -> void:
 	_clamp_pan()
-	_view.draw_rect(Rect2(Vector2.ZERO, Vector2(VIEW, VIEW)), Color("3d342b"))
+	_view.draw_rect(Rect2(Vector2.ZERO, Vector2(VIEW, VIEW)), Color("0f0b24"))
 	_view.draw_texture_rect(_texture, image_rect(), false)
 	var f := frame_rect()
 	var shade := Color(0, 0, 0, 0.55)

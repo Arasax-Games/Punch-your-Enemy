@@ -4,8 +4,12 @@ extends Control
 ## kreisende Sterne sowie Zahl- und Comic-Wort-Popups. Kein Blut, nur Cartoon.
 ## Positionen werden relativ zum Bild (UV 0..1) gespeichert, damit sie beim Skalieren mitwandern.
 
-const MAX_MARKS := 60
-const MAX_POPUPS := 30
+# Obergrenzen halten das Spiel auch bei Dauerfeuer flüssig.
+const MAX_MARKS := 36
+const MAX_POPUPS := 12
+const MAX_STARS := 6
+## Mindestabstand zwischen zwei Zahlen-Popups (Sekunden); dazwischen werden Treffer zusammengezählt.
+const POPUP_INTERVAL := 0.12
 const INK := Color("2b2118")
 const SPLAT_COLORS: Array[Color] = [
 	Color("ff6fae"), Color("ffd43b"), Color("3bc9db"), Color("b197fc"), Color("69db7c"),
@@ -22,6 +26,8 @@ var area: TargetArea
 var _marks: Array = []  # Spritzer, Beulen, Pflaster
 var _stars: Array = []  # kreisende Sternchen
 var _rng := RandomNumberGenerator.new()
+var _since_popup := 1.0
+var _pending_value := 0.0
 
 
 func _ready() -> void:
@@ -35,10 +41,10 @@ func add_hit(uv: Vector2, value: float, crit: bool) -> void:
 	var size_mult := (1.8 if crit else 1.0) * (1.0 + GameState.combo / 200.0)
 
 	var blobs: Array = []
-	for i in _rng.randi_range(5, 9):
+	for i in _rng.randi_range(3, 5):
 		blobs.append([Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(0.6, 1.25), _rng.randf_range(0.18, 0.45)])
 	_marks.append({
-		"kind": "splat", "uv": uv, "age": 0.0, "life": 5.0,
+		"kind": "splat", "uv": uv, "age": 0.0, "life": 3.5,
 		"radius": _rng.randf_range(16.0, 28.0) * size_mult,
 		"color": SPLAT_COLORS[_rng.randi() % SPLAT_COLORS.size()],
 		"blobs": blobs,
@@ -54,15 +60,21 @@ func add_hit(uv: Vector2, value: float, crit: bool) -> void:
 		_marks.pop_front()
 
 	if not reduced:
-		_stars.append({"uv": uv, "age": 0.0, "life": 0.9, "phase": _rng.randf() * TAU})
+		if _stars.size() < MAX_STARS:
+			_stars.append({"uv": uv, "age": 0.0, "life": 0.9, "phase": _rng.randf() * TAU})
 		# Aufprall-Ring: kurzer weißer Kreis, der aufploppt und verblasst
 		_marks.append({"kind": "ring", "uv": uv, "age": 0.0, "life": 0.22, "radius": 34.0 * size_mult})
 
 	var pos := area.uv_to_local(uv)
-	_popup("+" + Num.fmt(value), pos + Vector2(0, -10), 34 if not crit else 50, Color.WHITE, 0.9)
+	# Bei schnellen Treffern nicht jede Zahl einzeln zeigen, sondern zusammengefasst.
+	_pending_value += value
+	if crit or _since_popup >= POPUP_INTERVAL:
+		_popup("+" + Num.fmt(_pending_value), pos + Vector2(0, -10), 34 if not crit else 50, Color.WHITE, 0.9)
+		_pending_value = 0.0
+		_since_popup = 0.0
 	if crit:
 		_popup(tr("KRITISCH!"), pos + Vector2(0, -70), 64, Color("ff4d6d"), 1.2, true)
-	elif not reduced and _rng.randf() < 0.35:
+	elif not reduced and _since_popup == 0.0 and _rng.randf() < 0.3:
 		var word := tr(HIT_WORDS[_rng.randi() % HIT_WORDS.size()])
 		_popup(word, pos + _jitter(40.0) + Vector2(0, -50), 40, WORD_COLORS[_rng.randi() % WORD_COLORS.size()], 0.8, true)
 	queue_redraw()
@@ -96,6 +108,7 @@ func _jitter(amount: float) -> Vector2:
 
 
 func _process(delta: float) -> void:
+	_since_popup += delta
 	if _marks.is_empty() and _stars.is_empty():
 		return
 	for m in _marks:

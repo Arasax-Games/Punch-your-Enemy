@@ -22,7 +22,7 @@ signal challenge_changed
 signal cosmetics_changed
 signal minigame_finished(game: String, score: int)
 
-const SAVE_VERSION := 5
+const SAVE_VERSION := 6
 ## Speicherorte: Das fertige Spiel speichert direkt in user:// (Ordner "PunchYourEnemy", für Steam Cloud).
 ## Läuft das Spiel im Godot-Editor, landet alles in user://dev – so geraten Test-Spielstände nie ins fertige Spiel.
 const RELEASE_DIR := "user://"
@@ -141,10 +141,13 @@ var achievements: Dictionary = {}       # id -> true
 var stats: Dictionary = {}              # siehe STAT_KEYS
 var target_id: String = DEFAULT_TARGET
 var target_names: Dictionary = {}       # target_id -> Anzeigename
+var last_achievement_wumms: float = 0.0  # Wumms-Bonus des zuletzt freigeschalteten Erfolgs (für die Anzeige)
+var target_faces: Dictionary = {}       # target_id -> [links_x, links_y, rechts_x, rechts_y] (Augen, UV) bei eigenen Bildern
 var target_hits: Dictionary = {}        # target_id -> Treffer
 var reduced_effects: bool = false
 var sound_on: bool = true
 var autobuy_enabled: bool = true
+var auto_rage_enabled: bool = true
 var time_warp: bool = false
 var background: String = "standard"
 var fist_skin: String = "standard"
@@ -310,7 +313,7 @@ func set_language(lang: String) -> void:
 func effective_language() -> String:
 	if LANGUAGES.has(language):
 		return language
-	return "de" if OS.get_locale_language() == "de" else "en"
+	return "en"  # Standardsprache Englisch; Deutsch lässt sich im Menü wählen
 
 
 func _read_json_array(path: String) -> Array:
@@ -414,12 +417,26 @@ func achievement_count() -> int:
 	return achievements.size()
 
 
+## Wirkungen gekaufter Upgrades eines Typs. Zwischengespeichert, solange sich die gekauften Upgrades nicht ändern –
+## die Produktion wird oft pro Bild abgefragt, und jedes Mal alle Upgrades zu durchsuchen kostet spürbar Leistung.
+var _effect_cache: Dictionary = {}
+var _effect_cache_key := -1
+
+
 func _owned_effects(type: String) -> Array[Dictionary]:
-	var out: Array[Dictionary] = []
-	for u in upgrade_defs:
-		if has_upgrade(u.id) and u.effect.type == type:
-			out.append(u.effect)
-	return out
+	var key := hash([upgrades.keys(), upgrade_defs.size()])
+	if key != _effect_cache_key:
+		_effect_cache_key = key
+		_effect_cache.clear()
+		for u in upgrade_defs:
+			if has_upgrade(u.id):
+				var t := String(u.effect.type)
+				if not _effect_cache.has(t):
+					_effect_cache[t] = [] as Array[Dictionary]
+				(_effect_cache[t] as Array[Dictionary]).append(u.effect)
+	if not _effect_cache.has(type):
+		return [] as Array[Dictionary]
+	return (_effect_cache[type] as Array[Dictionary]).duplicate()
 
 
 ## Multiplikator eines Gerätetyps: Geräte-Upgrades (×2) und Synergien.
@@ -462,8 +479,11 @@ func device_total_wps(id: String) -> float:
 ## Produktion ohne zeitlich begrenzte Buffs (z. B. für Offline-Fortschritt).
 func base_wps() -> float:
 	var total := 0.0
+	var global := global_multiplier()
 	for d in device_defs:
-		total += device_total_wps(d.id)
+		var count := device_count(d.id)
+		if count > 0:
+			total += float(d.base_wps) * device_multiplier(d.id) * global * count
 	return total
 
 
@@ -488,7 +508,9 @@ func click_wps_percent() -> float:
 
 ## Klick-Wert ohne Combo (z. B. für die Anzeige "pro Klick" und die Simulation).
 func base_click_value() -> float:
-	return (1.0 * click_multiplier() * Balance.laurel_bonus(laurels_total) + wps() * click_wps_percent()) \
+	# Klick-Anteil an der Produktion ohne Wut – die Wut wirkt unten genau einmal (sonst wäre es ×9 statt ×3).
+	var production := base_wps() * buff_wps_multiplier()
+	return (1.0 * click_multiplier() * Balance.laurel_bonus(laurels_total) + production * click_wps_percent()) \
 		* buff_click_multiplier() * rage_multiplier()
 
 
@@ -590,8 +612,14 @@ func start_rage() -> bool:
 	return true
 
 
+func has_auto_rage() -> bool:
+	return not _owned_effects("auto_rage").is_empty()
+
+
 func _update_rage(delta: float) -> void:
 	if rage_time <= 0.0:
+		if auto_rage_enabled and has_auto_rage() and rage_ready():
+			start_rage()
 		return
 	rage_time -= delta
 	if rage_time <= 0.0:
@@ -714,11 +742,11 @@ func claim_shoe(kind: String, roll: float = -1.0) -> Dictionary:
 		add_stat("bad_luck")
 		beulen_marken += 3
 		add_buff("pech", tr("Pech-Schuh"), 66.0, 0.5)
-		result = {"title": tr("Pech-Schuh!"), "text": tr("Halbe WPS für 66 s. Trostpreis: 3 Beulen-Marken."), "good": false}
+		result = {"title": tr("Pech-Schuh!"), "text": tr("Halbe WPS für 66 s. Trostpreis: 3 Reue-Token."), "good": false}
 	elif roll < 0.50:
 		var gain := Balance.blessing(wps(), wumms, 15.0, 0.15, 13.0)
 		earn(gain)
-		result = {"title": tr("Wumms-Segen!"), "text": tr("+%s Wumms") % Num.whole(gain), "good": true}
+		result = {"title": tr("Schmerz-Segen!"), "text": tr("+%s Schmerz-Token") % Num.whole(gain), "good": true}
 	elif roll < 0.80:
 		add_stat("frenzies")
 		add_buff("raserei", tr("Raserei"), 77.0, 7.0)
@@ -742,7 +770,7 @@ func _chain_effect() -> Dictionary:
 	_chain_count += 1
 	var gain := Balance.blessing(wps(), wumms, float(_chain_count), 0.05, 13.0 * _chain_count)
 	earn(gain)
-	var text := tr("Glied %d: +%s Wumms") % [_chain_count, Num.whole(gain)]
+	var text := tr("Glied %d: +%s Schmerz-Token") % [_chain_count, Num.whole(gain)]
 	if _chain_count < CHAIN_MAX and _rng.randf() < 0.75:
 		_shoe_timers[SHOE_GOLDEN] = 1.2
 		text += tr(" … da kommt noch einer!")
@@ -757,7 +785,7 @@ func _silver_effect(roll: float) -> Dictionary:
 	if roll < 0.7:
 		var gain := Balance.blessing(wps(), wumms, 1.0, 0.05, 7.0)
 		earn(gain)
-		return {"title": tr("Silberner Pantoffel!"), "text": tr("+%s Wumms") % Num.whole(gain), "good": true}
+		return {"title": tr("Silberner Pantoffel!"), "text": tr("+%s Schmerz-Token") % Num.whole(gain), "good": true}
 	add_buff("mini_raserei", tr("Kleine Raserei"), 30.0, 2.0)
 	return {"title": tr("Silberner Pantoffel!"), "text": tr("Alle Geräte ×2 für 30 s."), "good": true}
 
@@ -909,6 +937,8 @@ func upgrade_effect_text(u: Dictionary) -> String:
 				Num.fmt(float(e.percent) * 100.0), achievement_count()]
 		"fanclub":
 			return tr("Alle Geräte +%d %% je %d Erfolge") % [roundi(float(e.percent) * 100.0), int(e.per)]
+		"auto_rage":
+			return tr("Wutmodus startet von selbst, sobald die Wut-Leiste voll ist")
 		"golden_luck":
 			return tr("Goldene Schuhe und Silberne Pantoffel erscheinen %d %% häufiger") % roundi((float(e.factor) - 1.0) * 100.0)
 	return ""
@@ -1055,7 +1085,7 @@ func _update_autobuy(delta: float) -> void:
 
 ## Lesbare Wirkung eines Lorbeer-Knotens.
 func laurel_cost_text(n: Dictionary) -> String:
-	var unit := tr("Beulen-Marken") if n.get("currency", "laurels") == "marken" else (tr("Lorbeer") if int(n.cost) == 1 else tr("Lorbeeren"))
+	var unit := tr("Reue-Token") if n.get("currency", "laurels") == "marken" else (tr("Lorbeer") if int(n.cost) == 1 else tr("Lorbeeren"))
 	return "%d %s" % [int(n.cost), unit]
 
 
@@ -1598,8 +1628,19 @@ func unlock_achievement(id: String) -> void:
 	if achievements.has(id) or achievement_def(id).is_empty():
 		return
 	achievements[id] = true
-	beulen_marken += 1
+	var reward := achievement_reward(achievement_def(id))
+	beulen_marken += int(reward.marken)
+	last_achievement_wumms = Balance.achievement_bonus(base_wps(), float(reward.minutes))
+	earn(last_achievement_wumms)
 	achievement_unlocked.emit(id)
+
+
+## Belohnung eines Erfolgs: Beulen-Marken plus ein paar Minuten Produktion als Wumms-Bonus.
+## Versteckte Erfolge geben mehr; ein Erfolg kann in achievements.json eigene Werte unter "reward" haben.
+func achievement_reward(a: Dictionary) -> Dictionary:
+	var hidden := bool(a.get("hidden", false))
+	var r: Dictionary = a.get("reward", {})
+	return {"marken": int(r.get("marken", 3 if hidden else 1)), "minutes": float(r.get("minutes", 5.0 if hidden else 2.0))}
 
 
 # =====================================================================
@@ -1632,7 +1673,37 @@ func mood_index(level: int) -> int:
 
 
 func target_figure() -> Dictionary:
-	return figure_def(target_id if _figure_by_id.has(target_id) else CUSTOM_FIGURE)
+	if _figure_by_id.has(target_id):
+		return figure_def(target_id)
+	var fig := figure_def(CUSTOM_FIGURE).duplicate()
+	if target_faces.has(target_id):
+		var eyes: Array = target_faces[target_id]
+		var tex := target_texture()
+		var image_size := tex.get_size() if tex != null else Vector2.ONE
+		fig["anchors"] = Balance.face_anchors(Vector2(eyes[0], eyes[1]), Vector2(eyes[2], eyes[3]), image_size)
+	return fig
+
+
+## Augen-Position eines eigenen Bildes (UV); daraus werden Pflaster, Veilchen und Verband platziert.
+func set_face(id: String, eye_left: Vector2, eye_right: Vector2) -> void:
+	if not target_names.has(id):
+		return
+	target_faces[id] = [snappedf(eye_left.x, 0.001), snappedf(eye_left.y, 0.001),
+		snappedf(eye_right.x, 0.001), snappedf(eye_right.y, 0.001)]
+	if id == target_id:
+		target_changed.emit()
+	save_game()
+
+
+## Augen-Position (oder die Standardlage für Porträts).
+func face_eyes(id: String) -> Array[Vector2]:
+	if target_faces.has(id):
+		var e: Array = target_faces[id]
+		return [Vector2(e[0], e[1]), Vector2(e[2], e[3])]
+	var a: Dictionary = figure_def(CUSTOM_FIGURE).get("anchors", {})
+	var l: Array = a.get("eye_left", [0.38, 0.4])
+	var r: Array = a.get("eye_right", [0.62, 0.4])
+	return [Vector2(l[0], l[1]), Vector2(r[0], r[1])]
 
 
 ## Mitgelieferte Figur (Bombastus, Event-Figuren) statt eigenes Bild?
@@ -1706,6 +1777,7 @@ func delete_target(id: String) -> bool:
 		return false
 	DirAccess.remove_absolute(_image_path(id))
 	target_names.erase(id)
+	target_faces.erase(id)
 	target_hits.erase(id)
 	if target_id == id:
 		target_id = DEFAULT_TARGET
@@ -1821,6 +1893,7 @@ func to_dict() -> Dictionary:
 		"stats": stats.duplicate(),
 		"target_id": target_id,
 		"target_names": target_names.duplicate(),
+		"target_faces": target_faces.duplicate(true),
 		"target_hits": target_hits.duplicate(),
 		"settings": _settings_dict(),
 	}
@@ -1828,6 +1901,7 @@ func to_dict() -> Dictionary:
 
 func _settings_dict() -> Dictionary:
 	return {"reduced_effects": reduced_effects, "sound_on": sound_on, "autobuy_enabled": autobuy_enabled,
+		"auto_rage_enabled": auto_rage_enabled,
 		"time_warp": time_warp, "background": background, "fist_skin": fist_skin, "sound_pack": sound_pack,
 		"language": language, "music_volume": music_volume, "sfx_volume": sfx_volume,
 		"ambient_volume": ambient_volume}
@@ -1894,6 +1968,12 @@ func from_dict(data: Dictionary) -> void:
 		stats[key] = float(saved_stats[key]) if key == "play_time" else int(saved_stats[key])
 	target_id = String(data.get("target_id", DEFAULT_TARGET))
 	target_names = data.get("target_names", {})
+	target_faces = {}
+	var faces: Variant = data.get("target_faces", {})
+	if faces is Dictionary:
+		for id in faces:
+			if faces[id] is Array and (faces[id] as Array).size() == 4:
+				target_faces[id] = faces[id]
 	target_hits.clear()
 	var saved_hits: Dictionary = data.get("target_hits", {})
 	for id in saved_hits:
@@ -1902,6 +1982,7 @@ func from_dict(data: Dictionary) -> void:
 	reduced_effects = bool(settings.get("reduced_effects", false))
 	sound_on = bool(settings.get("sound_on", true))
 	autobuy_enabled = bool(settings.get("autobuy_enabled", true))
+	auto_rage_enabled = bool(settings.get("auto_rage_enabled", true))
 	time_warp = bool(settings.get("time_warp", false))
 	background = String(settings.get("background", "standard"))
 	fist_skin = String(settings.get("fist_skin", "standard"))
@@ -1951,6 +2032,15 @@ func _migrate(data: Dictionary) -> Dictionary:
 		# v4 → v5: Kosmetik-Laden, Herausforderungen, Börse. Nichts umzurechnen, nur Standardwerte.
 		data["owned_cosmetics"] = data.get("owned_cosmetics", [])
 		data["laurels_extra"] = data.get("laurels_extra", 0)
+	if version < 6:
+		# v5 → v6: Versteckte Erfolge geben jetzt 3 statt 1 Beulen-Marke – nachträglich gutschreiben.
+		# Eigene Bilder können Augen-Positionen haben (target_faces), Standard leer.
+		var extra := 0
+		for id in data.get("achievements", []):
+			if bool(achievement_def(String(id)).get("hidden", false)):
+				extra += 2
+		data["beulen_marken"] = int(data.get("beulen_marken", 0)) + extra
+		data["target_faces"] = data.get("target_faces", {})
 	data["version"] = maxi(version, SAVE_VERSION)
 	return data
 
@@ -2058,9 +2148,11 @@ func import_save_code(code: String) -> bool:
 ## Setzt den Spielstand komplett zurück (Bilder bleiben erhalten).
 func reset_progress() -> void:
 	var names := target_names.duplicate()
+	var faces := target_faces.duplicate(true)
 	var keep_settings := _settings_dict()
 	from_dict({"version": SAVE_VERSION, "settings": keep_settings})
 	target_names = names
+	target_faces = faces
 	validate_cosmetics()
 	reset_shoe_timers()
 	save_game()

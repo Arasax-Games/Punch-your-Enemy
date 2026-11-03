@@ -36,6 +36,7 @@ func _initialize() -> void:
 	test_english()
 	test_phase7()
 	test_save_channels()
+	test_improvements_nov()
 	print("")
 	if _failures == 0:
 		print("OK: %d Prüfungen bestanden." % _checks)
@@ -73,13 +74,14 @@ func test_balance() -> void:
 	check_eq(Balance.unit_cost(15, 1), 18.0, "Faust #2 kostet ceil(17,25) = 18")
 	check_eq(Balance.unit_cost(100, 10), ceilf(100 * pow(1.15, 10)), "Pantoffel #11")
 	check_eq(Balance.bulk_cost(15, 0, 2), 33.0, "2 Fäuste kosten 33")
-	check_eq(Balance.max_affordable(15, 0, 32), 1, "mit 32 Wumms nur 1 Faust")
-	check_eq(Balance.max_affordable(15, 0, 33), 2, "mit 33 Wumms 2 Fäuste")
+	check_eq(Balance.max_affordable(15, 0, 32), 1, "mit 32 Schmerz-Token nur 1 Faust")
+	check_eq(Balance.max_affordable(15, 0, 33), 2, "mit 33 Schmerz-Token 2 Fäuste")
 	check_eq(Balance.sell_refund(15, 1), 3.0, "Verkauf erstattet 25 %")
 	check_eq(Balance.sell_refund(15, 0), 0.0, "Nichts zu verkaufen")
-	check_eq(Balance.laurels_for(1e12), 1, "1 Billion = 1 Lorbeer")
-	check_eq(Balance.laurels_for(8e12), 2, "8 Billionen = 2 Lorbeeren")
-	check_eq(Balance.laurels_for(5e11), 0, "unter 1 Billion = 0")
+	check_eq(Balance.laurels_for(1e10), 1, "10 Mrd. = 1 Lorbeer")
+	check_eq(Balance.laurels_for(8e10), 2, "80 Mrd. = 2 Lorbeeren")
+	check_eq(Balance.wumms_for_laurels(3), 2.7e11, "3. Lorbeer bei 270 Mrd.")
+	check_eq(Balance.laurels_for(5e9), 0, "unter 10 Mrd. = 0")
 	check_eq(Balance.golden_interval(0.0, 1.0), 300.0, "Goldener Schuh frühestens nach 300 s")
 	check_eq(Balance.golden_interval(1.0, 1.0), 600.0, "Goldener Schuh spätestens nach 600 s")
 	check_eq(Balance.golden_interval(0.0, 1.2), 250.0, "Kamerateam verkürzt das Intervall")
@@ -88,8 +90,8 @@ func test_balance() -> void:
 	check_eq(Balance.offline_gain(10.0, 3600.0), 18000.0, "Offline: halbe WPS")
 	check_eq(Balance.offline_gain(10.0, 20.0 * 3600.0), 144000.0, "Offline: max. 8 Stunden")
 	check_eq(Balance.synergy_bonus(25, 0.05, 10), 1.1, "Synergie: +5 % je 10")
-	check_eq(Balance.laurel_gain(8e12, 1), 1, "Neuanfang bringt nur neue Lorbeeren")
-	check_eq(Balance.laurel_gain(5e11, 0), 0, "unter 1 Billion keine Lorbeeren")
+	check_eq(Balance.laurel_gain(8e10, 1), 1, "Neuanfang bringt nur neue Lorbeeren")
+	check_eq(Balance.laurel_gain(5e9, 0), 0, "unter 10 Mrd. keine Lorbeeren")
 	check_eq(Balance.laurel_bonus(25), 1.25, "25 Lorbeeren = +25 %")
 	check_eq(Balance.combo_multiplier(0), 1.0, "Combo 0 = ×1")
 	check_eq(Balance.combo_multiplier(150), 2.0, "Combo max. ×2")
@@ -99,7 +101,7 @@ func test_balance() -> void:
 	check_eq(Balance.boss_hp(0), 100.0, "Erster Boss: 100 Treffer")
 	check_eq(Balance.boss_hp(3), 800.0, "Vierter Boss: 800 Treffer")
 	check_eq(Balance.minigame_reward(23, 8), 2, "Mini-Spiel: je 8 Punkte eine Marke")
-	check_eq(Balance.minigame_reward(500, 8), 5, "Mini-Spiel: max. 5 Marken")
+	check_eq(Balance.minigame_reward(500, 8), 5, "Mini-Spiel: max. 5 Reue-Token")
 	check_eq(Balance.login_day(8), 1, "Login-Serie beginnt nach Tag 7 von vorn")
 	check_eq(Balance.login_marken(7), 10, "Tag 7: Hauptgewinn")
 	check_eq(Balance.market_step(1.0, 0.0, 0.2), 1.0, "Börse: ohne Zufall bleibt der Kurs")
@@ -129,20 +131,20 @@ func test_game_state() -> void:
 	check_eq(gs.click_value(), 1.0, "Startklick = 1")
 	for i in 15:
 		gs.hit()
-	check(is_equal_approx(gs.wumms, 17.1), "15 Klicks = 15 Wumms + Combo-Bonus (17,1)")
+	check(is_equal_approx(gs.wumms, 17.1), "15 Klicks = 15 Schmerz-Token + Combo-Bonus (17,1)")
 	check_eq(gs.total_hits, 15, "Treffer gezählt")
 	gs.wumms = 15.0
 	gs.combo = 0.0
 	check(gs.buy_device("faust", 1), "Faust kaufbar")
-	check_eq(gs.wumms, 0.0, "Wumms abgezogen")
+	check_eq(gs.wumms, 0.0, "Schmerz-Token abgezogen")
 	check(not gs.buy_device("faust", 1), "Zweite Faust zu teuer")
 	check(is_equal_approx(gs.wps(), 0.1), "1 Faust = 0,1 WPS")
 	gs.tick(10.0)
-	check(is_equal_approx(gs.wumms, 1.0), "10 s Produktion = 1 Wumms")
+	check(is_equal_approx(gs.wumms, 1.0), "10 s Produktion = 1 Schmerz-Token")
 
 	gs.wumms = 1000.0
 	var u: Dictionary = gs.upgrade_def("boxhandschuh_training")
-	check(gs.is_upgrade_visible(u), "Upgrade sichtbar bei genug Wumms")
+	check(gs.is_upgrade_visible(u), "Upgrade sichtbar bei genug Schmerz-Token")
 	check(gs.buy_upgrade("boxhandschuh_training"), "Upgrade kaufbar")
 	check_eq(gs.click_value(), 2.0, "Klick-Wert verdoppelt")
 	check(not gs.buy_upgrade("boxhandschuh_training"), "Upgrade nicht doppelt kaufbar")
@@ -177,7 +179,7 @@ func test_save_roundtrip() -> void:
 	var json := JSON.stringify(a.to_dict())
 	var b := new_state()
 	b.from_dict(JSON.parse_string(json))
-	check_eq(b.wumms, 1234.5, "Wumms gespeichert")
+	check_eq(b.wumms, 1234.5, "Schmerz-Token gespeichert")
 	check_eq(b.total_hits, 42, "Treffer gespeichert (als int)")
 	check_eq(b.device_count("faust"), 3, "Geräte gespeichert")
 	check(b.has_upgrade("boxhandschuh_training"), "Upgrades gespeichert")
@@ -231,7 +233,7 @@ func test_save_migration() -> void:
 		"target_id": "bombastus", "target_names": {}, "target_hits": {"bombastus": 1200},
 		"settings": {"reduced_effects": false, "sound_on": true}}
 	gs.from_dict(v1)
-	check_eq(gs.wumms, 500.0, "v1-Wumms übernommen")
+	check_eq(gs.wumms, 500.0, "v1-Schmerz-Token übernommen")
 	check_eq(gs.achievement_count(), 0, "noch keine Erfolge")
 	check_eq(int(gs.stats.crits), 0, "Statistik angelegt")
 	gs.check_achievements()
@@ -304,11 +306,11 @@ func test_shoes_and_buffs() -> void:
 	check(is_equal_approx(gs.wps(), base), "Raserei endet nach 77 s")
 	var before: float = gs.wumms
 	r = gs.claim_shoe("golden", 0.3)
-	check_eq(r.title, "Wumms-Segen!", "Roll 0,3 = Segen")
+	check_eq(r.title, "Schmerz-Segen!", "Roll 0,3 = Segen")
 	check(is_equal_approx(gs.wumms - before, base * 900.0 + 13.0), "Segen = 15 min WPS + 13")
 	r = gs.claim_shoe("golden", 0.01)
 	check(not r.good, "Roll 0,01 = Pech-Schuh")
-	check_eq(gs.beulen_marken, 3, "Pech-Schuh gibt Beulen-Marken")
+	check_eq(gs.beulen_marken, 3, "Pech-Schuh gibt Reue-Token")
 	check(is_equal_approx(gs.wps(), base * 0.5), "Pech-Schuh halbiert WPS")
 	gs.tick(67.0)
 	r = gs.claim_shoe("golden", 0.85)
@@ -336,23 +338,23 @@ func test_offline() -> void:
 func test_prestige() -> void:
 	print("Neuanfang")
 	var gs := new_state()
-	gs.wumms = 5e11
-	gs.earn(5e11)
-	check(not gs.can_prestige(), "Unter 1 Billion kein Neuanfang")
-	gs.earn(8e12)
-	check(gs.can_prestige(), "Neuanfang ab 1 Billion möglich")
+	gs.wumms = 5e9
+	gs.earn(5e9)
+	check(not gs.can_prestige(), "Unter 10 Mrd. kein Neuanfang")
+	gs.earn(8e10)
+	check(gs.can_prestige(), "Neuanfang ab 10 Mrd. möglich")
 	gs.devices = {"faust": 50}
 	gs.upgrades = {"boxhandschuh_training": true}
 	gs.achievements = {"erstes_aua": true}
 	var marken: int = gs.beulen_marken
 	var gain: int = gs.perform_prestige()
-	check_eq(gain, 2, "8,5 Billionen = 2 Lorbeeren")
+	check_eq(gain, 2, "85 Mrd. = 2 Lorbeeren")
 	check_eq(gs.laurels_total, 2, "Lorbeeren gutgeschrieben")
-	check_eq(gs.wumms, 0.0, "Wumms zurückgesetzt")
+	check_eq(gs.wumms, 0.0, "Schmerz-Token zurückgesetzt")
 	check_eq(gs.device_count("faust"), 0, "Geräte zurückgesetzt")
 	check(not gs.has_upgrade("boxhandschuh_training"), "Upgrades zurückgesetzt")
 	check(gs.achievements.has("erstes_aua"), "Erfolge bleiben")
-	check_eq(gs.beulen_marken, marken, "Beulen-Marken bleiben")
+	check_eq(gs.beulen_marken, marken, "Reue-Token bleiben")
 	check_eq(int(gs.stat("prestiges")), 1, "Neuanfänge gezählt")
 	check(not gs.can_prestige(), "Direkt danach kein zweiter Neuanfang")
 	gs.devices = {"pantoffel": 10}
@@ -381,10 +383,10 @@ func test_laurel_tree() -> void:
 	check_eq(gs.laurels_total, 3, "Bonus bleibt beim Ausgeben")
 	check_eq(gs.device_cost("faust", 1), ceilf(15.0 * 0.95), "Geräte 5 % günstiger")
 	check(gs.buy_laurel_node("starthilfe"), "Starthilfe kaufbar")
-	gs.earn(7e13)  # bei 3 Lorbeeren braucht der nächste 4³ = 64 Billionen
-	check_eq(gs.perform_prestige(), 1, "Vierter Lorbeer ab 64 Billionen")
+	gs.earn(7e11)  # bei 3 Lorbeeren braucht der nächste 4³ × 10 Mrd. = 640 Mrd.
+	check_eq(gs.perform_prestige(), 1, "Vierter Lorbeer ab 640 Mrd.")
 	check_eq(gs.device_count("faust"), 10, "Starthilfe: 10 Fäuste nach Neuanfang")
-	check(not gs.buy_laurel_node("goldene_faust"), "Show-Zweig kostet Beulen-Marken")
+	check(not gs.buy_laurel_node("goldene_faust"), "Show-Zweig kostet Reue-Token")
 	gs.beulen_marken = 3
 	check(gs.buy_laurel_node("goldene_faust"), "Goldene Faust mit Marken kaufbar")
 	check_eq(gs.fist_skin, "gold", "Goldene Faust sofort aktiv")
@@ -462,7 +464,7 @@ func test_migration_v3() -> void:
 	var gs := new_state()
 	gs.from_dict({"version": 2, "wumms": 10.0, "total_wumms": 3e12, "achievements": ["erstes_aua", "warm_up"],
 		"beulen_marken": 3, "stats": {"golden_shoes": 2}})
-	check_eq(gs.lifetime_wumms, 3e12, "Lebenszeit-Wumms aus total_wumms")
+	check_eq(gs.lifetime_wumms, 3e12, "Lebenszeit-Schmerz-Token aus total_wumms")
 	check_eq(gs.beulen_marken, 5, "Marken für bisherige Erfolge nachgezahlt")
 	check_eq(gs.laurels_total, 0, "Noch keine Lorbeeren")
 	check(gs.can_prestige(), "Alter Spielstand kann sofort neu anfangen")
@@ -490,7 +492,7 @@ func test_bosses() -> void:
 	gs.boss_damage(5.0)
 	check(not gs.boss_active, "Boss besiegt")
 	check(results[0][0], "Sieg gemeldet")
-	check_eq(results[0][1].marken, 5, "Erster Boss: 5 Beulen-Marken")
+	check_eq(results[0][1].marken, 5, "Erster Boss: 5 Reue-Token")
 	check_eq(gs.trophies.size(), 1, "Pokal in der Vitrine")
 	check_eq(gs.next_boss_at, gs.total_hits + 100000, "Nächster Boss in 100.000 Treffern")
 	gs.total_hits = gs.next_boss_at - 1
@@ -577,11 +579,11 @@ func test_minigames() -> void:
 	check(gs.minigame_unlocked("dojo"), "Dojo ab 5.000 Treffern")
 	gs.check_new_day()  # Login-Bonus des Tages vorab, damit er hier nicht mitzählt
 	var start: int = gs.beulen_marken
-	check_eq(gs.record_minigame("dojo", 17), 2, "17 Punkte = 2 Marken")
+	check_eq(gs.record_minigame("dojo", 17), 2, "17 Punkte = 2 Reue-Token")
 	check_eq(gs.record_minigame("dojo", 10), 0, "Schlechteres Spiel bringt nichts extra")
-	check_eq(gs.record_minigame("dojo", 60), 3, "Bis 5 Marken pro Tag aufgefüllt")
+	check_eq(gs.record_minigame("dojo", 60), 3, "Bis 5 Reue-Token pro Tag aufgefüllt")
 	check_eq(gs.record_minigame("dojo", 99), 0, "Tageslimit erreicht")
-	check_eq(gs.beulen_marken, start + 5, "Insgesamt 5 Marken")
+	check_eq(gs.beulen_marken, start + 5, "Insgesamt 5 Reue-Token")
 	check_eq(int(gs.stat("dojo_best")), 99, "Rekord gemerkt")
 	gs._today_override = "2026-11-03"
 	check_eq(gs.record_minigame("dojo", 40), 5, "Neuer Tag, neues Glück")
@@ -636,7 +638,7 @@ func test_cosmetics() -> void:
 	check(not gs.buy_cosmetic("fist_boxhandschuh"), "Ohne Marken nicht kaufbar")
 	gs.beulen_marken = 10
 	check(gs.buy_cosmetic("fist_boxhandschuh"), "Boxhandschuh kaufbar")
-	check_eq(gs.beulen_marken, 4, "6 Marken abgezogen")
+	check_eq(gs.beulen_marken, 4, "6 Reue-Token abgezogen")
 	check_eq(gs.fist_skin, "boxhandschuh", "Sofort angelegt")
 	check(gs.cosmetic_equipped("fist_boxhandschuh"), "Als angelegt erkannt")
 	check(not gs.buy_cosmetic("fist_gold"), "Goldene Faust nur über den Lorbeer-Baum")
@@ -668,9 +670,9 @@ func test_challenges() -> void:
 	check_eq(gs.laurels_total, 2, "+1 Extra-Lorbeer")
 	check_eq(gs.laurels_extra, 1, "Als Extra-Lorbeer gemerkt")
 	check(not gs.start_challenge("nur_faeuste"), "Jede Herausforderung nur einmal")
-	gs.lifetime_wumms = 1e12
+	gs.lifetime_wumms = 1e10
 	check_eq(gs.prestige_gain(), 0, "Extra-Lorbeeren verringern den Neuanfang-Gewinn nicht doppelt")
-	gs.lifetime_wumms = 8e12
+	gs.lifetime_wumms = 8e10
 	check_eq(gs.prestige_gain(), 1, "Neuanfang zählt nur Neuanfang-Lorbeeren")
 	check(gs.start_challenge("inflation"), "Inflation startet")
 	check_eq(gs.device_cost("faust", 1), Balance.unit_cost(45.0, 10), "Inflation: dreifacher Preis (10 Startfäuste)")
@@ -687,7 +689,7 @@ func test_market() -> void:
 	var gs := new_state()
 	check(not gs.market_unlocked(), "Börse gesperrt am Anfang")
 	gs.lifetime_wumms = 2e7
-	check(gs.market_unlocked(), "Börse ab 10 Mio. Wumms")
+	check(gs.market_unlocked(), "Börse ab 10 Mio. Schmerz-Token")
 	gs.devices = {"pantoffel": 100}
 	gs.tick(0.01)
 	check(is_equal_approx(gs.market_scale, 100.0), "Preisbasis = höchste WPS")
@@ -726,7 +728,7 @@ func test_slow_motion_and_v5() -> void:
 	old.from_dict({"version": 4, "wumms": 5.0, "laurels_total": 3})
 	check_eq(old.laurels_extra, 0, "Keine Extra-Lorbeeren in alten Spielständen")
 	check(old.owned_cosmetics.is_empty(), "Laden leer")
-	check_eq(old.to_dict().version, 5, "Gespeichert als v5")
+	check_eq(old.to_dict().version, 6, "Gespeichert als aktuelle Version (v6)")
 	gs.free()
 	old.free()
 
@@ -819,4 +821,84 @@ func test_save_channels() -> void:
 	check(not script.is_foreign_save({"channel": "release"}, "release"), "Eigener Spielstand bleibt")
 	check(not script.is_foreign_save({"version": 5}, "dev"), "Editor übernimmt alte Test-Spielstände")
 	check(script.is_foreign_save({"channel": "release"}, "dev"), "Editor fasst Spieler-Spielstände nicht an")
+	gs.free()
+
+
+func test_improvements_nov() -> void:
+	print("Verbesserungen November (Wut, Erfolge, Gesicht, Lorbeeren)")
+	var gs := new_state()
+	# Wutmodus: genau ×3, auch mit Klick-Anteil an der Produktion (früher ×9)
+	gs.devices = {"pantoffel": 100}
+	gs.upgrades = {"boxhandschuh_training": true}
+	for u in gs.upgrade_defs:
+		if u.effect.type == "click_wps":
+			gs.upgrades[u.id] = true
+			break
+	var calm: float = gs.base_click_value()
+	gs.rage_meter = gs.RAGE_MAX
+	check(gs.start_rage(), "Wut startet")
+	check(is_equal_approx(gs.base_click_value(), calm * 3.0), "Wut: Klick genau ×3")
+	gs.rage_time = 0.0
+	# Upgrade-Wirkungen werden zwischengespeichert, aber nach einem Kauf neu berechnet
+	var before: float = gs.base_wps()
+	var dev_up := ""
+	for u in gs.upgrade_defs:
+		if u.effect.type == "device_mult" and u.effect.device == "pantoffel" and not gs.has_upgrade(u.id):
+			dev_up = u.id
+			break
+	gs.upgrades[dev_up] = true
+	check(gs.base_wps() > before, "Neues Upgrade wirkt sofort (Zwischenspeicher erneuert)")
+	# Automatische Wut als spätes Upgrade
+	check(not gs.has_auto_rage(), "Ohne Upgrade keine Auto-Wut")
+	var auto: Dictionary = gs.upgrade_def("cholerischer_wecker")
+	check(not auto.is_empty() and float(auto.cost) >= 1e9, "Cholerischer Wecker ist ein spätes Upgrade")
+	check(gs.upgrade_effect_text(auto) != "", "Auto-Wut hat einen Wirkungstext")
+	gs.upgrades["cholerischer_wecker"] = true
+	gs.rage_meter = gs.RAGE_MAX
+	gs.tick(0.1)
+	check(gs.rage_active(), "Auto-Wut startet bei voller Leiste")
+	gs.rage_time = 0.0
+	gs.auto_rage_enabled = false
+	gs.rage_meter = gs.RAGE_MAX
+	gs.tick(0.1)
+	check(not gs.rage_active(), "Auto-Wut lässt sich abschalten")
+	# Erfolge geben Marken und Wumms
+	var marken: int = gs.beulen_marken
+	var wumms: float = gs.wumms
+	gs.unlock_achievement("erstes_aua")
+	check_eq(gs.beulen_marken, marken + 1, "Erfolg: +1 Reue-Token")
+	check(gs.wumms > wumms, "Erfolg: Schmerz-Bonus")
+	check_eq(Balance.achievement_bonus(0.0, 2.0), 100.0, "Bonus am Anfang mindestens 50 je Minute")
+	check_eq(Balance.achievement_bonus(10.0, 2.0), 1200.0, "Bonus = 2 Minuten Produktion")
+	var hidden_def: Dictionary = {}
+	for a in gs.achievement_defs:
+		if a.get("hidden", false):
+			hidden_def = a
+			break
+	check_eq(int(gs.achievement_reward(hidden_def).marken), 3, "Versteckte Erfolge: 3 Reue-Token")
+	# Migration v5 → v6: versteckte Erfolge nachträglich +2
+	var old := new_state()
+	old.from_dict({"version": 5, "beulen_marken": 4, "achievements": ["erstes_aua", hidden_def.id]})
+	check_eq(old.beulen_marken, 6, "v6: versteckter Erfolg nachträglich +2 Reue-Token")
+	old.free()
+	# Gesicht: Anker aus Augenposition
+	var a: Dictionary = Balance.face_anchors(Vector2(0.404, 0.466), Vector2(0.596, 0.466), Vector2(520, 520))
+	check(absf(a.forehead[1] - 0.4) < 0.01, "Stirn über den Augen (wie Bombastus)")
+	check(absf(a.cheek[0] - 0.33) < 0.01 and absf(a.cheek[1] - 0.6) < 0.01, "Wange wie Bombastus")
+	var b: Dictionary = Balance.face_anchors(Vector2(0.7, 0.3), Vector2(0.6, 0.3), Vector2(1000, 500))
+	check(b.eye_left[0] < b.eye_right[0], "Augen werden sortiert")
+	check(b.forehead[1] < 0.3, "Stirn liegt oben, auch bei Querformat")
+	gs.target_names["img_test"] = "Test"
+	gs.set_face("img_test", Vector2(0.3, 0.4), Vector2(0.5, 0.4))
+	check_eq(gs.face_eyes("img_test")[1], Vector2(0.5, 0.4), "Augen gespeichert")
+	var restored := new_state()
+	restored.from_dict(gs.to_dict())
+	check(restored.target_faces.has("img_test"), "Augen landen im Spielstand")
+	restored.free()
+	check_eq(gs.face_eyes("img_unbekannt").size(), 2, "Standard-Augen für unmarkierte Bilder")
+	# Standardsprache Englisch
+	var lang := new_state()
+	lang.language = ""
+	check_eq(lang.effective_language(), "en", "Standardsprache ist Englisch")
+	lang.free()
 	gs.free()

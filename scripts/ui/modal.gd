@@ -5,7 +5,7 @@ extends Control
 
 signal closed(button_index: int)
 
-const INK := Color("2b2118")
+const MAIN := preload("res://scripts/ui/main.gd")
 
 
 static func open(parent: Node, title: String, content: Variant, buttons: Array = ["OK"], min_width: float = 520.0) -> Modal:
@@ -19,7 +19,7 @@ func _build(title: String, content: Variant, buttons: Array, min_width: float) -
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	# Dialoge sind helle Karten über der dunklen Bühne.
-	theme = load("res://scripts/ui/main.gd").paper_theme()
+	theme = MAIN.dialog_theme()
 	var dim := ColorRect.new()
 	dim.color = Color(0.03, 0.02, 0.09, 0.65)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -38,10 +38,10 @@ func _build(title: String, content: Variant, buttons: Array, min_width: float) -
 	var title_label := Label.new()
 	title_label.text = title
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_override("font", load("res://scripts/ui/main.gd").heading_font())
+	title_label.add_theme_font_override("font", MAIN.heading_font())
 	title_label.add_theme_font_size_override("font_size", 32)
-	title_label.add_theme_color_override("font_color", Color("ffd43b"))
-	title_label.add_theme_color_override("font_outline_color", INK)
+	title_label.add_theme_color_override("font_color", MAIN.GOLD)
+	title_label.add_theme_color_override("font_outline_color", MAIN.LINE)
 	title_label.add_theme_constant_override("outline_size", 9)
 	box.add_child(title_label)
 
@@ -64,6 +64,8 @@ func _build(title: String, content: Variant, buttons: Array, min_width: float) -
 		b.text = str(buttons[i])
 		b.custom_minimum_size = Vector2(130, 0)
 		b.focus_mode = Control.FOCUS_NONE
+		if i == 0:
+			MAIN.style_primary(b)
 		var index := i
 		b.pressed.connect(func() -> void: close(index))
 		row.add_child(b)

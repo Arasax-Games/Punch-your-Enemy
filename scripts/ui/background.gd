@@ -17,6 +17,21 @@ func _ready() -> void:
 		_stars.append([Vector2(rng.randf(), rng.randf()), rng.randf_range(1.0, 2.6), rng.randf() * TAU])
 
 
+static var _dots: Texture2D
+
+
+static func _dot_texture() -> Texture2D:
+	if _dots == null:
+		var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+		img.fill(Color(1, 1, 1, 0))
+		for y in 16:
+			for x in 16:
+				var d := Vector2(x + 0.5, y + 0.5).distance_to(Vector2(8, 8))
+				img.set_pixel(x, y, Color(1, 1, 1, 0.06 * clampf(2.1 - d, 0.0, 1.0)))
+		_dots = ImageTexture.create_from_image(img)
+	return _dots
+
+
 func _process(delta: float) -> void:
 	_time += delta
 	if GameState.background in ["weltraum", "arena"] and not GameState.reduced_effects:
@@ -44,15 +59,8 @@ func _draw() -> void:
 ## Standard: Comic-Arena bei Nacht – dunkles Lila mit Rasterpunkten und einem Bühnenboden.
 func _draw_night_arena() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("231a4a"))
-	var dot := Color(1, 1, 1, 0.06)
-	var step := 16.0
-	var y := step * 0.5
-	while y < size.y:
-		var x := step * 0.5
-		while x < size.x:
-			draw_circle(Vector2(x, y), 1.6, dot)
-			x += step
-		y += step
+	# Rasterpunkte als gekachelte Textur: ein Zeichenaufruf statt Tausender einzelner Kreise.
+	draw_texture_rect(_dot_texture(), Rect2(Vector2.ZERO, size), true)
 	var fy := floor_y if floor_y > 0.0 else size.y * 0.74
 	draw_rect(Rect2(0, fy, size.x, size.y - fy), Color("1a1338"))
 	draw_line(Vector2(0, fy), Vector2(size.x, fy), Color("0f0b24"), 3.0)

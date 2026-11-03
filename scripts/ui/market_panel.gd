@@ -18,7 +18,7 @@ func _ready() -> void:
 	_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_info.custom_minimum_size = Vector2(760, 0)
 	_info.add_theme_font_size_override("font_size", 14)
-	_info.add_theme_color_override("font_color", Color(INK, 0.7))
+	_info.add_theme_color_override("font_color", Color("a99fdc"))
 	add_child(_info)
 	var header := _row_box()
 	for i in COLUMNS.size():
@@ -81,7 +81,7 @@ func _sell_all(id: String) -> void:
 	var profit := GameState.market_sell(id, int(GameState.market_holdings.get(id, 0)))
 	var owner := get_tree().current_scene
 	if owner and owner.has_method("show_toast"):
-		owner.show_toast((tr("Gewinn: +%s Wumms") if profit >= 0.0 else tr("Verlust: %s Wumms")) % Num.whole(profit))
+		owner.show_toast((tr("Gewinn: +%s Schmerz-Token") if profit >= 0.0 else tr("Verlust: %s Schmerz-Token")) % Num.whole(profit))
 
 
 func _process(delta: float) -> void:
@@ -92,7 +92,7 @@ func _process(delta: float) -> void:
 
 
 func _refresh() -> void:
-	_info.text = tr("Kaufe Ware billig, verkaufe sie teuer. Die Kurse ändern sich jede Minute. Lager: höchstens %d Stück pro Ware. Guthaben: %s Wumms.\nAchtung: Beim Neuanfang schließt die Börse – nicht verkaufte Ware ist dann weg.") % [
+	_info.text = tr("Kaufe Ware billig, verkaufe sie teuer. Die Kurse ändern sich jede Minute. Lager: höchstens %d Stück pro Ware. Guthaben: %s Schmerz-Token.\nAchtung: Beim Neuanfang schließt die Börse – nicht verkaufte Ware ist dann weg.") % [
 		GameState.market_capacity(), Num.whole(GameState.wumms)]
 	for id in _rows:
 		var r: Dictionary = _rows[id]
