@@ -3,7 +3,7 @@ extends Control
 
 const INK := Color("2b2118")
 const PAPER := Color("fff8ec")
-# Farbsystem „Comic-Arena bei Nacht“ (Hauptbildschirm). Dialoge bleiben hell (paper_theme()).
+# Farbsystem „Comic-Arena bei Nacht“ – gilt für Hauptbildschirm und Dialoge (dialog_theme()).
 const NIGHT := Color("120d2b")
 const PANEL := Color("1b1540")
 const CARD := Color("2a2156")
@@ -48,6 +48,7 @@ const MENU_SOUND := 10
 const MENU_EFFECTS := 11
 const MENU_TIME_WARP := 12
 const MENU_AUTOBUY := 13
+const MENU_AUTO_RAGE := 14
 # i18n
 const SHOP_SLOTS := [["fist", "Fäuste"], ["background", "Hintergründe"], ["sound", "Sounds"]]
 # i18n
@@ -144,6 +145,104 @@ func _ready() -> void:
 	var event := GameState.active_event()
 	if not event.is_empty() and not GameState.events_done.has(GameState.event_key(event)):
 		_ticker_override = tr("Saison-Event: %s – zu finden in der Galerie!") % event.name
+	if OS.has_feature("editor"):
+		_dev_preview.call_deferred()
+
+
+## Nur im Editor: Vorschau-Schalter für Screenshots und schnelle Tests, z. B.
+## godot --path . -- --lang=de --rich --open=achievements --hits=200
+## Mit Vorschau-Schaltern wird nie gespeichert.
+func _dev_preview() -> void:
+	var args := OS.get_cmdline_user_args()
+	if args.is_empty():
+		return
+	GameState.persist = false
+	for arg in args:
+		if arg.begins_with("--lang=") and not TranslationServer.get_locale().begins_with(arg.get_slice("=", 1)):
+			GameState.set_language(arg.get_slice("=", 1))
+			get_tree().reload_current_scene.call_deferred()
+			return
+	for arg in args:
+		var key := arg.get_slice("=", 0)
+		var value := arg.get_slice("=", 1)
+		match key:
+			"--rich":
+				GameState.lifetime_wumms = 5e12
+				GameState.total_wumms = 5e12
+				GameState.wumms = 5e12
+				GameState.total_hits = 20000
+				GameState.laurels_total = 40
+				GameState.beulen_marken = 25
+				GameState.add_stat("prestiges")
+				for d in GameState.device_defs.slice(0, 8):
+					GameState.buy_device(d.id, 30)
+				GameState.check_achievements()
+				_on_target_changed()
+			"--hits":
+				for i in int(value):
+					target_area.hit_somewhere()
+					await get_tree().process_frame
+			"--bench":
+				# Treffer im Dauerfeuer-Tempo (20/s), danach Bildrate ausgeben
+				var frames := 0
+				var proc := 0.0
+				var draws := 0.0
+				var start := Time.get_ticks_msec()
+				var next_hit := 0.0
+				var rate := 20.0
+				for a in args:
+					if a.begins_with("--benchrate="):
+						rate = float(a.get_slice("=", 1))
+				while Time.get_ticks_msec() - start < int(value) * 1000:
+					var t := (Time.get_ticks_msec() - start) / 1000.0
+					while rate > 0.0 and next_hit <= t:
+						target_area.try_hit(target_area.uv_to_local(Vector2(randf_range(0.35, 0.65), randf_range(0.35, 0.6))))
+						next_hit += 1.0 / rate
+					await get_tree().process_frame
+					frames += 1
+					proc += Performance.get_monitor(Performance.TIME_PROCESS)
+					draws += Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
+				print("BENCH fps=%.1f process=%.1fms draws=%.0f nodes=%d" % [frames / float(value), proc / frames * 1000.0,
+					draws / frames, Performance.get_monitor(Performance.OBJECT_NODE_COUNT)])
+				get_tree().quit()
+			"--import":
+				GameState.import_image_file(value)
+			"--eyes":
+				var e := value.split_floats(",")
+				GameState.set_face(GameState.target_id, Vector2(e[0], e[1]), Vector2(e[2], e[3]))
+			"--level":
+				GameState.target_hits[GameState.target_id] = int(value) * 1000
+				_on_target_changed()
+			"--prof":
+				for label in ["tick", "refresh", "achievements", "wps", "upgrades"]:
+					var t0 := Time.get_ticks_usec()
+					for i in 50:
+						match label:
+							"tick": GameState.tick(0.016)
+							"refresh": _refresh()
+							"achievements": GameState.check_achievements()
+							"wps": GameState.wps()
+							"upgrades": _refresh_upgrades()
+					print("PROF %s %.2f ms" % [label, (Time.get_ticks_usec() - t0) / 50000.0])
+			"--rage":
+				GameState.rage_meter = GameState.RAGE_MAX
+				GameState.start_rage()
+	for arg in args:
+		if arg.begins_with("--open="):
+			match arg.get_slice("=", 1):
+				"achievements": _show_achievements()
+				"quests": _show_quests()
+				"games": _show_games()
+				"shop": _show_shop()
+				"laurels": _show_laurel_tree()
+				"gallery": _show_gallery()
+				"volume": _show_volume()
+				"prestige": _show_prestige()
+				"menu": (%MenuButton as MenuButton).show_popup()
+				"face": _open_face(GameState.target_id)
+				"market": Modal.open(self, tr("Börse für Beulen"), MarketPanel.new(), [tr("Schließen")], 900.0)
+				"dojo": MiniGame.open(self, "dojo")
+				"pie": MiniGame.open(self, "pie")
 
 
 func _process(delta: float) -> void:
@@ -241,51 +340,92 @@ func _build_theme() -> Theme:
 	return t
 
 
-static var _paper: Theme
+static var _dialog: Theme
 
 
-## Helles „Papier“-Theme für Dialoge (Modal) – ihre Inhalte sind auf helle Kacheln mit dunkler Schrift ausgelegt.
-static func paper_theme() -> Theme:
-	if _paper != null:
-		return _paper
+## Theme für Dialoge (Modal) und Mini-Spiele: dieselbe „Comic-Arena bei Nacht“ wie der Hauptbildschirm –
+## dunkle Karten, helle Schrift, Gold nur für die wichtigste Aktion bzw. „leistbar“.
+static func dialog_theme() -> Theme:
+	if _dialog != null:
+		return _dialog
 	var t := Theme.new()
-	t.default_font_size = 17
+	t.default_font_size = 16
 	t.default_font = load("res://assets/fonts/Poppins-Medium.ttf")
 
-	for type in ["Label", "Button", "CheckButton", "MenuButton", "TooltipLabel", "PopupMenu", "LineEdit"]:
-		t.set_color("font_color", type, INK)
-	for state in ["font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
-		for type in ["Button", "CheckButton", "MenuButton"]:
-			t.set_color(state, type, INK)
-	t.set_color("font_hover_color", "PopupMenu", INK)
-	t.set_color("font_disabled_color", "Button", Color(INK, 0.45))
+	for type in ["Label", "Button", "CheckButton", "CheckBox", "MenuButton", "TooltipLabel", "PopupMenu", "LineEdit"]:
+		t.set_color("font_color", type, TEXT)
+	for type in ["Button", "CheckButton", "CheckBox", "MenuButton"]:
+		t.set_color("font_hover_color", type, TEXT)
+		t.set_color("font_focus_color", type, TEXT)
+		t.set_color("font_pressed_color", type, LINE)
+		t.set_color("font_hover_pressed_color", type, LINE)
+		t.set_color("font_disabled_color", type, Color(MUTED, 0.6))
+	t.set_color("font_hover_color", "PopupMenu", LINE)
+	t.set_color("font_placeholder_color", "LineEdit", Color(MUTED, 0.7))
 
-	t.set_stylebox("panel", "PanelContainer", _box(PAPER, 14, 3, 12))
-	t.set_stylebox("panel", "TooltipPanel", _box(Color("fffdf7"), 10, 2, 10))
-	t.set_stylebox("panel", "PopupMenu", _box(Color("fffdf7"), 10, 3, 8))
-	t.set_stylebox("hover", "PopupMenu", _box(Color("ffe066"), 6, 0, 4))
+	var panel := _box(PANEL, 18, 3, 18, LINE)
+	panel.shadow_color = Color(0, 0, 0, 0.45)
+	panel.shadow_size = 18
+	t.set_stylebox("panel", "PanelContainer", panel)
+	t.set_stylebox("panel", "TooltipPanel", _box(CARD, 10, 2, 10, LINE))
+	t.set_stylebox("panel", "PopupMenu", _box(CARD, 10, 2, 8, LINE))
+	t.set_stylebox("hover", "PopupMenu", _box(GOLD, 6, 0, 4))
 	for type in ["Button", "MenuButton"]:
-		t.set_stylebox("normal", type, _box(Color("ffd43b"), 10, 3, 8))
-		t.set_stylebox("hover", type, _box(Color("ffe066"), 10, 3, 8))
-		t.set_stylebox("pressed", type, _box(Color("fab005"), 10, 3, 8))
-		t.set_stylebox("hover_pressed", type, _box(Color("fab005"), 10, 3, 8))
-		t.set_stylebox("disabled", type, _box(Color("eee3d0"), 10, 3, 8, Color(INK, 0.35)))
+		t.set_stylebox("normal", type, _box(CARD, 10, 2, 8, LINE))
+		t.set_stylebox("hover", type, _box(ROW_HOVER, 10, 2, 8, Color(GOLD, 0.6)))
+		t.set_stylebox("pressed", type, _box(GOLD, 10, 2, 8, LINE))
+		t.set_stylebox("hover_pressed", type, _box(GOLD_HOVER, 10, 2, 8, LINE))
+		t.set_stylebox("disabled", type, _box(ROW, 10, 0, 8, LINE))
 		t.set_stylebox("focus", type, StyleBoxEmpty.new())
 	t.set_stylebox("focus", "CheckButton", StyleBoxEmpty.new())
-	t.set_stylebox("normal", "LineEdit", _box(Color.WHITE, 8, 2, 8))
-	t.set_stylebox("focus", "LineEdit", _box(Color.WHITE, 8, 3, 8, Color("3bc9db")))
-	t.set_stylebox("background", "ProgressBar", _box(Color("eee3d0"), 6, 2, 0))
-	t.set_stylebox("fill", "ProgressBar", _box(Color("69db7c"), 6, 2, 0))
-	t.set_color("font_color", "ProgressBar", INK)
-	t.set_stylebox("slider", "HSlider", _box(Color("eee3d0"), 6, 2, 3))
-	t.set_stylebox("grabber_area", "HSlider", _box(Color("ffd43b"), 6, 2, 3))
-	t.set_stylebox("grabber_area_highlight", "HSlider", _box(Color("ffe066"), 6, 2, 3))
+	t.set_stylebox("focus", "CheckBox", StyleBoxEmpty.new())
+	t.set_stylebox("normal", "LineEdit", _box(ROW, 8, 2, 8, LINE))
+	t.set_stylebox("read_only", "LineEdit", _box(ROW, 8, 2, 8, LINE))
+	t.set_stylebox("focus", "LineEdit", _box(ROW, 8, 2, 8, GOLD))
+	t.set_stylebox("background", "ProgressBar", _box(LINE, 6, 0, 0))
+	t.set_stylebox("fill", "ProgressBar", _box(GOLD, 6, 0, 0))
+	t.set_color("font_color", "ProgressBar", TEXT)
+	t.set_stylebox("slider", "HSlider", _box(LINE, 6, 0, 3))
+	t.set_stylebox("grabber_area", "HSlider", _box(GOLD, 6, 0, 3))
+	t.set_stylebox("grabber_area_highlight", "HSlider", _box(GOLD_HOVER, 6, 0, 3))
+	for bar in ["VScrollBar", "HScrollBar"]:
+		t.set_stylebox("scroll", bar, _box(Color(LINE, 0.6), 6, 0, 3))
+		t.set_stylebox("grabber", bar, _box(Color("4d4196"), 6, 0, 3))
+		t.set_stylebox("grabber_highlight", bar, _box(Color("5f52b0"), 6, 0, 3))
+		t.set_stylebox("grabber_pressed", bar, _box(GOLD, 6, 0, 3))
 	var sep := StyleBoxLine.new()
-	sep.color = Color(INK, 0.25)
+	sep.color = Color(MUTED, 0.25)
 	sep.thickness = 2
 	t.set_stylebox("separator", "HSeparator", sep)
-	_paper = t
+	_dialog = t
 	return t
+
+
+## Wichtigste Aktion in Dialogen: goldener Knopf wie „Kaufen“ im Shop.
+static func style_primary(b: Button) -> void:
+	var normal := _box(GOLD, 10, 2, 8, LINE)
+	normal.border_width_bottom = 4
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = GOLD_HOVER
+	b.add_theme_stylebox_override("normal", normal)
+	b.add_theme_stylebox_override("hover", hover)
+	b.add_theme_stylebox_override("pressed", _box(Color("f0b400"), 10, 2, 8, LINE))
+	b.add_theme_stylebox_override("disabled", _box(ROW, 10, 0, 8, LINE))
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		b.add_theme_color_override(c, LINE)
+	b.add_theme_font_override("font", heading_font())
+
+
+## Kachel in Dialogen: normal dunkel, hervorgehoben (aktiv/erreicht) mit goldenem Rand, gesperrt blasser.
+static func tile_box(state: String = "normal", margin: int = 8) -> StyleBoxFlat:
+	match state:
+		"active":
+			return _box(ROW_HOVER, 12, 2, margin, GOLD)
+		"locked":
+			return _box(Color(ROW, 0.7), 12, 2, margin, Color(LINE, 0.6))
+		"good":
+			return _box(Color("1f3d3a"), 12, 2, margin, Color("63e6be"))
+	return _box(CARD, 12, 2, margin, LINE)
 
 
 static func _box(bg: Color, radius: int, border: int, margin: int, border_color: Color = INK) -> StyleBoxFlat:
@@ -323,14 +463,25 @@ func _style_panels() -> void:
 	chip.content_margin_right = 14
 	%MarkenChip.add_theme_stylebox_override("panel", chip)
 
-	# Kopfleiste: Knöpfe treten zurück, nur Hover hebt sie hervor.
+	# Kopfleiste: jeder Knopf als eigene Plakette mit Luft dazwischen, damit nichts aneinanderklebt.
+	(%TopBar.get_node("TopRow") as HBoxContainer).add_theme_constant_override("separation", 8)
 	for b in [%ImportButton, %GalleryButton, %ShowerButton, %AchievementsButton, %QuestsButton, %ShopButton,
 			%GamesButton, %LaurelButton, %MenuButton]:
-		b.add_theme_stylebox_override("normal", _box(Color(CARD, 0.0), 10, 0, 8))
-		b.add_theme_stylebox_override("hover", _box(ROW_HOVER, 10, 0, 8))
-		b.add_theme_stylebox_override("pressed", _box(ROW_HOVER, 10, 0, 8))
+		var chip_normal := _box(CARD, 10, 2, 5, LINE)
+		chip_normal.content_margin_left = 12
+		chip_normal.content_margin_right = 12
+		var chip_hover := chip_normal.duplicate() as StyleBoxFlat
+		chip_hover.bg_color = ROW_HOVER
+		chip_hover.border_color = Color(GOLD, 0.6)
+		b.add_theme_stylebox_override("normal", chip_normal)
+		b.add_theme_stylebox_override("hover", chip_hover)
+		b.add_theme_stylebox_override("pressed", chip_hover)
 		b.add_theme_color_override("font_pressed_color", TEXT)
-		b.add_theme_font_size_override("font_size", 15)
+		b.add_theme_font_size_override("font_size", 14)
+		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var menu_normal := (%MenuButton.get_theme_stylebox("normal") as StyleBoxFlat).duplicate() as StyleBoxFlat
+	menu_normal.border_color = Color(GOLD, 0.8)
+	%MenuButton.add_theme_stylebox_override("normal", menu_normal)
 
 	# Shop-Reiter: aktiver Reiter verschmilzt mit der Seite darunter.
 	var tab_group := ButtonGroup.new()
@@ -352,7 +503,7 @@ func _style_panels() -> void:
 
 
 func _style_labels() -> void:
-	_comic(%Title, 30, RAGE)
+	_comic(%Title, 27, RAGE)
 	_comic(wumms_label, 72, GOLD)
 	_comic(toast, 26, Color.WHITE)
 	for l in [%UpgradesTitle, %DevicesTitle]:
@@ -535,6 +686,9 @@ func _fill_menu() -> void:
 	if GameState.has_autobuy():
 		popup.add_check_item(tr("Upgrades automatisch kaufen"), MENU_AUTOBUY)
 		popup.set_item_checked(popup.get_item_index(MENU_AUTOBUY), GameState.autobuy_enabled)
+	if GameState.has_auto_rage():
+		popup.add_check_item(tr("Wut automatisch entfesseln"), MENU_AUTO_RAGE)
+		popup.set_item_checked(popup.get_item_index(MENU_AUTO_RAGE), GameState.auto_rage_enabled)
 	popup.add_item("Sprache / Language: %s" % GameState.LANGUAGES[GameState.effective_language()], MENU_LANGUAGE)
 	popup.add_separator()
 	popup.add_item(tr("Foto speichern"), MENU_PHOTO)
@@ -702,10 +856,10 @@ func _refresh() -> void:
 	click_label.text = tr("pro Klick: %s") % Num.fmt(GameState.click_value())
 	if GameState.time_warp_active():
 		wps_label.text += tr(" (Zeitraffer ×2)")
-	wumms_label.tooltip_text = tr("Insgesamt erzeugt: %s Wumms") % Num.whole(GameState.total_wumms) \
+	wumms_label.tooltip_text = tr("Insgesamt erzeugt: %s Schmerz-Token") % Num.whole(GameState.total_wumms) \
 		+ "\n" + tr("Treffer gesamt: %s") % Num.whole(GameState.total_hits)
 	%MarkenChip.visible = GameState.beulen_marken > 0
-	marken_label.text = tr("Beulen-Marken: %d") % GameState.beulen_marken
+	marken_label.text = tr("Reue-Token: %d") % GameState.beulen_marken
 	target_label.text = GameState.target_name()
 	target_hits_label.text = tr("Insgesamt verhauen: %s") % Num.whole(GameState.current_target_hits())
 	# Die Tastenhilfe brauchen nur Neulinge.
@@ -739,7 +893,7 @@ func _refresh_progress_widgets() -> void:
 	if GameState.rage_active():
 		_rage_bar.max_value = GameState.RAGE_DURATION
 		_rage_bar.value = GameState.rage_time
-		_rage_label.text = "%d s" % ceili(GameState.rage_time)
+		_rage_label.text = tr("×%s · %d s") % [Num.fmt(GameState.RAGE_MULT), ceili(GameState.rage_time)]
 		_rage_button.text = "%d s" % ceili(GameState.rage_time)
 		_rage_button.disabled = true
 	else:
@@ -753,7 +907,7 @@ func _refresh_progress_widgets() -> void:
 	var active_challenge := GameState.challenge_def(GameState.challenge_active)
 	_challenge_label.get_parent().visible = not active_challenge.is_empty()
 	if not active_challenge.is_empty():
-		_challenge_label.text = tr("Herausforderung „%s“: %s / %s Wumms") % [active_challenge.name,
+		_challenge_label.text = tr("Herausforderung „%s“: %s / %s Schmerz-Token") % [active_challenge.name,
 			Num.whole(GameState.total_wumms), Num.whole(float(active_challenge.goal_wumms))]
 	var gain := GameState.prestige_gain()
 	_prestige_button.visible = GameState.can_prestige()
@@ -842,7 +996,7 @@ func _rebuild_upgrades(list: Array[Dictionary]) -> void:
 		var panel := PanelContainer.new()
 		panel.mouse_filter = Control.MOUSE_FILTER_PASS
 		panel.add_theme_stylebox_override("panel", _box(ROW, 12, 0, 8))
-		panel.tooltip_text = tr("%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms") % [
+		panel.tooltip_text = tr("%s\n\n%s\n\nWirkung: %s\nPreis: %s Schmerz-Token") % [
 			u.name, u.description, GameState.upgrade_effect_text(u), Num.whole(float(u.cost))]
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 12)
@@ -981,9 +1135,7 @@ func _apply_cosmetics() -> void:
 
 func _try_rage() -> void:
 	if GameState.start_rage():
-		Sfx.play("rage", 0.0, 0.0)
-		show_toast(tr("WUTMODUS! Alles ×3 für 10 Sekunden!"))
-		target_area.shake()
+		pass
 
 
 func _on_rage_changed(active: bool) -> void:
@@ -993,6 +1145,9 @@ func _on_rage_changed(active: bool) -> void:
 	if not active:
 		show_toast(tr("Puh. Durchatmen."))
 		return
+	Sfx.play("rage", 0.0, 0.0)
+	show_toast(tr("WUTMODUS! Alles ×3 für 10 Sekunden!"))
+	target_area.shake()
 	_rage_tint.color.a = 0.16
 	if not GameState.reduced_effects:
 		_rage_tween = create_tween().set_loops()
@@ -1005,7 +1160,7 @@ func _on_bump_level_up(target: String, level: int) -> void:
 		return
 	var texts := ["", tr("Erstes Pflaster!"), tr("Ein Veilchen!"), tr("Riesenbeule!"), tr("Jetzt ist er genervt."), tr("Er sieht Sterne!"),
 		tr("Noch ein Veilchen!"), tr("Kopfverband!"), tr("Am Ende seiner Kräfte."), tr("Die Ohren qualmen!"), tr("Vögelchen zwitschern. Maximum erreicht!")]
-	show_toast(tr("Beulen-Level %d: %s (+1 Beulen-Marke)") % [level, texts[mini(level, texts.size() - 1)]])
+	show_toast(tr("Beulen-Level %d: %s (+1 Reue-Token)") % [level, texts[mini(level, texts.size() - 1)]])
 	Sfx.play("achievement", 0.05, -6.0)
 	# Bei der Standardfigur wechselt ab Level 4 und 8 die Mimik.
 	target_area.set_texture(GameState.target_texture())
@@ -1030,8 +1185,25 @@ func _open_crop(img: Image, display_name: String) -> void:
 			return
 		if GameState.import_image(chosen, display_name):
 			show_toast(tr("Neues Opfer: %s") % GameState.target_name())
+			_open_face(GameState.target_id)
 		else:
 			show_toast(tr("Dieses Bild konnte nicht geladen werden.")))
+
+
+## Augen markieren, damit Pflaster, Veilchen und Verband auf eigenen Bildern richtig sitzen.
+func _open_face(id: String, after: Callable = Callable()) -> void:
+	var img := GameState.gallery_image(id)
+	if img == null:
+		return
+	var marker := FaceMarker.new()
+	marker.setup(ImageTexture.create_from_image(img), GameState.face_eyes(id))
+	var m := Modal.open(self, tr("Wo ist das Gesicht?"), marker, [tr("Passt so"), tr("Überspringen")], 480.0)
+	m.closed.connect(func(index: int) -> void:
+		if index == 0:
+			GameState.set_face(id, marker.eye_left, marker.eye_right)
+			target_area.bumps.refresh()
+		if after.is_valid():
+			after.call())
 
 
 func _on_files_dropped(files: PackedStringArray) -> void:
@@ -1103,9 +1275,14 @@ func _on_achievement_unlocked(id: String) -> void:
 	desc.text = a.get("description", "")
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.add_theme_font_size_override("font_size", 14)
+	var reward := Label.new()
+	reward.text = _reward_text(GameState.achievement_reward(a), GameState.last_achievement_wumms)
+	reward.add_theme_font_size_override("font_size", 14)
+	reward.add_theme_color_override("font_color", GOLD)
 	box.add_child(head)
 	box.add_child(title)
 	box.add_child(desc)
+	box.add_child(reward)
 	achievement_toasts.add_child(panel)
 	panel.modulate.a = 0.0
 	var tw := panel.create_tween()
@@ -1115,6 +1292,15 @@ func _on_achievement_unlocked(id: String) -> void:
 	tw.tween_callback(panel.queue_free)
 	if not GameState.reduced_effects:
 		Confetti.burst(self, Vector2(size.x - 200.0, 110.0), 40)
+
+
+## "Belohnung: +1 Reue-Token · +120 Schmerz-Token" (wumms < 0: noch nicht bekannt, dann Minuten Produktion).
+func _reward_text(reward: Dictionary, wumms: float = -1.0) -> String:
+	var marken := int(reward.marken)
+	var tokens := tr("+1 Reue-Token") if marken == 1 else tr("+%d Reue-Token") % marken
+	if wumms >= 0.0:
+		return tr("Belohnung: %s · +%s Schmerz-Token") % [tokens, Num.fmt(wumms)]
+	return tr("Belohnung: %s · %s Min. Produktion") % [tokens, Num.fmt(float(reward.minutes))]
 
 
 func _show_achievements() -> void:
@@ -1142,9 +1328,8 @@ func _show_achievements() -> void:
 		var unlocked := GameState.achievements.has(a.id)
 		var hidden := bool(a.get("hidden", false)) and not unlocked
 		var tile := PanelContainer.new()
-		tile.custom_minimum_size = Vector2(262, 96)
-		tile.add_theme_stylebox_override("panel", _box(Color("fff3bf") if unlocked else Color("f1e9dc"), 10, 2, 8,
-			INK if unlocked else Color(INK, 0.35)))
+		tile.custom_minimum_size = Vector2(262, 112)
+		tile.add_theme_stylebox_override("panel", tile_box("active" if unlocked else "locked"))
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 2)
 		tile.add_child(box)
@@ -1152,15 +1337,20 @@ func _show_achievements() -> void:
 		name_label.text = "???" if hidden else String(a.name)
 		name_label.add_theme_font_size_override("font_size", 16)
 		if not unlocked:
-			name_label.add_theme_color_override("font_color", Color(INK, 0.55))
+			name_label.add_theme_color_override("font_color", MUTED)
 		var desc := Label.new()
 		desc.text = tr("Versteckter Erfolg") if hidden else String(a.description)
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc.custom_minimum_size = Vector2(236, 0)
 		desc.add_theme_font_size_override("font_size", 12)
-		desc.add_theme_color_override("font_color", Color(INK, 0.75 if unlocked else 0.5))
+		desc.add_theme_color_override("font_color", Color(TEXT, 0.8) if unlocked else MUTED)
 		box.add_child(name_label)
 		box.add_child(desc)
+		var reward := Label.new()
+		reward.text = ("✓ " if unlocked else "") + _reward_text(GameState.achievement_reward(a))
+		reward.add_theme_font_size_override("font_size", 11)
+		reward.add_theme_color_override("font_color", GOLD if not unlocked else Color(GOLD, 0.6))
+		box.add_child(reward)
 		if not unlocked and not hidden and a.condition.type not in ["night", "idle"]:
 			var p := GameState.condition_progress(a.condition)
 			var bar := ProgressBar.new()
@@ -1179,6 +1369,8 @@ func _show_achievements() -> void:
 # =====================================================================
 
 func _on_menu(id: int) -> void:
+	if id in [MENU_SOUND, MENU_EFFECTS, MENU_TIME_WARP, MENU_AUTOBUY, MENU_AUTO_RAGE]:
+		_sync_menu_checks.call_deferred()
 	match id:
 		MENU_SOUND:
 			GameState.sound_on = not GameState.sound_on
@@ -1192,6 +1384,8 @@ func _on_menu(id: int) -> void:
 			show_toast(tr("Zeitraffer an: Geräte arbeiten doppelt so schnell.") if GameState.time_warp else tr("Zeitraffer aus."))
 		MENU_AUTOBUY:
 			GameState.autobuy_enabled = not GameState.autobuy_enabled
+		MENU_AUTO_RAGE:
+			GameState.auto_rage_enabled = not GameState.auto_rage_enabled
 		MENU_SAVE:
 			if GameState.save_game():
 				show_toast(tr("Gespeichert."))
@@ -1225,7 +1419,7 @@ func _on_menu(id: int) -> void:
 						show_toast(tr("Dieser Code funktioniert leider nicht.")))
 		MENU_RESET:
 			var m := Modal.open(self, tr("Alles löschen?"),
-				tr("Wirklich ALLES wird gelöscht: Wumms, Geräte, Upgrades, Erfolge, Lorbeeren und der Lorbeer-Baum. Deine Bilder bleiben erhalten.\n\n(Für einen Neuanfang mit Lorbeeren nimm den grünen Knopf in der Statistik.)"),
+				tr("Wirklich ALLES wird gelöscht: Schmerz-Token, Geräte, Upgrades, Erfolge, Lorbeeren und der Lorbeer-Baum. Deine Bilder bleiben erhalten.\n\n(Für einen Neuanfang mit Lorbeeren nimm den grünen Knopf in der Statistik.)"),
 				[tr("Ja, alles löschen"), tr("Abbrechen")])
 			m.closed.connect(func(index: int) -> void:
 				if index == 0:
@@ -1235,6 +1429,19 @@ func _on_menu(id: int) -> void:
 					for shoe in shoe_layer.get_children():
 						shoe.queue_free()
 					show_toast(tr("Alles auf Anfang. Bombastus atmet auf.")))
+
+
+## Häkchen sofort nachziehen – das Menü bleibt bei Ankreuz-Einträgen offen.
+func _sync_menu_checks() -> void:
+	var popup: PopupMenu = (%MenuButton as MenuButton).get_popup()
+	var states := {MENU_SOUND: GameState.sound_on, MENU_EFFECTS: GameState.reduced_effects,
+		MENU_TIME_WARP: GameState.time_warp, MENU_AUTOBUY: GameState.autobuy_enabled,
+		MENU_AUTO_RAGE: GameState.auto_rage_enabled}
+	for id in states:
+		var index := popup.get_item_index(id)
+		if index >= 0:
+			popup.set_item_checked(index, bool(states[id]))
+	GameState.save_game()
 
 
 func _column(texts: Array, extra: Control = null) -> VBoxContainer:
@@ -1256,14 +1463,14 @@ func _show_welcome_back(info: Dictionary, login: Dictionary = {}) -> void:
 	var text := ""
 	if not info.is_empty():
 		var seconds := float(info.seconds)
-		text = tr("Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Wumms\nerwirtschaftet.") % [
+		text = tr("Du warst %s weg.\nIn der Zeit haben deine Geräte\n%s Schmerz-Token\nerwirtschaftet.") % [
 			Num.duration(seconds), Num.whole(float(info.gain))]
 		if seconds > GameState.offline_cap():
 			text += tr("\n\n(Ohne Aufsicht arbeiten sie höchstens %s.)") % Num.duration(GameState.offline_cap())
 	if not login.is_empty():
 		if text != "":
 			text += "\n\n"
-		text += tr("Login-Serie: Tag %d von 7%s\nTagesbonus: +%s Wumms und +%d Beulen-Marken") % [
+		text += tr("Login-Serie: Tag %d von 7%s\nTagesbonus: +%s Schmerz-Token und +%d Reue-Token") % [
 			int(login.day), tr(" – Hauptgewinn!") if int(login.day) == 7 else "", Num.whole(float(login.wumms)), int(login.marken)]
 	Modal.open(self, tr("Willkommen zurück!"), text, [tr("Weiter hauen!")])
 
@@ -1279,7 +1486,7 @@ func _show_prestige() -> void:
 	var text := tr("Du fängst von vorne an und bekommst dafür %s.\n\n") % laurels_text(gain)
 	text += tr("Jeder Lorbeer gibt dauerhaft +1 %% auf Produktion und Klicks – insgesamt dann +%d %%.\n") % (GameState.laurels_total + gain)
 	text += tr("Lorbeeren kannst du zusätzlich im Lorbeer-Baum ausgeben, der Bonus bleibt trotzdem.\n\n")
-	text += tr("Weg sind: Wumms, Geräte und Upgrades.\nBleiben: Erfolge, Statistiken, Bilder, Beulen-Marken und der Lorbeer-Baum.")
+	text += tr("Weg sind: Schmerz-Token, Geräte und Upgrades.\nBleiben: Erfolge, Statistiken, Bilder, Reue-Token und der Lorbeer-Baum.")
 	var m := Modal.open(self, tr("Neuanfang?"), text, [tr("Neu anfangen!"), tr("Noch nicht")], 600.0)
 	m.closed.connect(func(index: int) -> void:
 		if index == 0:
@@ -1310,15 +1517,17 @@ func _show_laurel_tree() -> void:
 	content.add_theme_constant_override("separation", 12)
 	var head := Label.new()
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	head.text = tr("Verfügbar: %s  ·  %d Beulen-Marken  ·  Lorbeer-Bonus: +%d %%") % [
+	head.text = tr("Verfügbar: %s  ·  %d Reue-Token  ·  Lorbeer-Bonus: +%d %%") % [
 		laurels_text(GameState.laurels_available()),
 		GameState.beulen_marken, GameState.laurels_total]
 	content.add_child(head)
 	var hint := Label.new()
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 13)
-	hint.add_theme_color_override("font_color", Color(INK, 0.65))
-	hint.text = tr("Lorbeeren gibt es beim Neuanfang. Beulen-Marken gibt es für Erfolge, Beulen-Level und Pech-Schuhe.")
+	hint.add_theme_color_override("font_color", MUTED)
+	var next_laurel := Balance.wumms_for_laurels(GameState.laurels_total - GameState.laurels_extra + 1)
+	hint.text = tr("Lorbeeren gibt es beim Neuanfang. Reue-Token gibt es für Erfolge, Beulen-Level und Pech-Schuhe.") + "\n" + \
+		tr("Nächster Lorbeer ab %s Schmerz-Token insgesamt – bisher %s.") % [Num.fmt(next_laurel), Num.fmt(GameState.lifetime_wumms)]
 	content.add_child(hint)
 
 	var columns := HBoxContainer.new()
@@ -1353,7 +1562,7 @@ func _challenge_row(c: Dictionary, modal_ref: Array) -> HBoxContainer:
 	var label := Label.new()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.text = tr("%s: %s Ziel: %s Wumms → %s") % [c.name, c.description, Num.whole(float(c.goal_wumms)),
+	label.text = tr("%s: %s Ziel: %s Schmerz-Token → %s") % [c.name, c.description, Num.whole(float(c.goal_wumms)),
 		laurels_text(int(c.reward_laurels), true)]
 	row.add_child(label)
 	var b := Button.new()
@@ -1368,10 +1577,11 @@ func _challenge_row(c: Dictionary, modal_ref: Array) -> HBoxContainer:
 		b.disabled = true
 	else:
 		b.text = tr("Starten")
+		style_primary(b)
 		b.disabled = GameState.challenge_active != ""
 		b.pressed.connect(func() -> void:
 			var m := Modal.open(self, tr("„%s“ starten?") % c.name,
-				tr("Dein Durchlauf beginnt von vorn – wie bei einem Neuanfang, nur ohne neue Lorbeeren.\nLorbeeren, Erfolge und der Lorbeer-Baum bleiben.\n\n%s\nZiel: %s Wumms") % [c.description, Num.whole(float(c.goal_wumms))],
+				tr("Dein Durchlauf beginnt von vorn – wie bei einem Neuanfang, nur ohne neue Lorbeeren.\nLorbeeren, Erfolge und der Lorbeer-Baum bleiben.\n\n%s\nZiel: %s Schmerz-Token") % [c.description, Num.whole(float(c.goal_wumms))],
 				[tr("Los geht's!"), tr("Doch nicht")])
 			m.closed.connect(func(index: int) -> void:
 				if index == 0 and GameState.start_challenge(id):
@@ -1398,17 +1608,20 @@ func _laurel_node_button(n: Dictionary, modal_ref: Array) -> Button:
 	b.tooltip_text = "%s\n\n%s%s" % [n.name, n.description,
 		"" if req_names.is_empty() else tr("\n\nBraucht: ") + ", ".join(req_names)]
 	if owned:
-		b.add_theme_stylebox_override("normal", _box(Color("ffe066"), 10, 3, 6))
-		b.add_theme_stylebox_override("disabled", _box(Color("ffe066"), 10, 3, 6))
-		b.add_theme_color_override("font_disabled_color", INK)
+		b.add_theme_stylebox_override("normal", tile_box("active", 6))
+		b.add_theme_stylebox_override("disabled", tile_box("active", 6))
+		b.add_theme_color_override("font_disabled_color", GOLD)
 		b.disabled = true
 	elif not unlocked:
 		b.disabled = true
 		b.text = tr("%s\ngesperrt · %s") % [n.name, GameState.laurel_cost_text(n)]
 	else:
 		b.disabled = not affordable
-		b.add_theme_stylebox_override("normal", _box(Color("d3f9d8"), 10, 3, 6))
-		b.add_theme_stylebox_override("hover", _box(Color("ebfbee"), 10, 3, 6))
+		b.add_theme_stylebox_override("normal", tile_box("good", 6))
+		var hover := tile_box("good", 6)
+		hover.bg_color = Color("285750")
+		b.add_theme_stylebox_override("hover", hover)
+		b.add_theme_color_override("font_pressed_color", TEXT)
 		var id: String = n.id
 		b.pressed.connect(func() -> void:
 			if GameState.buy_laurel_node(id):
@@ -1456,7 +1669,7 @@ func _show_gallery() -> void:
 func _gallery_tile(entry: Dictionary, modal_ref: Array) -> PanelContainer:
 	var current: bool = entry.id == GameState.target_id
 	var tile := PanelContainer.new()
-	tile.add_theme_stylebox_override("panel", _box(Color("fff3bf") if current else Color("fffdf7"), 10, 3 if current else 2, 8))
+	tile.add_theme_stylebox_override("panel", tile_box("active" if current else "normal"))
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
 	tile.add_child(box)
@@ -1482,7 +1695,7 @@ func _gallery_tile(entry: Dictionary, modal_ref: Array) -> PanelContainer:
 	var info := Label.new()
 	info.text = tr("%s Treffer · Beulen-Level %d") % [Num.whole(entry.hits), entry.level]
 	info.add_theme_font_size_override("font_size", 12)
-	info.add_theme_color_override("font_color", Color(INK, 0.7))
+	info.add_theme_color_override("font_color", MUTED)
 	box.add_child(info)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
@@ -1498,6 +1711,12 @@ func _gallery_tile(entry: Dictionary, modal_ref: Array) -> PanelContainer:
 		var rename := _small_button(tr("Name"), true)
 		rename.pressed.connect(func() -> void: _rename_dialog(id, modal_ref))
 		row.add_child(rename)
+		var face := _small_button(tr("Gesicht"), true)
+		face.tooltip_text = tr("Augen markieren, damit Pflaster und Verband richtig sitzen")
+		face.pressed.connect(func() -> void:
+			modal_ref[0].close()
+			_open_face(id, _show_gallery))
+		row.add_child(face)
 		var delete := _small_button(tr("Löschen"), true)
 		delete.pressed.connect(func() -> void: _delete_dialog(id, modal_ref))
 		row.add_child(delete)
@@ -1553,7 +1772,7 @@ func _on_boss_finished(won: bool, reward: Dictionary) -> void:
 		Sfx.applause(true)
 		if not GameState.reduced_effects:
 			Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
-		Modal.open(self, tr("Boss besiegt!"), tr("Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Beulen-Marken") % [
+		Modal.open(self, tr("Boss besiegt!"), tr("Er hat aufgegeben und wedelt mit der weißen Fahne.\n\nPokal: %s\n+%d Reue-Token") % [
 			tr(reward.trophy), int(reward.marken)], [tr("Hurra!")])
 	else:
 		Sfx.play("bad", 0.0, -2.0)
@@ -1594,24 +1813,24 @@ func _show_quests() -> void:
 			b.text = tr("Erledigt ✓")
 			b.disabled = true
 		elif GameState.quest_done(q):
-			b.text = tr("Abholen: %d Marken") % int(q.reward)
+			b.text = tr("Abholen: %d Reue-Token") % int(q.reward)
 			b.pressed.connect(func() -> void:
 				var gain := GameState.claim_quest(index)
 				if gain > 0:
 					Sfx.play("achievement", 0.0, -4.0)
-					show_toast(tr("+%d Beulen-Marken") % gain)
+					show_toast(tr("+%d Reue-Token") % gain)
 				modal_ref[0].close()
 				_show_quests())
 		else:
-			b.text = tr("%s / %s · %d Marken") % [Num.whole(GameState.quest_progress(q)), Num.whole(float(q.amount)), int(q.reward)]
+			b.text = tr("%s / %s · %d Reue-Token") % [Num.whole(GameState.quest_progress(q)), Num.whole(float(q.amount)), int(q.reward)]
 			b.disabled = true
 		row.add_child(b)
 		content.add_child(row)
 	var streak := Label.new()
-	streak.text = (tr("Login-Serie: 1 Tag · Morgen gibt es %d Beulen-Marken") % Balance.login_marken(GameState.login_streak + 1)) \
-		if GameState.login_streak == 1 else (tr("Login-Serie: %d Tage in Folge · Morgen gibt es %d Beulen-Marken") % [
+	streak.text = (tr("Login-Serie: 1 Tag · Morgen gibt es %d Reue-Token") % Balance.login_marken(GameState.login_streak + 1)) \
+		if GameState.login_streak == 1 else (tr("Login-Serie: %d Tage in Folge · Morgen gibt es %d Reue-Token") % [
 		GameState.login_streak, Balance.login_marken(GameState.login_streak + 1)])
-	streak.add_theme_color_override("font_color", Color(INK, 0.7))
+	streak.add_theme_color_override("font_color", MUTED)
 	content.add_child(streak)
 
 	var event := GameState.active_event()
@@ -1653,7 +1872,7 @@ func _show_quests() -> void:
 		if GameState.trophies.is_empty() else "🏆 " + " · ".join(GameState.trophies.map(func(t: String) -> String: return tr(t)))
 	content.add_child(shelf)
 	var next_boss := Label.new()
-	next_boss.add_theme_color_override("font_color", Color(INK, 0.7))
+	next_boss.add_theme_color_override("font_color", MUTED)
 	next_boss.text = tr("Nächster Boss in %s Treffern.") % Num.whole(maxf(0.0, GameState.next_boss_at - GameState.total_hits))
 	content.add_child(next_boss)
 	modal_ref.append(Modal.open(self, tr("Aufträge"), content, [tr("Schließen")], 720.0))
@@ -1672,7 +1891,7 @@ func _on_event_completed(event: Dictionary) -> void:
 	if not GameState.reduced_effects:
 		Confetti.burst(self, size * Vector2(0.5, 0.3), 100)
 	_ticker_override = ""
-	Modal.open(self, tr("Event geschafft!"), tr("%s gibt auf!\n\nPokal: %s\n+%d Beulen-Marken\n\nDie Figur bleibt für immer in deiner Galerie.") % [
+	Modal.open(self, tr("Event geschafft!"), tr("%s gibt auf!\n\nPokal: %s\n+%d Reue-Token\n\nDie Figur bleibt für immer in deiner Galerie.") % [
 		event.name, tr(event.trophy), int(event.reward_marken)], [tr("Hurra!")])
 
 
@@ -1696,9 +1915,9 @@ func _show_games() -> void:
 		col.add_child(title)
 		var desc := Label.new()
 		desc.add_theme_font_size_override("font_size", 14)
-		desc.add_theme_color_override("font_color", Color(INK, 0.7))
+		desc.add_theme_color_override("font_color", MUTED)
 		var today_marken := int(GameState.minigame_rewards_today.get(game, 0))
-		desc.text = tr("Rekord: %d Punkte · heute verdient: %d/5 Beulen-Marken (je %d Punkte eine)") % [
+		desc.text = tr("Rekord: %d Punkte · heute verdient: %d/5 Reue-Token (je %d Punkte einen)") % [
 			int(GameState.stat(info.stat)), today_marken, int(info.points_per_marke)]
 		col.add_child(desc)
 		row.add_child(col)
@@ -1707,6 +1926,7 @@ func _show_games() -> void:
 		b.custom_minimum_size = Vector2(180, 0)
 		var unlocked := GameState.minigame_unlocked(game)
 		b.text = tr("Spielen!") if unlocked else GameState.minigame_unlock_text(game)
+		style_primary(b)
 		b.disabled = not unlocked
 		var which: String = game
 		b.pressed.connect(func() -> void:
@@ -1724,14 +1944,15 @@ func _show_games() -> void:
 	market_col.add_child(market_title)
 	var market_desc := Label.new()
 	market_desc.add_theme_font_size_override("font_size", 14)
-	market_desc.add_theme_color_override("font_color", Color(INK, 0.7))
+	market_desc.add_theme_color_override("font_color", MUTED)
 	market_desc.text = tr("Pflaster, Eisbeutel, Torten und Gummienten handeln – billig kaufen, teuer verkaufen.")
 	market_col.add_child(market_desc)
 	market_row.add_child(market_col)
 	var market_button := Button.new()
 	market_button.focus_mode = Control.FOCUS_NONE
 	market_button.custom_minimum_size = Vector2(180, 0)
-	market_button.text = tr("Zur Börse!") if GameState.market_unlocked() else tr("Ab 10 Mio. Wumms")
+	market_button.text = tr("Zur Börse!") if GameState.market_unlocked() else tr("Ab 10 Mio. Schmerz-Token")
+	style_primary(market_button)
 	market_button.disabled = not GameState.market_unlocked()
 	market_button.pressed.connect(func() -> void:
 		modal_ref[0].close()
@@ -1782,7 +2003,7 @@ func _show_shop() -> void:
 	var modal_ref: Array = []
 	var head := Label.new()
 	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	head.text = tr("Du hast %d Beulen-Marken. Gekauftes kannst du jederzeit wechseln.") % GameState.beulen_marken
+	head.text = tr("Du hast %d Reue-Token. Gekauftes kannst du jederzeit wechseln.") % GameState.beulen_marken
 	content.add_child(head)
 	for slot in SHOP_SLOTS:
 		content.add_child(_section_title(tr(slot[1])))
@@ -1801,7 +2022,7 @@ func _shop_item(c: Dictionary, modal_ref: Array) -> PanelContainer:
 	var equipped := GameState.cosmetic_equipped(c.id)
 	var tile := PanelContainer.new()
 	tile.custom_minimum_size = Vector2(210, 0)
-	tile.add_theme_stylebox_override("panel", _box(Color("fff3bf") if equipped else Color("fffdf7"), 10, 3 if equipped else 2, 6))
+	tile.add_theme_stylebox_override("panel", tile_box("active" if equipped else "normal", 6))
 	tile.tooltip_text = String(c.description)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
@@ -1840,8 +2061,9 @@ func _shop_item(c: Dictionary, modal_ref: Array) -> PanelContainer:
 		b.text = tr("Im Lorbeer-Baum")
 		b.disabled = true
 	else:
-		b.text = tr("Kaufen: %d Marken") % int(c.cost)
+		b.text = tr("Kaufen: %d Reue-Token") % int(c.cost)
 		b.disabled = GameState.beulen_marken < int(c.cost)
+		style_primary(b)
 		b.pressed.connect(func() -> void:
 			if GameState.buy_cosmetic(id):
 				Sfx.play("buy", 0.0, -3.0)

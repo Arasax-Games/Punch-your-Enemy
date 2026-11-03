@@ -39,7 +39,10 @@ func _draw() -> void:
 	if level <= 0:
 		return
 	var r := area.image_rect()
-	var k := clampf(minf(r.size.x, r.size.y) / 520.0, 0.4, 2.0)
+	# Größe richtet sich nach dem Augenabstand (bei Bombastus ca. 100 px auf 520 px Bildgröße),
+	# damit Pflaster und Verband auch auf kleinen Gesichtern in großen Fotos passen.
+	var eye_dist := _anchor("eye_left").distance_to(_anchor("eye_right"))
+	var k := clampf(eye_dist / 100.0, 0.25, 2.5)
 	var animate := not GameState.reduced_effects
 	var t := _time if animate else 0.0
 	# Bei der Standardfigur sorgt ab Level 4 schon die Mimik für Ausdruck; Overlays bleiben trotzdem.
@@ -56,7 +59,7 @@ func _draw() -> void:
 	if level >= 6:
 		_black_eye(_anchor("eye_right"), k)
 	if level >= 7:
-		_bandage(_anchor("forehead"), r.size.x * 0.55, k)
+		_bandage(_anchor("forehead"), eye_dist * 2.86, k)
 	if level >= 8:
 		_bump(_anchor("head_top") + Vector2(-150, 20) * k, 22.0 * k, k)
 	if level >= 9:

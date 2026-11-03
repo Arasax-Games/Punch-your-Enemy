@@ -200,8 +200,10 @@ func _update_pivot() -> void:
 
 
 func _punch_cursor() -> void:
-	_set_cursor(_cursor(1))
-	_cursor_timer = 0.09
+	# Der Cursor-Wechsel ist teuer (das System baut jedes Mal einen neuen Mauszeiger) – nur wechseln, wenn nötig.
+	if _cursor_timer <= 0.0:
+		_set_cursor(_cursor(1))
+	_cursor_timer = 0.09 if not _held else 0.2
 
 
 var _cursor_cache: Dictionary = {}

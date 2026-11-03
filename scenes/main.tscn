@@ -56,12 +56,12 @@ visible = false
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 1
-tooltip_text = "Beulen-Marken: für Laden, Lorbeer-Baum (Zweig „Show“) und mehr."
+tooltip_text = "Reue-Token: für Laden, Lorbeer-Baum (Zweig „Show“) und mehr."
 
 [node name="MarkenLabel" type="Label" parent="Layout/TopBar/TopRow/MarkenChip"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Beulen-Marken: 0"
+text = "Reue-Token: 0"
 
 [node name="Spacer" type="Control" parent="Layout/TopBar/TopRow"]
 layout_mode = 2
@@ -107,14 +107,14 @@ text = "Aufträge"
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
-tooltip_text = "Kosmetik-Laden: Faust-Skins, Hintergründe und Sounds für Beulen-Marken."
+tooltip_text = "Kosmetik-Laden: Faust-Skins, Hintergründe und Sounds für Reue-Token."
 text = "Laden"
 
 [node name="GamesButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
-tooltip_text = "Mini-Spiele für Beulen-Marken."
+tooltip_text = "Mini-Spiele für Reue-Token."
 text = "Spiele"
 
 [node name="LaurelButton" type="Button" parent="Layout/TopBar/TopRow"]
@@ -122,7 +122,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 focus_mode = 0
-tooltip_text = "Lorbeeren und Beulen-Marken dauerhaft investieren."
+tooltip_text = "Lorbeeren und Reue-Token dauerhaft investieren."
 text = "Lorbeer-Baum"
 
 [node name="MenuButton" type="MenuButton" parent="Layout/TopBar/TopRow"]

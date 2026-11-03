@@ -208,9 +208,9 @@ Etwa 80 Achievements in Kategorien, jedes mit +0,5 % Wutmilch-Bonus und einem wi
 
 ## 9. Prestige: Der Neuanfang
 
-Ab 1 Billion insgesamt erzeugtem Wumms freigeschaltet. Der Spieler setzt Fortschritt zurück und erhält Lorbeeren.
+Ab 10 Milliarden insgesamt erzeugtem Wumms freigeschaltet (früher 1 Billion – nach Spielertests gesenkt, damit der erste Neuanfang nach einigen Stunden kommt). Der Spieler setzt Fortschritt zurück und erhält Lorbeeren.
 
-**Formel:** Lorbeeren = floor(∛(Gesamt-Wumms ÷ 1 Billion))
+**Formel:** Lorbeeren = floor(∛(Gesamt-Wumms ÷ 10 Milliarden))
 
 Jede Lorbeere gibt dauerhaft +1 % WPS und +1 % Klickwert.
 

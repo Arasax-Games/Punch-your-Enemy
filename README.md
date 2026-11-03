@@ -51,22 +51,22 @@ Das Spiel ist **zweisprachig: Deutsch und Englisch** (Menü → „Sprache / Lan
 
 **Phase 5**
 - **Drei neue Standardfiguren** mit je 3 Mimik-Stufen: Dr. Doomsday Dieter (mit Katze), Baron von Blamage (mit Monokel) und Sir Fiesling der Dritte (Stummfilm-Schurke in Schwarz-Weiß)
-- **Kosmetik-Laden** für Beulen-Marken: Faust-Skins (Gummihandschuh, Boxhandschuh, Schaumstoff-Hand, Pfote, Brathähnchenkeule), Hintergründe Wohnzimmer und Arena, Sound-Pack Kampfsport – alles jederzeit wechselbar
+- **Kosmetik-Laden** für Reue-Token: Faust-Skins (Gummihandschuh, Boxhandschuh, Schaumstoff-Hand, Pfote, Brathähnchenkeule), Hintergründe Wohnzimmer und Arena, Sound-Pack Kampfsport – alles jederzeit wechselbar
 - **Herausforderungen** nach dem ersten Neuanfang: „Nur Fäuste“, „Ohne Upgrades“, „Inflation“ – bringen Extra-Lorbeeren
 - **Börse für Beulen**: Pflaster, Eisbeutel, Sahnetorten und Gummienten billig kaufen, teuer verkaufen
 - **Zeitlupe** als neuer Effekt des Goldenen Schuhs
 
 **Phase 4**
-- **Boss-Kämpfe** alle 100.000 Treffer: Lebensleiste, 30 Sekunden, wandernde Schwachstelle (×5) und harmlose Gimmicks (Wegducken, Pappschild, Gummiente). Belohnung: Pokal und Beulen-Marken
+- **Boss-Kämpfe** alle 100.000 Treffer: Lebensleiste, 30 Sekunden, wandernde Schwachstelle (×5) und harmlose Gimmicks (Wegducken, Pappschild, Gummiente). Belohnung: Pokal und Reue-Token
 - **Tagesaufträge** (3 pro Tag) und **Login-Serie** (Tag 1–7, steigende Belohnung)
 - **Saison-Events** mit eigener Figur: Halloween-Hexe Hildegard (24.10.–7.11.) und Weihnachtsmuffel Gustav (1.–26.12.)
-- **Mini-Spiele**: Reaktions-Dojo und Tortenwurf-Schießbude (bis zu 5 Beulen-Marken pro Spiel und Tag)
+- **Mini-Spiele**: Reaktions-Dojo und Tortenwurf-Schießbude (bis zu 5 Reue-Token pro Spiel und Tag)
 - **Vitrine** für Pokale, **Foto speichern** mit Wasserzeichen (bleibt lokal)
 - **Steam vorbereitet**: Erfolge werden über GodotSteam gemeldet, Spielstand für Steam Cloud – Anleitung in [`docs/steam.md`](docs/steam.md)
 
 **Phase 3**
-- **Neuanfang (Prestige)** ab 1 Billion Wumms: Lorbeeren = ∛(Wumms ÷ 1 Billion), je Lorbeer +1 % auf alles
-- **Lorbeer-Baum** mit 4 Zweigen: Handwerk (Rabatte, Startgeräte), Glück (Schuhe, Krits), Komfort (Offline, Dauerfeuer, Autokauf) und Show (goldene Faust, Hintergründe, Retro-Sounds, Konfetti – bezahlt mit Beulen-Marken)
+- **Neuanfang (Prestige)** ab 10 Mrd. Schmerz-Token: Lorbeeren = ∛(Schmerz-Token ÷ 10 Mrd.), je Lorbeer +1 % auf alles
+- **Lorbeer-Baum** mit 4 Zweigen: Handwerk (Rabatte, Startgeräte), Glück (Schuhe, Krits), Komfort (Offline, Dauerfeuer, Autokauf) und Show (goldene Faust, Hintergründe, Retro-Sounds, Konfetti – bezahlt mit Reue-Token)
 - **Combo** (bis ×2 Klick-Wert) und **Wutmodus** (Leiste füllen, mit R entfesseln: 10 s alles ×3, keine Goldenen Schuhe)
 - **Beulen-Level** 1–10 pro Opfer (alle 1.000 Treffer): Pflaster, Veilchen, Kopfverband, rauchende Ohren, Vögelchen – Bombastus wird ab Level 4 genervt und ab Level 8 ist er am Ende
 - **Galerie**: Opfer wechseln, umbenennen, löschen

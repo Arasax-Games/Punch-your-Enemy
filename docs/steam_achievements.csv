@@ -5,17 +5,17 @@ ZAPPELPHILIPP;Zappelphilipp;1.000 Treffer. Stillsitzen ist überbewertet.;Fidget
 FINGERFERTIG;Fingerfertig;10.000 Treffer. Deine Maus braucht Urlaub.;Nimble Fingers;10,000 hits. Your mouse needs a holiday.;nein
 SEHNENSCHEIDE;Sehnenscheidenentzündung;100.000 Treffer. Bitte mach mal eine Pause.;Tendinitis;100,000 hits. Please take a break.;nein
 KLICK_LEGENDE;Klick-Legende;1 Million Treffer. Man erzählt sich Geschichten über dich.;Click Legend;1 million hits. People tell stories about you.;nein
-TASCHENGELD;Taschengeld;1.000 Wumms insgesamt erzeugt.;Pocket Money;1,000 Whams produced in total.;nein
-SPARSCHWEIN;Sparschwein;100.000 Wumms insgesamt erzeugt.;Piggy Bank;100,000 Whams produced in total.;nein
-WUMMS_MILLIONAER;Wumms-Millionär;1 Million Wumms insgesamt erzeugt.;Wham Millionaire;1 million Whams produced in total.;nein
-WUMMS_MILLIARDAER;Wumms-Milliardär;1 Milliarde Wumms insgesamt erzeugt.;Wham Billionaire;1 billion Whams produced in total.;nein
-WUMMS_BILLIONAER;Wumms-Billionär;1 Billion Wumms insgesamt erzeugt.;Wham Trillionaire;1 trillion Whams produced in total.;nein
-WUMMS_BILLIARDAER;Wumms-Billiardär;1 Billiarde Wumms. Die Zahl hat jetzt ein e.;Wham Quadrillionaire;1 quadrillion Whams. The number has an e in it now.;nein
-LAEUFT_VON_ALLEIN;Läuft von allein;1 Wumms pro Sekunde.;Runs By Itself;1 Wham per second.;nein
-FLIESSBANDARBEIT;Fließbandarbeit;100 Wumms pro Sekunde.;Assembly Line;100 Whams per second.;nein
-INDUSTRIELLE_REVOLUTION;Industrielle Revolution;10.000 Wumms pro Sekunde.;Industrial Revolution;10,000 Whams per second.;nein
-OHRFEIGEN_KONZERN;Ohrfeigen-Konzern;1 Million Wumms pro Sekunde.;Slap Corporation;1 million Whams per second.;nein
-GALAKTISCH;Galaktisch;1 Milliarde Wumms pro Sekunde.;Galactic;1 billion Whams per second.;nein
+TASCHENGELD;Taschengeld;1.000 Schmerz-Token insgesamt erzeugt.;Pocket Money;1,000 Pain Tokens produced in total.;nein
+SPARSCHWEIN;Sparschwein;100.000 Schmerz-Token insgesamt erzeugt.;Piggy Bank;100,000 Pain Tokens produced in total.;nein
+WUMMS_MILLIONAER;Schmerz-Millionär;1 Million Schmerz-Token insgesamt erzeugt.;Pain Millionaire;1 million Pain Tokens produced in total.;nein
+WUMMS_MILLIARDAER;Schmerz-Milliardär;1 Milliarde Schmerz-Token insgesamt erzeugt.;Pain Billionaire;1 billion Pain Tokens produced in total.;nein
+WUMMS_BILLIONAER;Schmerz-Billionär;1 Billion Schmerz-Token insgesamt erzeugt.;Pain Trillionaire;1 trillion Pain Tokens produced in total.;nein
+WUMMS_BILLIARDAER;Schmerz-Billiardär;1 Billiarde Schmerz-Token. Die Zahl hat jetzt ein e.;Pain Quadrillionaire;1 quadrillion Pain Tokens. The number has an e in it now.;nein
+LAEUFT_VON_ALLEIN;Läuft von allein;1 Schmerz-Token pro Sekunde.;Runs By Itself;1 Pain Token per second.;nein
+FLIESSBANDARBEIT;Fließbandarbeit;100 Schmerz-Token pro Sekunde.;Assembly Line;100 Pain Tokens per second.;nein
+INDUSTRIELLE_REVOLUTION;Industrielle Revolution;10.000 Schmerz-Token pro Sekunde.;Industrial Revolution;10,000 Pain Tokens per second.;nein
+OHRFEIGEN_KONZERN;Ohrfeigen-Konzern;1 Million Schmerz-Token pro Sekunde.;Slap Corporation;1 million Pain Tokens per second.;nein
+GALAKTISCH;Galaktisch;1 Milliarde Schmerz-Token pro Sekunde.;Galactic;1 billion Pain Tokens per second.;nein
 FAUST_CLUB;Faust-Club;100 Fäuste. Die erste Regel: Wir reden nicht drüber.;Fist Club;100 fists. First rule: we don't talk about it.;nein
 PANTOFFEL_ARMEE;Pantoffel-Armee;100 Pantoffel. Oma ist stolz.;Slipper Army;100 slippers. Grandma is proud.;nein
 QUIETSCH_ORCHESTER;Quietsch-Orchester;50 Gummihämmer in perfekter Harmonie.;Squeak Orchestra;50 rubber mallets in perfect harmony.;nein
@@ -38,7 +38,7 @@ SCHUH_SAMMLER;Schuh-Sammler;10 Goldene Schuhe gefangen.;Shoe Collector;Caught 10
 GOLDENER_FINGER;Goldener Finger;50 Goldene Schuhe gefangen.;Golden Finger;Caught 50 Golden Shoes.;nein
 PANTOFFELHELD;Pantoffelheld;10 Silberne Pantoffel gefangen.;Slipper Hero;Caught 10 Silver Slippers.;nein
 RASEREI_REITER;Raserei-Reiter;5 Mal Raserei ausgelöst.;Frenzy Rider;Triggered Frenzy 5 times.;nein
-PECHVOGEL;Pechvogel;Ein Pech-Schuh. Immerhin gab es Beulen-Marken.;Jinxed;A Bad Luck Boot. At least there were Bump Tokens.;nein
+PECHVOGEL;Pechvogel;Ein Pech-Schuh. Immerhin gab es Reue-Token.;Jinxed;A Bad Luck Boot. At least there were Suffer Tokens.;nein
 FOTOGRAF;Fotograf;Dein erstes eigenes Bild importiert.;Photographer;Imported your first own image.;nein
 SAMMLER;Sammler;10 eigene Bilder importiert.;Collector;Imported 10 own images.;nein
 EINE_STUNDE;Eine Stunde Backpfeife;Eine Stunde Spielzeit.;One Hour of Slapping;One hour of playtime.;nein

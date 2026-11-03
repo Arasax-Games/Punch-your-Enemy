@@ -35,7 +35,7 @@ func _build() -> void:
 	_rng.randomize()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	theme = load("res://scripts/ui/main.gd").paper_theme()
+	theme = load("res://scripts/ui/main.gd").dialog_theme()
 	_running = true
 	_spawn_timer = 0.3
 
@@ -132,7 +132,7 @@ func _end_game() -> void:
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(400, 0)
 	text.text = (tr("Neuer Rekord!\n") if _score > best_before else tr("Rekord: %d\n") % best_before) + \
-		(tr("+%d Beulen-Marken") % gain if gain > 0 else tr("Heute gibt es dafür keine weiteren Beulen-Marken."))
+		(tr("+%d Reue-Token") % gain if gain > 0 else tr("Heute gibt es dafür keine weiteren Reue-Token."))
 	box.add_child(text)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -175,10 +175,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, size), Color(0.17, 0.13, 0.09, 0.6))
-	var bg := Color("fff8ec") if game == "dojo" else Color("ffe3e3")
-	draw_rect(_area_rect.grow(6), INK)
+	# Gleiches Farbsystem wie die Bühne: dunkles Lila mit Rasterpunkten, goldener Rahmen.
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.03, 0.02, 0.09, 0.7))
+	var bg := Color("231a4a") if game == "dojo" else Color("2e1a45")
+	draw_rect(_area_rect.grow(8), Color("0f0b24"))
+	draw_rect(_area_rect.grow(4), Color("ffc929"))
 	draw_rect(_area_rect, bg)
+	draw_texture_rect(GameBackground._dot_texture(), _area_rect, true)
 	if game == "pie":
 		for lane in 3:
 			var y := _area_rect.position.y + 140.0 + lane * 140.0 + 44.0
