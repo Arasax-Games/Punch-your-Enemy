@@ -463,25 +463,14 @@ func _style_panels() -> void:
 	chip.content_margin_right = 14
 	%MarkenChip.add_theme_stylebox_override("panel", chip)
 
-	# Kopfleiste: jeder Knopf als eigene Plakette mit Luft dazwischen, damit nichts aneinanderklebt.
-	(%TopBar.get_node("TopRow") as HBoxContainer).add_theme_constant_override("separation", 8)
+	# Kopfleiste: Knöpfe treten zurück, nur Hover hebt sie hervor.
 	for b in [%ImportButton, %GalleryButton, %ShowerButton, %AchievementsButton, %QuestsButton, %ShopButton,
 			%GamesButton, %LaurelButton, %MenuButton]:
-		var chip_normal := _box(CARD, 10, 2, 5, LINE)
-		chip_normal.content_margin_left = 12
-		chip_normal.content_margin_right = 12
-		var chip_hover := chip_normal.duplicate() as StyleBoxFlat
-		chip_hover.bg_color = ROW_HOVER
-		chip_hover.border_color = Color(GOLD, 0.6)
-		b.add_theme_stylebox_override("normal", chip_normal)
-		b.add_theme_stylebox_override("hover", chip_hover)
-		b.add_theme_stylebox_override("pressed", chip_hover)
+		b.add_theme_stylebox_override("normal", _box(Color(CARD, 0.0), 10, 0, 8))
+		b.add_theme_stylebox_override("hover", _box(ROW_HOVER, 10, 0, 8))
+		b.add_theme_stylebox_override("pressed", _box(ROW_HOVER, 10, 0, 8))
 		b.add_theme_color_override("font_pressed_color", TEXT)
-		b.add_theme_font_size_override("font_size", 14)
-		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var menu_normal := (%MenuButton.get_theme_stylebox("normal") as StyleBoxFlat).duplicate() as StyleBoxFlat
-	menu_normal.border_color = Color(GOLD, 0.8)
-	%MenuButton.add_theme_stylebox_override("normal", menu_normal)
+		b.add_theme_font_size_override("font_size", 15)
 
 	# Shop-Reiter: aktiver Reiter verschmilzt mit der Seite darunter.
 	var tab_group := ButtonGroup.new()
@@ -503,7 +492,7 @@ func _style_panels() -> void:
 
 
 func _style_labels() -> void:
-	_comic(%Title, 27, RAGE)
+	_comic(%Title, 30, RAGE)
 	_comic(wumms_label, 72, GOLD)
 	_comic(toast, 26, Color.WHITE)
 	for l in [%UpgradesTitle, %DevicesTitle]:
