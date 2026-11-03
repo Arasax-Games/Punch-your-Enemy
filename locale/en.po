@@ -5,6 +5,46 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
 
+#: scripts/audio/music.gd
+msgid "Pflaster-Pause"
+msgstr "Band-Aid Break"
+
+#: scripts/audio/music.gd
+msgid "Lo-Fi"
+msgstr "Lo-fi"
+
+#: scripts/audio/music.gd
+msgid "Hängematten-Bossa"
+msgstr "Hammock Bossa"
+
+#: scripts/audio/music.gd
+msgid "Bossa Nova"
+msgstr "Bossa nova"
+
+#: scripts/audio/music.gd
+msgid "Eisbeutel-Lounge"
+msgstr "Ice Pack Lounge"
+
+#: scripts/audio/music.gd
+msgid "Jazz-Lounge"
+msgstr "Jazz lounge"
+
+#: scripts/audio/music.gd
+msgid "Tortenstrand"
+msgstr "Pie Beach"
+
+#: scripts/audio/music.gd
+msgid "Strand-Chill"
+msgstr "Beach chill"
+
+#: scripts/audio/music.gd
+msgid "Sternchen kreisen"
+msgstr "Circling Stars"
+
+#: scripts/audio/music.gd
+msgid "Ambient"
+msgstr "Ambient"
+
 #: scripts/core/game_state.gd
 msgid "Pech-Schuh"
 msgstr "Bad Luck Boot"
@@ -314,8 +354,8 @@ msgid "Ton"
 msgstr "Sound"
 
 #: scripts/ui/main.gd
-msgid "Lautstärke …"
-msgstr "Volume …"
+msgid "Lautstärke und Musik …"
+msgstr "Volume & music …"
 
 #: scripts/ui/main.gd
 msgid "Weniger Effekte"
@@ -1050,12 +1090,28 @@ msgid "Publikum"
 msgstr "Audience"
 
 #: scripts/ui/main.gd
-msgid "Lautstärke"
-msgstr "Volume"
+msgid "Lautstärke und Musik"
+msgstr "Volume & Music"
 
 #: scripts/ui/main.gd
 msgid "Fertig"
 msgstr "Done"
+
+#: scripts/ui/main.gd
+msgid "Titel"
+msgstr "Track"
+
+#: scripts/ui/main.gd
+msgid "Alle abwechselnd"
+msgstr "All, taking turns"
+
+#: scripts/ui/main.gd
+msgid "Läuft gerade: %s"
+msgstr "Now playing: %s"
+
+#: scripts/ui/main.gd
+msgid "Es läuft deine eigene Musik (assets/audio/music/loop)."
+msgstr "Your own music is playing (assets/audio/music/loop)."
 
 #: scripts/ui/main.gd
 msgid "Nachbarn beschweren sich über Quietschen."

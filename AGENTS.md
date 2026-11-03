@@ -37,7 +37,8 @@ scripts/ui/            main.gd (UI-Logik), target_area.gd (Zielbild, Treffer, Cu
 scripts/effects/       hit_effects.gd (Spritzer, Beulen, Pflaster, Sterne, Popups), confetti.gd,
                        bump_overlay.gd (dauerhafte Beulen-Level-Optik)
 scripts/audio/         sfx.gd (Autoload Sfx: prozedurale Effekte, Audio-Busse Music/SFX/Ambient, Applaus),
-                       music.gd (Autoload Music: Ragtime-Schleife in Schichten, im Wutmodus schneller)
+                       music.gd (Autoload Music: 5 entspannte Titel à 5 Schichten, wechseln sich ab,
+                       im Wutmodus schneller; Dateien in assets/audio/music/tracks/, erzeugt mit tools/make_music.py)
 data/                  devices.json, upgrades.json, achievements.json, laurels.json (Lorbeer-Baum),
                        figures.json (Figuren inkl. Event-Figuren, Mimik-Stufen, Anker-Punkte),
                        bosses.json, quests.json (Tagesaufträge), events.json (Saison-Events),
@@ -79,6 +80,10 @@ python3 tools/i18n.py --check      # muss vor jedem Commit ohne Fehler durchlauf
 python3 tools/achievement_icons.py
 godot --headless --path . --script res://tools/steam_rich_presence.gd
 
+# Musik neu erzeugen (numpy, scipy, ffmpeg; ca. 5 min) – danach importieren und die .ogg/.import-Dateien committen.
+# Hörfassungen (MP3) landen in build/music/, mit --preview auch Spektrogramme zur Kontrolle.
+python3 tools/make_music.py [--only <id>] [--preview]
+
 # Spiel kurz headless starten, um Skriptfehler zu finden
 godot --headless --path . --quit-after 180
 
@@ -108,7 +113,7 @@ GODOT=/pfad/zu/godot tools/build_release.sh
 - Börse: Preise = Sekunden Produktion × höchste WPS dieses Durchlaufs × Kursfaktor (0,3–3, Schritt jede Minute). Beim Neuanfang schließt die Börse (Bestand weg).
 - Zeitlupe: `Engine.time_scale` wird in der Oberfläche gesetzt; `GameState._process` rechnet mit Echtzeit (`delta / Engine.time_scale`), damit Produktion und Timer nicht langsamer werden.
 - **Übersetzung:** Jeder Anzeigetext im Code steht in `tr("…")` (in statischen Funktionen `TranslationServer.translate("…")`). Texte in Konstanten bekommen darüber einen Kommentar `# i18n` und werden bei der Anzeige mit `tr()` übersetzt. Datenfelder `name`, `description`, `text`, `intro` übersetzt `GameState._localize_data()` beim Laden; Pokalnamen erst bei der Anzeige (sie stehen im Spielstand). Mehrzahl nie mit angehängten Endungen bauen (`"Lorbeer%s"`), sondern ganze Sätze übersetzen (Beispiel: `laurels_text()` in `main.gd`). Zahlen immer über `Num` – das Format hängt von der Sprache ab. Standardsprache ist **Englisch** (`GameState.effective_language()`), Deutsch wählt man im Menü. Ersatzsprache für fehlende Übersetzungen ist Deutsch (`locale/fallback="de"`, die msgids sind deutsch). Sprachwechsel lädt die Hauptszene neu.
-- **Audio:** Effekte immer über `Sfx.play()`, Publikum über `Sfx.applause()`. Busse `Music`, `SFX`, `Ambient` (Lautstärke in `GameState.music_volume` usw., angewendet mit `Sfx.apply_volumes()`). Echte Aufnahmen ersetzen die Platzhalter ohne Code-Änderung: `assets/audio/sfx/<sound>[_n].ogg|wav` und `assets/audio/music/loop.ogg`. Musik wird nur außerhalb von `headless` erzeugt.
+- **Audio:** Effekte immer über `Sfx.play()`, Publikum über `Sfx.applause()`. Busse `Music`, `SFX`, `Ambient` (Lautstärke in `GameState.music_volume` usw., angewendet mit `Sfx.apply_volumes()`). Echte Aufnahmen ersetzen die Platzhalter ohne Code-Änderung: `assets/audio/sfx/<sound>[_n].ogg|wav` und `assets/audio/music/loop.ogg` (ersetzt die ganze Playlist). **Musik:** 5 Titel (`Music.TRACKS`, komponiert in `tools/music/tracks.py`, Klangerzeugung in `tools/music/synth.py`), je 5 gleich lange, nahtlos schleifende Schichten `keys`, `bass`, `beat`, `lead`, `extra` in einem `AudioStreamSynchronized`; wie viele Schichten spielen, bestimmt `Music.layers_for()`. Ein Titel läuft `LOOPS_PER_TRACK`-mal, dann folgt mit Überblendung der nächste; im Dialog „Lautstärke und Musik“ kann man einen Titel festlegen (`GameState.music_track`). Musik bleibt ruhig und entspannt (Lo-Fi, Bossa, Lounge, Strand, Ambient). Neuer Titel: Funktion in `tracks.py` + Eintrag in `TRACKS` dort und in `music.gd`, dann `make_music.py`. Musik wird nur außerhalb von `headless` geladen.
 - **Schrift:** Text Poppins Medium, Überschriften `main.gd.heading_font()` (Poppins Bold oder `assets/fonts/heading.ttf`).
 - **Farben:** Der Hauptbildschirm ist eine dunkle „Comic-Arena bei Nacht“ – Farben nur über die Paletten-Konstanten in `main.gd` (`PANEL`, `CARD`, `TEXT`, `MUTED`, `GOLD` = kaufen/leistbar, `RAGE` = Wut/Krit). Dialoge (`Modal`) und Mini-Spiele nutzen dasselbe dunkle Farbsystem über `main.gd.dialog_theme()`; Kacheln in Dialogen über `main.gd.tile_box("normal"|"active"|"locked"|"good")`, Nebentext in `MUTED`. Keine hellen Papier-Farben mehr.
 - Neue Geräte brauchen ein Symbol `assets/devices/<id>.svg` (in `devices.json` als `icon`).

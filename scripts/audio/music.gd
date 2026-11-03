@@ -1,50 +1,60 @@
 extends Node
-## Musik (Autoload "Music"): eine schräge Ragtime-Schleife, die mit dem Fortschritt um
-## Instrumente wächst (Schlagzeug → Bass → Klavier → Klarinette → Bläser) und im Wutmodus schneller wird.
+## Musik (Autoload "Music"): fünf entspannte Titel, die sich abwechseln (oder einer in Dauerschleife).
+## Jeder Titel besteht aus fünf gleich langen Schichten – Tasten → Bass → Beat → Melodie → Extras –,
+## die mit dem Fortschritt dazukommen. Im Wutmodus läuft die Musik etwas schneller.
 ##
-## Die Schleife wird beim Start prozedural erzeugt (in einem Hintergrund-Thread). Wer echte Musik hat,
-## legt sie als assets/audio/music/loop.ogg (oder .wav/.mp3) ab – dann wird diese Datei gespielt.
+## Die Dateien erzeugt `python3 tools/make_music.py` (assets/audio/music/tracks/<id>_<schicht>.ogg).
+## Wer eigene Musik hat, legt sie als assets/audio/music/loop.ogg (oder .wav/.mp3) ab – dann läuft nur diese.
 
-const RATE := 22050
-const BPM := 112.0
-const BEATS := 16                       # 4 Takte à 4 Schläge
-const LAYERS: Array[String] = ["drums", "bass", "piano", "melody", "brass"]
-const MUTED_DB := -60.0
-const RAGE_PITCH := 1.12
+signal track_changed(index: int)
+
+const TRACK_DIR := "res://assets/audio/music/tracks"
 const CUSTOM_DIR := "res://assets/audio/music"
-const LAYER_PEAK := {"drums": 0.75, "bass": 0.7, "piano": 0.55, "melody": 0.5, "brass": 0.35}
-const ATTACK := {"piano": 0.004, "bass": 0.01, "clarinet": 0.03, "brass": 0.05}
-
-# Akkordfolge (C – A7 – D7 – G7): Bassgrundton, Quinte, Akkord-Töne (MIDI)
-const CHORDS := [
-	{"root": 36, "fifth": 43, "notes": [60, 64, 67], "tones": [72, 76, 79, 84]},
-	{"root": 45, "fifth": 40, "notes": [61, 64, 67], "tones": [73, 76, 79, 81]},
-	{"root": 38, "fifth": 45, "notes": [62, 66, 69], "tones": [74, 78, 81, 84]},
-	{"root": 43, "fifth": 38, "notes": [62, 65, 71], "tones": [74, 77, 79, 83]},
+const LAYERS: Array[String] = ["keys", "bass", "beat", "lead", "extra"]
+# i18n: "name" und "style" werden bei der Anzeige mit tr() übersetzt
+const TRACKS: Array[Dictionary] = [
+	{"id": "pflaster_pause", "name": "Pflaster-Pause", "style": "Lo-Fi"},
+	{"id": "haengematten_bossa", "name": "Hängematten-Bossa", "style": "Bossa Nova"},
+	{"id": "eisbeutel_lounge", "name": "Eisbeutel-Lounge", "style": "Jazz-Lounge"},
+	{"id": "tortenstrand", "name": "Tortenstrand", "style": "Strand-Chill"},
+	{"id": "sternchen_kreisen", "name": "Sternchen kreisen", "style": "Ambient"},
 ]
-# Synkopierte Melodie pro Takt: [Schlag, Länge in Schlägen, Index in "tones"]
-const MELODY := [[0.0, 0.5, 1], [0.75, 0.5, 2], [1.5, 0.5, 3], [2.0, 0.75, 2], [3.0, 0.5, 1], [3.5, 0.5, 0]]
+const LOOPS_PER_TRACK := 2   # so oft läuft ein Titel durch, bevor der nächste kommt
+const CROSSFADE := 4.0       # Sekunden Überblendung zwischen zwei Titeln
+const MUTED_DB := -60.0
+const RAGE_PITCH := 1.1
 
-var player: AudioStreamPlayer
-var _sync: AudioStreamSynchronized
+var _players: Array[AudioStreamPlayer] = []
+var _syncs: Array[AudioStreamSynchronized] = [null, null]
 var _layer_db: Array[float] = []
-var _ready_to_play := false
+var _active := 0             # welcher der beiden Player gerade führt
+var _track := -1             # Index in TRACKS
+var _track_time := 0.0
+var _track_length := 0.0
+var _fade := 1.0             # Fortschritt der Überblendung (1 = fertig)
 var _custom := false
+var _ready_to_play := false
 
 
 func _ready() -> void:
-	player = AudioStreamPlayer.new()
-	player.bus = "Music"
-	add_child(player)
+	for i in 2:
+		var p := AudioStreamPlayer.new()
+		p.bus = "Music"
+		add_child(p)
+		_players.append(p)
 	var custom := _find_custom_loop()
 	if custom != null:
 		_custom = true
-		player.stream = custom
-		_start()
+		_players[0].stream = custom
+		_players[0].play()
+		_ready_to_play = true
 		return
 	if DisplayServer.get_name() == "headless":
 		return  # Tests und Simulationen brauchen keine Musik
-	WorkerThreadPool.add_task(_generate_all)
+	var wanted := track_index(GameState.music_track)
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	play_track(wanted if wanted >= 0 else rng.randi() % TRACKS.size(), false)
 
 
 func _find_custom_loop() -> AudioStream:
@@ -58,44 +68,125 @@ func _find_custom_loop() -> AudioStream:
 	return null
 
 
-func _generate_all() -> void:
-	var streams: Array[AudioStreamWAV] = []
-	for layer in LAYERS:
-		streams.append(_render_layer(layer))
-	_finish_generation.call_deferred(streams)
-
-
-func _finish_generation(streams: Array[AudioStreamWAV]) -> void:
-	_sync = AudioStreamSynchronized.new()
-	_sync.stream_count = streams.size()
-	for i in streams.size():
-		_sync.set_sync_stream(i, streams[i])
-		_sync.set_sync_stream_volume(i, MUTED_DB)
-		_layer_db.append(MUTED_DB)
-	player.stream = _sync
-	_start()
-
-
-func _start() -> void:
-	_ready_to_play = true
+## Titel starten (mit Überblendung vom laufenden Titel).
+func play_track(index: int, crossfade: bool = true) -> void:
+	index = posmod(index, TRACKS.size())
+	var sync := _build_sync(TRACKS[index].id)
+	if sync == null:
+		return
+	var next := 1 - _active if _ready_to_play else _active
+	var player := _players[next]
+	player.stream = sync
+	player.pitch_scale = _players[_active].pitch_scale
+	player.volume_db = MUTED_DB if crossfade and _ready_to_play else 0.0
 	player.play()
+	_fade = 0.0 if crossfade and _ready_to_play else 1.0
+	if not crossfade and _ready_to_play and next != _active:
+		_players[_active].stop()
+	_active = next
+	_syncs[_active] = sync
+	_track = index
+	_track_time = 0.0
+	_track_length = 0.0
+	var first: AudioStream = sync.get_sync_stream(0)
+	if first != null:
+		_track_length = first.get_length()
+	_ready_to_play = true
+	_apply_layers(true)
+	track_changed.emit(index)
+
+
+func _build_sync(id: String) -> AudioStreamSynchronized:
+	var sync := AudioStreamSynchronized.new()
+	sync.stream_count = LAYERS.size()
+	_layer_db.resize(LAYERS.size())
+	for i in LAYERS.size():
+		var path := "%s/%s_%s.ogg" % [TRACK_DIR, id, LAYERS[i]]
+		if not ResourceLoader.exists(path):
+			push_warning("Musik fehlt: %s" % path)
+			return null
+		var stream: AudioStreamOggVorbis = load(path)
+		stream.loop = true
+		sync.set_sync_stream(i, stream)
+		sync.set_sync_stream_volume(i, MUTED_DB)
+	return sync
 
 
 func _process(delta: float) -> void:
 	if not _ready_to_play:
 		return
+	delta /= maxf(Engine.time_scale, 0.01)  # Zeitlupe verlangsamt nur das Bild, nicht die Musik
 	var target_pitch := RAGE_PITCH if GameState.rage_active() else 1.0
-	player.pitch_scale = move_toward(player.pitch_scale, target_pitch, delta * 0.5)
-	if _custom or _sync == null:
+	for p in _players:
+		p.pitch_scale = move_toward(p.pitch_scale, target_pitch, delta * 0.5)
+	if _custom:
+		return
+	if _fade < 1.0:
+		_fade = minf(1.0, _fade + delta / CROSSFADE)
+		_players[_active].volume_db = linear_to_db(maxf(_fade, 0.001))
+		var old := _players[1 - _active]
+		old.volume_db = linear_to_db(maxf(1.0 - _fade, 0.001))
+		if _fade >= 1.0:
+			old.stop()
+			_syncs[1 - _active] = null
+	_apply_layers(false, delta)
+	_track_time += delta * _players[_active].pitch_scale
+	if GameState.music_track == "" and _track_length > 0.0 \
+			and _track_time >= _track_length * LOOPS_PER_TRACK - CROSSFADE:
+		play_track(next_track(_track, TRACKS.size()))
+
+
+func _apply_layers(instant: bool, delta: float = 0.0) -> void:
+	var sync := _syncs[_active]
+	if sync == null:
 		return
 	var active := active_layers()
 	for i in LAYERS.size():
 		var target := 0.0 if i < active else MUTED_DB
-		_layer_db[i] = move_toward(_layer_db[i], target, delta * 20.0)
-		_sync.set_sync_stream_volume(i, _layer_db[i])
+		_layer_db[i] = target if instant else move_toward(_layer_db[i], target, delta * 20.0)
+		sync.set_sync_stream_volume(i, _layer_db[i])
 
 
-## Wie viele Instrumente spielen: wächst mit den Gerätetypen, nach dem ersten Neuanfang spielt alles.
+## Titel im Menü gewählt: "" = alle abwechselnd, sonst eine Titel-ID in Dauerschleife.
+func select_track(id: String) -> void:
+	GameState.music_track = id if track_index(id) >= 0 else ""
+	var index := track_index(id)
+	if index >= 0 and index != _track and not _custom and DisplayServer.get_name() != "headless":
+		play_track(index)
+
+
+func current_track() -> int:
+	return _track
+
+
+func track_name(index: int) -> String:
+	if index < 0 or index >= TRACKS.size():
+		return ""
+	return tr(String(TRACKS[index].name))
+
+
+func track_style(index: int) -> String:
+	if index < 0 or index >= TRACKS.size():
+		return ""
+	return tr(String(TRACKS[index].style))
+
+
+func has_custom_music() -> bool:
+	return _custom
+
+
+static func track_index(id: String) -> int:
+	for i in TRACKS.size():
+		if TRACKS[i].id == id:
+			return i
+	return -1
+
+
+static func next_track(current: int, count: int) -> int:
+	return posmod(current + 1, count)
+
+
+## Wie viele Schichten spielen: wächst mit den Gerätetypen, nach dem ersten Neuanfang spielt alles.
 static func layers_for(device_types: int, prestiges: int) -> int:
 	if prestiges > 0:
 		return 5
@@ -112,144 +203,3 @@ static func layers_for(device_types: int, prestiges: int) -> int:
 
 func active_layers() -> int:
 	return layers_for(GameState.device_types_owned(), int(GameState.stat("prestiges")))
-
-
-# =====================================================================
-# Synthese
-# =====================================================================
-
-func _beat() -> float:
-	return 60.0 / BPM
-
-
-func _render_layer(layer: String) -> AudioStreamWAV:
-	var length := int(RATE * _beat() * BEATS)
-	var buf := PackedFloat32Array()
-	buf.resize(length)
-	var b := _beat()
-	for bar in 4:
-		var c: Dictionary = CHORDS[bar]
-		var t0 := bar * 4 * b
-		match layer:
-			"drums":
-				for beat in 4:
-					var t := t0 + beat * b
-					if beat % 2 == 0:
-						_kick(buf, t)
-					else:
-						_snare(buf, t)
-					_hihat(buf, t + b * 0.5, 0.18)
-					_hihat(buf, t, 0.1)
-			"bass":
-				_note(buf, t0, b * 0.9, c.root, "bass", 0.55)
-				_note(buf, t0 + 2 * b, b * 0.9, c.fifth, "bass", 0.5)
-				_note(buf, t0 + 3.5 * b, b * 0.4, c.fifth + 2, "bass", 0.3)
-			"piano":
-				for beat in [1, 3]:
-					for n in c.notes:
-						_note(buf, t0 + beat * b, b * 0.5, n, "piano", 0.22)
-			"melody":
-				for m in MELODY:
-					_note(buf, t0 + m[0] * b, m[1] * b, c.tones[m[2]], "clarinet", 0.28)
-			"brass":
-				for n in c.notes:
-					_note(buf, t0, b * 1.8, n, "brass", 0.12)
-				_note(buf, t0 + 2.5 * b, b * 0.4, c.tones[0], "brass", 0.2)
-				_note(buf, t0 + 3.0 * b, b * 0.8, c.tones[1], "brass", 0.22)
-	return _to_wav(buf, LAYER_PEAK[layer])
-
-
-static func _freq(midi: int) -> float:
-	return 440.0 * pow(2.0, (midi - 69) / 12.0)
-
-
-func _note(buf: PackedFloat32Array, start: float, duration: float, midi: int, timbre: String, volume: float) -> void:
-	var f := _freq(midi)
-	var from := int(start * RATE)
-	var tail := 0.25 if timbre == "piano" else 0.08
-	var count := int((duration + tail) * RATE)
-	var attack: float = ATTACK[timbre]
-	for i in count:
-		var idx := (from + i) % buf.size()  # Nachhall läuft in den Schleifenanfang
-		var t := float(i) / RATE
-		var env := _envelope(timbre, t, duration, attack)
-		if env <= 0.0005:
-			continue
-		var ph := TAU * f * t
-		var s := 0.0
-		match timbre:
-			"piano":
-				s = sin(ph) + 0.5 * sin(2.0 * ph) + 0.25 * sin(3.0 * ph) + 0.1 * sin(4.0 * ph)
-			"bass":
-				s = (2.0 / PI) * asin(sin(ph)) + 0.3 * sin(2.0 * ph)
-			"clarinet":
-				var vib := 1.0 + 0.004 * sin(TAU * 5.5 * t)
-				var p := ph * vib
-				s = sin(p) + 0.45 * sin(3.0 * p) + 0.2 * sin(5.0 * p)
-			"brass":
-				for h in range(1, 7):
-					s += sin(h * ph) / h
-				s *= 0.8
-		buf[idx] += s * env * volume
-
-
-func _envelope(timbre: String, t: float, duration: float, attack: float) -> float:
-	var a := clampf(t / attack, 0.0, 1.0)
-	match timbre:
-		"piano":
-			return a * exp(-t * 3.5)
-		"bass":
-			return a * exp(-t * 3.0) * (1.0 if t < duration else exp(-(t - duration) * 30.0))
-	var release := 1.0 if t < duration else exp(-(t - duration) * 25.0)
-	return a * release * (0.85 + 0.15 * exp(-t * 4.0))
-
-
-func _kick(buf: PackedFloat32Array, start: float) -> void:
-	var from := int(start * RATE)
-	var phase := 0.0
-	for i in int(0.25 * RATE):
-		var t := float(i) / RATE
-		phase += TAU * (45.0 + 70.0 * exp(-t * 30.0)) / RATE
-		buf[(from + i) % buf.size()] += sin(phase) * exp(-t * 14.0) * 0.6
-
-
-func _snare(buf: PackedFloat32Array, start: float) -> void:
-	var from := int(start * RATE)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = from
-	for i in int(0.18 * RATE):
-		var t := float(i) / RATE
-		var noise := rng.randf() * 2.0 - 1.0
-		buf[(from + i) % buf.size()] += (noise * 0.7 + sin(TAU * 190.0 * t) * 0.3) * exp(-t * 22.0) * 0.35
-
-
-func _hihat(buf: PackedFloat32Array, start: float, volume: float) -> void:
-	var from := int(start * RATE)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = from + 7
-	var last := 0.0
-	for i in int(0.05 * RATE):
-		var t := float(i) / RATE
-		var noise := rng.randf() * 2.0 - 1.0
-		var high := noise - last  # einfacher Hochpass
-		last = noise
-		buf[(from + i) % buf.size()] += high * exp(-t * 80.0) * volume
-
-
-func _to_wav(buf: PackedFloat32Array, target_peak: float) -> AudioStreamWAV:
-	var peak := 0.0001
-	for v in buf:
-		peak = maxf(peak, absf(v))
-	var gain := target_peak / peak
-	var data := PackedByteArray()
-	data.resize(buf.size() * 2)
-	for i in buf.size():
-		data.encode_s16(i * 2, int(clampf(buf[i] * gain, -1.0, 1.0) * 32000.0))
-	var wav := AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = RATE
-	wav.data = data
-	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	wav.loop_begin = 0
-	wav.loop_end = buf.size()
-	return wav

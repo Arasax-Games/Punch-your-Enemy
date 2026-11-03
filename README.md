@@ -33,8 +33,8 @@ Neu bauen: `tools/build_release.sh` (braucht Godot 4.7 und die Export-Vorlagen).
 
 **Phase 7**
 - **Schrift Poppins** fest eingebaut (OFL); eine eigene Comic-Schrift für Überschriften als `assets/fonts/heading.ttf` ablegen
-- **Musik:** Ragtime-Schleife, die mit dem Fortschritt um Instrumente wächst (Schlagzeug → Bass → Klavier → Klarinette → Bläser) und im Wutmodus schneller wird
-- **Lautstärke** getrennt für Musik, Effekte und Publikum (Menü → Lautstärke), Applaus bei Erfolgen und großen Momenten, mehr Treffer-Varianten
+- **Musik:** fünf entspannte Titel (Lo-Fi „Pflaster-Pause“, „Hängematten-Bossa“, Jazz „Eisbeutel-Lounge“, „Tortenstrand“, Ambient „Sternchen kreisen“), die sich abwechseln oder einzeln in Dauerschleife laufen. Jeder Titel wächst mit dem Fortschritt um Schichten (Tasten → Bass → Beat → Melodie → Extras) und wird im Wutmodus schneller. Erzeugt mit `tools/make_music.py`
+- **Lautstärke** getrennt für Musik, Effekte und Publikum (Menü → Lautstärke und Musik), Applaus bei Erfolgen und großen Momenten, mehr Treffer-Varianten
 - **Echte Sounds und Musik** einfach als Dateien ablegen: `assets/audio/sfx/punch_1.ogg` …, `assets/audio/music/loop.ogg`
 - **Animierte Geräte-Reihe** unter dem Bild mit Meilenstein-Rahmen (1, 5, 25, 50, 100, 150, 200 Stück: Holz bis Regenbogen) und Sternchen im Shop
 - **Ausschnitt wählen** beim Bild-Import: verschieben, zoomen, Original/Quadrat/Rund
