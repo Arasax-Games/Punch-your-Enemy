@@ -18,6 +18,7 @@ python3 tools/i18n.py --check
 
 rm -rf build/windows build/linux build/macos "$OUT"
 mkdir -p build/windows build/linux build/macos "$OUT"
+touch build/.gdignore  # Godot soll nichts aus build/ importieren oder exportieren
 "$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/PunchYourEnemy.exe
 "$GODOT" --headless --path . --export-release "Linux" build/linux/PunchYourEnemy.x86_64
 "$GODOT" --headless --path . --export-release "macOS" build/macos/PunchYourEnemy.zip
