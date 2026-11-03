@@ -90,6 +90,8 @@ Das Spiel ist **zweisprachig: Deutsch und Englisch** (Menü → „Sprache / Lan
 
 Das komplette Design steht in [`docs/konzept.md`](docs/konzept.md).
 
+Wie das Spiel aussieht (Farben, Schrift, Komponenten, Bilder): **[`docs/design/`](docs/design/README.md)**.
+
 ## Tests
 
 ```bash
