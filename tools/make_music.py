@@ -131,6 +131,8 @@ def build(number: int, track_id: str, title: str, fn, want_preview: bool) -> dic
     listen *= fade[:, None] * master
     listen *= min(1.0, PEAK / (np.max(np.abs(listen)) + 1e-9))
     os.makedirs(LISTEN_DIR, exist_ok=True)
+    # build/ gehört nicht ins Spiel: Godot soll die MP3s weder importieren noch exportieren
+    open(os.path.join(ROOT, "build", ".gdignore"), "a").close()
     mp3 = os.path.join(LISTEN_DIR, f"{number:02d} {title}.mp3")
     encode(listen, mp3, ["-c:a", "libmp3lame", "-q:a", "2", "-metadata", f"title={title}",
                          "-metadata", "artist=Punch your Enemy", "-metadata", "album=Punch your Enemy – Soundtrack",
