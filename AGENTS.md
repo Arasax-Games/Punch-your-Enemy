@@ -22,7 +22,7 @@ Diese Datei gilt für **alle** Agenten, die an diesem Repo arbeiten. `CLAUDE.md`
 
 ```
 project.godot          Projekteinstellungen, Autoloads
-scenes/main.tscn       Hauptbildschirm (Drei-Spalten-Layout)
+scenes/main.tscn       Hauptbildschirm (Bühne mit Zähler, Opfer und Leisten; Shop mit Reitern Geräte/Upgrades)
 scripts/core/          game_state.gd (Autoload GameState: Wumms, Geräte, Upgrades, Erfolge, Buffs,
                        Goldener Schuh, Combo, Wutmodus, Neuanfang, Lorbeer-Baum, Galerie, Boss-Kämpfe,
                        Tagesaufträge, Login-Serie, Saison-Events, Mini-Spiel-Belohnungen, Offline,
@@ -109,6 +109,7 @@ GODOT=/pfad/zu/godot tools/build_release.sh
 - **Übersetzung:** Jeder Anzeigetext im Code steht in `tr("…")` (in statischen Funktionen `TranslationServer.translate("…")`). Texte in Konstanten bekommen darüber einen Kommentar `# i18n` und werden bei der Anzeige mit `tr()` übersetzt. Datenfelder `name`, `description`, `text`, `intro` übersetzt `GameState._localize_data()` beim Laden; Pokalnamen erst bei der Anzeige (sie stehen im Spielstand). Mehrzahl nie mit angehängten Endungen bauen (`"Lorbeer%s"`), sondern ganze Sätze übersetzen (Beispiel: `laurels_text()` in `main.gd`). Zahlen immer über `Num` – das Format hängt von der Sprache ab. Ersatzsprache ist Deutsch (`locale/fallback="de"`), sonst sähen deutsche Spieler Englisch. Sprachwechsel lädt die Hauptszene neu.
 - **Audio:** Effekte immer über `Sfx.play()`, Publikum über `Sfx.applause()`. Busse `Music`, `SFX`, `Ambient` (Lautstärke in `GameState.music_volume` usw., angewendet mit `Sfx.apply_volumes()`). Echte Aufnahmen ersetzen die Platzhalter ohne Code-Änderung: `assets/audio/sfx/<sound>[_n].ogg|wav` und `assets/audio/music/loop.ogg`. Musik wird nur außerhalb von `headless` erzeugt.
 - **Schrift:** Text Poppins Medium, Überschriften `main.gd.heading_font()` (Poppins Bold oder `assets/fonts/heading.ttf`).
+- **Farben:** Der Hauptbildschirm ist eine dunkle „Comic-Arena bei Nacht“ – Farben nur über die Paletten-Konstanten in `main.gd` (`PANEL`, `CARD`, `TEXT`, `MUTED`, `GOLD` = kaufen/leistbar, `RAGE` = Wut/Krit). Dialoge (`Modal`) und Mini-Spiele nutzen das helle `main.gd.paper_theme()`.
 - Neue Geräte brauchen ein Symbol `assets/devices/<id>.svg` (in `devices.json` als `icon`).
 - Steam: Nur über `SteamService` (keine direkten `Steam`-Aufrufe anderswo). Steam-API-Name eines Erfolgs = ID in Großbuchstaben. Importierte Bilder und Fotos dürfen **nie** in die Steam Cloud.
 - Klassen, die Autoloads (`GameState`, `Sfx`) benutzen, nicht direkt aus `--script`-Testskripten referenzieren, sondern zur Laufzeit mit `load()` holen (die Autoloads existieren beim Kompilieren des Testskripts noch nicht).

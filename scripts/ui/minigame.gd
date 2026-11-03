@@ -35,6 +35,7 @@ func _build() -> void:
 	_rng.randomize()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	theme = load("res://scripts/ui/main.gd").paper_theme()
 	_running = true
 	_spawn_timer = 0.3
 

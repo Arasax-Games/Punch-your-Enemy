@@ -28,39 +28,46 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("4_background")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 12
+theme_override_constants/separation = 0
 
-[node name="Layout" type="VBoxContainer" parent="Margin"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="TopBar" type="PanelContainer" parent="Margin/Layout"]
+[node name="TopBar" type="PanelContainer" parent="Layout"]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="TopRow" type="HBoxContainer" parent="Margin/Layout/TopBar"]
+[node name="TopRow" type="HBoxContainer" parent="Layout/TopBar"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="Title" type="Label" parent="Margin/Layout/TopBar/TopRow"]
+[node name="Title" type="Label" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Punch your Enemy"
 
-[node name="Spacer" type="Control" parent="Margin/Layout/TopBar/TopRow"]
+[node name="MarkenChip" type="PanelContainer" parent="Layout/TopBar/TopRow"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+tooltip_text = "Beulen-Marken: für Laden, Lorbeer-Baum (Zweig „Show“) und mehr."
+
+[node name="MarkenLabel" type="Label" parent="Layout/TopBar/TopRow/MarkenChip"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Beulen-Marken: 0"
+
+[node name="Spacer" type="Control" parent="Layout/TopBar/TopRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ImportButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="ImportButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
@@ -68,49 +75,49 @@ tooltip_text = "Bild von der Festplatte laden. Du kannst Bilder auch ins Fenster
 Nimm Bilder, bei denen alle Beteiligten Spaß verstehen."
 text = "Neues Opfer …"
 
-[node name="GalleryButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="GalleryButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Alle Opfer: wechseln, umbenennen, löschen."
 text = "Galerie"
 
-[node name="ShowerButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="ShowerButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Wäscht alle Spritzer und Beulen ab. Der Fortschritt bleibt."
 text = "Duschen"
 
-[node name="AchievementsButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="AchievementsButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Alle Erfolge und dein Fortschritt."
 text = "Erfolge"
 
-[node name="QuestsButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="QuestsButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Tagesaufträge, Login-Serie, Saison-Event und deine Pokale."
 text = "Aufträge"
 
-[node name="ShopButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="ShopButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Kosmetik-Laden: Faust-Skins, Hintergründe und Sounds für Beulen-Marken."
 text = "Laden"
 
-[node name="GamesButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="GamesButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 tooltip_text = "Mini-Spiele für Beulen-Marken."
 text = "Spiele"
 
-[node name="LaurelButton" type="Button" parent="Margin/Layout/TopBar/TopRow"]
+[node name="LaurelButton" type="Button" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -118,124 +125,63 @@ focus_mode = 0
 tooltip_text = "Lorbeeren und Beulen-Marken dauerhaft investieren."
 text = "Lorbeer-Baum"
 
-[node name="MenuButton" type="MenuButton" parent="Margin/Layout/TopBar/TopRow"]
+[node name="MenuButton" type="MenuButton" parent="Layout/TopBar/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Menü"
 flat = false
 
-[node name="Columns" type="HBoxContainer" parent="Margin/Layout"]
+[node name="Columns" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 0
 
-[node name="StatsPanel" type="PanelContainer" parent="Margin/Layout/Columns"]
-custom_minimum_size = Vector2(290, 0)
+[node name="Stage" type="MarginContainer" parent="Layout/Columns"]
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
 
-[node name="StatsBox" type="VBoxContainer" parent="Margin/Layout/Columns/StatsPanel"]
+[node name="StageBox" type="VBoxContainer" parent="Layout/Columns/Stage"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="WummsLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
+[node name="WummsLabel" type="Label" parent="Layout/Columns/Stage/StageBox"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 1
 text = "0"
 horizontal_alignment = 1
 
-[node name="WummsCaption" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
+[node name="RateRow" type="HBoxContainer" parent="Layout/Columns/Stage/StageBox"]
 layout_mode = 2
-text = "Wumms"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
 
-[node name="WpsLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
+[node name="WpsLabel" type="Label" parent="Layout/Columns/Stage/StageBox/RateRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "pro Sekunde: 0"
-horizontal_alignment = 1
 
-[node name="ClickLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
+[node name="ClickLabel" type="Label" parent="Layout/Columns/Stage/StageBox/RateRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "pro Klick: 1"
-horizontal_alignment = 1
 
-[node name="MarkenLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "Beulen-Marken: 0"
-horizontal_alignment = 1
-
-[node name="BuffBox" type="VBoxContainer" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Sep1" type="HSeparator" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-layout_mode = 2
-
-[node name="TargetLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Opfer"
-autowrap_mode = 3
-
-[node name="TargetHitsLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Insgesamt verhauen: 0"
-autowrap_mode = 3
-
-[node name="Sep2" type="HSeparator" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-layout_mode = 2
-
-[node name="TotalLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Insgesamt erzeugt: 0"
-autowrap_mode = 3
-
-[node name="HitsLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Treffer gesamt: 0"
-autowrap_mode = 3
-
-[node name="StatsSpacer" type="Control" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="HelpLabel" type="Label" parent="Margin/Layout/Columns/StatsPanel/StatsBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Klick oder Leertaste: hauen
-1–5: Gerät kaufen
-Strg+V: Bild einfügen
-Bild ins Fenster ziehen: neues Opfer"
-autowrap_mode = 3
-
-[node name="CenterBox" type="VBoxContainer" parent="Margin/Layout/Columns"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
-
-[node name="TargetArea" type="Control" parent="Margin/Layout/Columns/CenterBox"]
+[node name="TargetArea" type="Control" parent="Layout/Columns/Stage/StageBox"]
 unique_name_in_owner = true
 clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("2_target")
 
-[node name="DeviceStrip" type="Control" parent="Margin/Layout/Columns/CenterBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 96)
-layout_mode = 2
-mouse_filter = 1
-script = ExtResource("7_strip")
-
-[node name="TargetImage" type="TextureRect" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
+[node name="TargetImage" type="TextureRect" parent="Layout/Columns/Stage/StageBox/TargetArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -250,7 +196,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BumpOverlay" type="Control" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
+[node name="BumpOverlay" type="Control" parent="Layout/Columns/Stage/StageBox/TargetArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -260,7 +206,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_bumps")
 
-[node name="BossFight" type="Control" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
+[node name="BossFight" type="Control" parent="Layout/Columns/Stage/StageBox/TargetArea"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -271,7 +217,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("6_boss")
 
-[node name="Effects" type="Control" parent="Margin/Layout/Columns/CenterBox/TargetArea"]
+[node name="Effects" type="Control" parent="Layout/Columns/Stage/StageBox/TargetArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -281,68 +227,167 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3_effects")
 
-[node name="ShopPanel" type="PanelContainer" parent="Margin/Layout/Columns"]
-custom_minimum_size = Vector2(480, 0)
+[node name="NameRow" type="CenterContainer" parent="Layout/Columns/Stage/StageBox"]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="ShopBox" type="VBoxContainer" parent="Margin/Layout/Columns/ShopPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="UpgradesTitle" type="Label" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
+[node name="NamePlate" type="PanelContainer" parent="Layout/Columns/Stage/StageBox/NameRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Upgrades"
+mouse_filter = 2
 
-[node name="UpgradeScroll" type="ScrollContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
-custom_minimum_size = Vector2(0, 150)
+[node name="NameBox" type="HBoxContainer" parent="Layout/Columns/Stage/StageBox/NameRow/NamePlate"]
 layout_mode = 2
-horizontal_scroll_mode = 0
+theme_override_constants/separation = 10
 
-[node name="UpgradeFlow" type="HFlowContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox/UpgradeScroll"]
+[node name="TargetLabel" type="Label" parent="Layout/Columns/Stage/StageBox/NameRow/NamePlate/NameBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Opfer"
+
+[node name="TargetHitsLabel" type="Label" parent="Layout/Columns/Stage/StageBox/NameRow/NamePlate/NameBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 Mal verhauen"
+
+[node name="ProgressRow" type="HBoxContainer" parent="Layout/Columns/Stage/StageBox"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="DeviceStrip" type="Control" parent="Layout/Columns/Stage/StageBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("7_strip")
+
+[node name="StageInfo" type="VBoxContainer" parent="Layout/Columns/Stage"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(270, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="BuffBox" type="VBoxContainer" parent="Layout/Columns/Stage/StageInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="HelpLabel" type="Label" parent="Layout/Columns/Stage/StageInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Klick oder Leertaste: hauen"
+autowrap_mode = 3
+
+[node name="ShopPanel" type="PanelContainer" parent="Layout/Columns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+
+[node name="ShopBox" type="VBoxContainer" parent="Layout/Columns/ShopPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TabRow" type="HBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DevicesTab" type="Button" parent="Layout/Columns/ShopPanel/ShopBox/TabRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-
-[node name="NoUpgradesLabel" type="Label" parent="Margin/Layout/Columns/ShopPanel/ShopBox/UpgradeScroll/UpgradeFlow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Noch nichts in Sicht. Weiter hauen!"
-
-[node name="Sep" type="HSeparator" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
-layout_mode = 2
-
-[node name="DevicesHeader" type="HBoxContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
-layout_mode = 2
-
-[node name="DevicesTitle" type="Label" parent="Margin/Layout/Columns/ShopPanel/ShopBox/DevicesHeader"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_pressed = true
 text = "Geräte"
 
-[node name="AmountRow" type="HBoxContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox/DevicesHeader"]
+[node name="UpgradesTab" type="Button" parent="Layout/Columns/ShopPanel/ShopBox/TabRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+text = "Upgrades"
+
+[node name="ShopPage" type="PanelContainer" parent="Layout/Columns/ShopPanel/ShopBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Pages" type="VBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage"]
+layout_mode = 2
+
+[node name="DevicesPage" type="VBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="DevicesHeader" type="HBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/DevicesPage"]
+layout_mode = 2
+
+[node name="DevicesTitle" type="Label" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/DevicesPage/DevicesHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Kaufmenge"
+
+[node name="AmountRow" type="HBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/DevicesPage/DevicesHeader"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="DeviceScroll" type="ScrollContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox"]
+[node name="DeviceScroll" type="ScrollContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/DevicesPage"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="DeviceList" type="VBoxContainer" parent="Margin/Layout/Columns/ShopPanel/ShopBox/DeviceScroll"]
+[node name="DeviceList" type="VBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/DevicesPage/DeviceScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="TickerBar" type="PanelContainer" parent="Margin/Layout"]
+[node name="UpgradesPage" type="VBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="UpgradesTitle" type="Label" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/UpgradesPage"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Einmal kaufen, für immer stärker."
+
+[node name="UpgradeScroll" type="ScrollContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/UpgradesPage"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="UpgradeList" type="VBoxContainer" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/UpgradesPage/UpgradeScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="NoUpgradesLabel" type="Label" parent="Layout/Columns/ShopPanel/ShopBox/ShopPage/Pages/UpgradesPage/UpgradeScroll/UpgradeList"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Noch nichts in Sicht. Weiter hauen!"
+autowrap_mode = 3
+
+[node name="TickerBar" type="PanelContainer" parent="Layout"]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="TickerLabel" type="Label" parent="Margin/Layout/TickerBar"]
+[node name="TickerLabel" type="Label" parent="Layout/TickerBar"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "+++ Nachbarn beschweren sich über Quietschen +++"
@@ -364,10 +409,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -360.0
-offset_top = 90.0
-offset_right = -24.0
-offset_bottom = 90.0
+offset_left = -810.0
+offset_top = 84.0
+offset_right = -470.0
+offset_bottom = 84.0
 grow_horizontal = 0
 mouse_filter = 2
 theme_override_constants/separation = 8

@@ -334,6 +334,10 @@ msgid "Alles löschen und neu anfangen …"
 msgstr "Delete everything and start over …"
 
 #: scripts/ui/main.gd
+msgid "WUT"
+msgstr "RAGE"
+
+#: scripts/ui/main.gd
 msgid "Wut-Leiste: füllt sich mit jedem Treffer.\nVoll? Mit R oder dem Knopf 10 s Wutmodus entfesseln:\nalles ×3, aber keine Goldenen Schuhe."
 msgstr "Rage meter: fills up with every hit.\nFull? Press R or the button to unleash 10 s of Rage Mode:\neverything ×3, but no Golden Shoes."
 
@@ -374,24 +378,20 @@ msgid " (Zeitraffer ×2)"
 msgstr " (time warp ×2)"
 
 #: scripts/ui/main.gd
-msgid "Beulen-Marken: %d"
-msgstr "Bump Tokens: %d"
-
-#: scripts/ui/main.gd
-msgid "Opfer: %s"
-msgstr "Target: %s"
-
-#: scripts/ui/main.gd
-msgid "Insgesamt verhauen: %s"
-msgstr "Punched in total: %s"
-
-#: scripts/ui/main.gd
 msgid "Insgesamt erzeugt: %s Wumms"
 msgstr "Total produced: %s Whams"
 
 #: scripts/ui/main.gd
 msgid "Treffer gesamt: %s"
 msgstr "Total hits: %s"
+
+#: scripts/ui/main.gd
+msgid "Beulen-Marken: %d"
+msgstr "Bump Tokens: %d"
+
+#: scripts/ui/main.gd
+msgid "Insgesamt verhauen: %s"
+msgstr "Punched in total: %s"
 
 #: scripts/ui/main.gd
 msgid "Erfolge %d/%d"
@@ -406,8 +406,12 @@ msgid "Aufträge"
 msgstr "Tasks"
 
 #: scripts/ui/main.gd
-msgid "Combo %d · Klick ×%s"
-msgstr "Combo %d · Click ×%s"
+msgid "COMBO %d"
+msgstr "COMBO %d"
+
+#: scripts/ui/main.gd
+msgid "Klick ×%s"
+msgstr "Click ×%s"
 
 #: scripts/ui/main.gd
 msgid "Lorbeeren: %d (+%d %% auf alles)"
@@ -426,20 +430,24 @@ msgid "WPS ×%s"
 msgstr "WPS ×%s"
 
 #: scripts/ui/main.gd
-msgid "Klick ×%s"
-msgstr "Click ×%s"
+msgid "je %s WPS"
+msgstr "%s WPS each"
 
 #: scripts/ui/main.gd
-msgid "Besitz: %s · je %s WPS"
-msgstr "Owned: %s · %s WPS each"
-
-#: scripts/ui/main.gd
-msgid "Kaufen"
-msgstr "Buy"
+msgid "Taste %d"
+msgstr "Key %d"
 
 #: scripts/ui/main.gd
 msgid "%s\n\n%s\nJedes Gerät: %s WPS (×%s durch Upgrades)\nAlle zusammen: %s WPS (%s %% deiner Produktion)\nAmortisation: %s"
 msgstr "%s\n\n%s\nEach gadget: %s WPS (×%s from upgrades)\nAll together: %s WPS (%s %% of your production)\nPays for itself in: %s"
+
+#: scripts/ui/main.gd
+msgid "Upgrades (%d)"
+msgstr "Upgrades (%d)"
+
+#: scripts/ui/main.gd
+msgid "Upgrades"
+msgstr "Upgrades"
 
 #: scripts/ui/main.gd
 msgid "%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms"
@@ -1198,6 +1206,14 @@ msgid "Klick mich!"
 msgstr "Click me!"
 
 #: scenes/main.tscn
+msgid "Beulen-Marken: für Laden, Lorbeer-Baum (Zweig „Show“) und mehr."
+msgstr "Bump Tokens: for the shop, the laurel tree (“Show” branch) and more."
+
+#: scenes/main.tscn
+msgid "Beulen-Marken: 0"
+msgstr "Bump Tokens: 0"
+
+#: scenes/main.tscn
 msgid "Bild von der Festplatte laden. Du kannst Bilder auch ins Fenster ziehen oder mit Strg+V einfügen.\nNimm Bilder, bei denen alle Beteiligten Spaß verstehen."
 msgstr "Load an image from your disk. You can also drop images on the window or paste them with Ctrl+V.\nOnly use pictures everyone involved will find funny."
 
@@ -1254,10 +1270,6 @@ msgid "0"
 msgstr "0"
 
 #: scenes/main.tscn
-msgid "Wumms"
-msgstr "Whams"
-
-#: scenes/main.tscn
 msgid "pro Sekunde: 0"
 msgstr "per second: 0"
 
@@ -1266,40 +1278,32 @@ msgid "pro Klick: 1"
 msgstr "per click: 1"
 
 #: scenes/main.tscn
-msgid "Beulen-Marken: 0"
-msgstr "Bump Tokens: 0"
-
-#: scenes/main.tscn
 msgid "Opfer"
 msgstr "Target"
 
 #: scenes/main.tscn
-msgid "Insgesamt verhauen: 0"
-msgstr "Punched in total: 0"
+msgid "0 Mal verhauen"
+msgstr "Punched 0 times"
 
 #: scenes/main.tscn
-msgid "Insgesamt erzeugt: 0"
-msgstr "Total produced: 0"
-
-#: scenes/main.tscn
-msgid "Treffer gesamt: 0"
-msgstr "Total hits: 0"
-
-#: scenes/main.tscn
-msgid "Klick oder Leertaste: hauen\n1–5: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer"
-msgstr "Click or Space: punch\n1–5: buy gadget\nCtrl+V: paste image\nDrop an image on the window: new target"
-
-#: scenes/main.tscn
-msgid "Upgrades"
-msgstr "Upgrades"
-
-#: scenes/main.tscn
-msgid "Noch nichts in Sicht. Weiter hauen!"
-msgstr "Nothing in sight yet. Keep punching!"
+msgid "Klick oder Leertaste: hauen"
+msgstr "Click or Space: punch"
 
 #: scenes/main.tscn
 msgid "Geräte"
 msgstr "Gadgets"
+
+#: scenes/main.tscn
+msgid "Kaufmenge"
+msgstr "Amount"
+
+#: scenes/main.tscn
+msgid "Einmal kaufen, für immer stärker."
+msgstr "Buy once, stronger forever."
+
+#: scenes/main.tscn
+msgid "Noch nichts in Sicht. Weiter hauen!"
+msgstr "Nothing in sight yet. Keep punching!"
 
 #: scenes/main.tscn
 msgid "+++ Nachbarn beschweren sich über Quietschen +++"

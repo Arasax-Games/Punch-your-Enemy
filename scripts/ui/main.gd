@@ -3,6 +3,18 @@ extends Control
 
 const INK := Color("2b2118")
 const PAPER := Color("fff8ec")
+# Farbsystem „Comic-Arena bei Nacht“ (Hauptbildschirm). Dialoge bleiben hell (paper_theme()).
+const NIGHT := Color("120d2b")
+const PANEL := Color("1b1540")
+const CARD := Color("2a2156")
+const ROW := Color("231a4a")
+const ROW_HOVER := Color("342a68")
+const LINE := Color("0f0b24")
+const TEXT := Color("f4f1ff")
+const MUTED := Color("a99fdc")
+const GOLD := Color("ffc929")
+const GOLD_HOVER := Color("ffd95e")
+const RAGE := Color("ff4d6d")
 const AMOUNT_MODES: Array[int] = [1, 10, 100, -1]
 const TICKER_INTERVAL := 9.0
 const MAX_ACHIEVEMENT_TOASTS := 3
@@ -49,9 +61,7 @@ const BRANCHES := [["handwerk", "Handwerk"], ["glueck", "Glück"], ["komfort", "
 @onready var buff_box: VBoxContainer = %BuffBox
 @onready var target_label: Label = %TargetLabel
 @onready var target_hits_label: Label = %TargetHitsLabel
-@onready var total_label: Label = %TotalLabel
-@onready var hits_label: Label = %HitsLabel
-@onready var upgrade_flow: HFlowContainer = %UpgradeFlow
+@onready var upgrade_list: VBoxContainer = %UpgradeList
 @onready var no_upgrades_label: Label = %NoUpgradesLabel
 @onready var amount_row: HBoxContainer = %AmountRow
 @onready var device_list: VBoxContainer = %DeviceList
@@ -72,7 +82,9 @@ var _toast_tween: Tween
 var _file_dialog: FileDialog
 var _combo_bar: ProgressBar
 var _combo_label: Label
+var _combo_mult_label: Label
 var _rage_bar: ProgressBar
+var _rage_label: Label
 var _rage_button: Button
 var _prestige_button: Button
 var _laurel_label: Label
@@ -85,6 +97,7 @@ var _challenge_abort: Button
 
 func _ready() -> void:
 	theme = _build_theme()
+	_style_panels()
 	_style_labels()
 	_build_amount_buttons()
 	_build_device_rows()
@@ -178,7 +191,63 @@ func _modal_open() -> bool:
 # Aufbau der Oberfläche
 # =====================================================================
 
+## Dunkles Theme für den Hauptbildschirm: Bühne, Leisten und Shop.
 func _build_theme() -> Theme:
+	var t := Theme.new()
+	t.default_font_size = 17
+	t.default_font = load("res://assets/fonts/Poppins-Medium.ttf")
+
+	for type in ["Label", "Button", "CheckButton", "MenuButton", "TooltipLabel", "PopupMenu", "LineEdit"]:
+		t.set_color("font_color", type, TEXT)
+	for type in ["Button", "CheckButton", "MenuButton"]:
+		t.set_color("font_hover_color", type, TEXT)
+		t.set_color("font_focus_color", type, TEXT)
+		t.set_color("font_pressed_color", type, LINE)
+		t.set_color("font_hover_pressed_color", type, LINE)
+		t.set_color("font_disabled_color", type, Color(MUTED, 0.55))
+	t.set_color("font_hover_color", "PopupMenu", LINE)
+	t.set_color("font_separator_color", "PopupMenu", MUTED)
+
+	t.set_stylebox("panel", "PanelContainer", _box(PANEL, 0, 0, 12))
+	t.set_stylebox("panel", "TooltipPanel", _box(CARD, 10, 2, 10, LINE))
+	t.set_stylebox("panel", "PopupMenu", _box(CARD, 10, 2, 8, LINE))
+	t.set_stylebox("hover", "PopupMenu", _box(GOLD, 6, 0, 4))
+	var popup_sep := StyleBoxLine.new()
+	popup_sep.color = Color(MUTED, 0.3)
+	popup_sep.thickness = 1
+	t.set_stylebox("separator", "PopupMenu", popup_sep)
+	for type in ["Button", "MenuButton"]:
+		t.set_stylebox("normal", type, _box(CARD, 10, 2, 8, LINE))
+		t.set_stylebox("hover", type, _box(ROW_HOVER, 10, 2, 8, LINE))
+		t.set_stylebox("pressed", type, _box(GOLD, 10, 2, 8, LINE))
+		t.set_stylebox("hover_pressed", type, _box(GOLD_HOVER, 10, 2, 8, LINE))
+		t.set_stylebox("disabled", type, _box(ROW, 10, 2, 8, LINE))
+		t.set_stylebox("focus", type, StyleBoxEmpty.new())
+	t.set_stylebox("focus", "CheckButton", StyleBoxEmpty.new())
+	t.set_stylebox("normal", "LineEdit", _box(ROW, 8, 2, 8, LINE))
+	t.set_stylebox("focus", "LineEdit", _box(ROW, 8, 2, 8, GOLD))
+	t.set_stylebox("background", "ProgressBar", _box(LINE, 7, 0, 0))
+	t.set_stylebox("fill", "ProgressBar", _box(GOLD, 7, 0, 0))
+	t.set_color("font_color", "ProgressBar", TEXT)
+	for bar in ["VScrollBar", "HScrollBar"]:
+		t.set_stylebox("scroll", bar, _box(Color(LINE, 0.6), 6, 0, 3))
+		t.set_stylebox("grabber", bar, _box(Color("4d4196"), 6, 0, 3))
+		t.set_stylebox("grabber_highlight", bar, _box(Color("5f52b0"), 6, 0, 3))
+		t.set_stylebox("grabber_pressed", bar, _box(GOLD, 6, 0, 3))
+	var sep := StyleBoxLine.new()
+	sep.color = Color(MUTED, 0.25)
+	sep.thickness = 2
+	t.set_stylebox("separator", "HSeparator", sep)
+	return t
+
+
+static var _paper: Theme
+
+
+## Helles „Papier“-Theme für Dialoge (Modal) – ihre Inhalte sind auf helle Kacheln mit dunkler Schrift ausgelegt.
+static func paper_theme() -> Theme:
+	if _paper != null:
+		return _paper
 	var t := Theme.new()
 	t.default_font_size = 17
 	t.default_font = load("res://assets/fonts/Poppins-Medium.ttf")
@@ -215,10 +284,11 @@ func _build_theme() -> Theme:
 	sep.color = Color(INK, 0.25)
 	sep.thickness = 2
 	t.set_stylebox("separator", "HSeparator", sep)
+	_paper = t
 	return t
 
 
-func _box(bg: Color, radius: int, border: int, margin: int, border_color: Color = INK) -> StyleBoxFlat:
+static func _box(bg: Color, radius: int, border: int, margin: int, border_color: Color = INK) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
 	sb.set_corner_radius_all(radius)
@@ -231,16 +301,77 @@ func _box(bg: Color, radius: int, border: int, margin: int, border_color: Color 
 	return sb
 
 
+func _style_panels() -> void:
+	var top := _box(PANEL, 0, 0, 10)
+	top.border_width_bottom = 3
+	top.border_color = LINE
+	top.content_margin_left = 20
+	top.content_margin_right = 14
+	%TopBar.add_theme_stylebox_override("panel", top)
+	var shop := _box(PANEL, 0, 0, 14)
+	shop.border_width_left = 3
+	shop.border_color = LINE
+	%ShopPanel.add_theme_stylebox_override("panel", shop)
+	var page := _box(CARD, 0, 0, 12)
+	page.corner_radius_bottom_left = 14
+	page.corner_radius_bottom_right = 14
+	%ShopPage.add_theme_stylebox_override("panel", page)
+	%TickerBar.add_theme_stylebox_override("panel", _box(LINE, 0, 0, 8))
+	%NamePlate.add_theme_stylebox_override("panel", _box(LINE, 12, 0, 8))
+	var chip := _box(CARD, 20, 2, 5, LINE)
+	chip.content_margin_left = 14
+	chip.content_margin_right = 14
+	%MarkenChip.add_theme_stylebox_override("panel", chip)
+
+	# Kopfleiste: Knöpfe treten zurück, nur Hover hebt sie hervor.
+	for b in [%ImportButton, %GalleryButton, %ShowerButton, %AchievementsButton, %QuestsButton, %ShopButton,
+			%GamesButton, %LaurelButton, %MenuButton]:
+		b.add_theme_stylebox_override("normal", _box(Color(CARD, 0.0), 10, 0, 8))
+		b.add_theme_stylebox_override("hover", _box(ROW_HOVER, 10, 0, 8))
+		b.add_theme_stylebox_override("pressed", _box(ROW_HOVER, 10, 0, 8))
+		b.add_theme_color_override("font_pressed_color", TEXT)
+		b.add_theme_font_size_override("font_size", 15)
+
+	# Shop-Reiter: aktiver Reiter verschmilzt mit der Seite darunter.
+	var tab_group := ButtonGroup.new()
+	for b in [%DevicesTab, %UpgradesTab]:
+		b.button_group = tab_group
+		var active := _box(CARD, 12, 0, 8)
+		active.corner_radius_bottom_left = 0
+		active.corner_radius_bottom_right = 0
+		b.add_theme_stylebox_override("pressed", active)
+		b.add_theme_stylebox_override("hover_pressed", active)
+		b.add_theme_stylebox_override("normal", _box(Color(CARD, 0.0), 12, 0, 8))
+		b.add_theme_stylebox_override("hover", _box(Color(CARD, 0.5), 12, 0, 8))
+		b.add_theme_font_override("font", heading_font())
+		b.add_theme_font_size_override("font_size", 21)
+		b.add_theme_color_override("font_color", MUTED)
+		b.add_theme_color_override("font_hover_color", TEXT)
+		b.add_theme_color_override("font_pressed_color", GOLD)
+		b.add_theme_color_override("font_hover_pressed_color", GOLD)
+
+
 func _style_labels() -> void:
-	_comic(%Title, 34, Color("ff6fae"))
-	_comic(wumms_label, 46, Color("ffd43b"))
-	_comic(%UpgradesTitle, 24, Color("3bc9db"))
-	_comic(%DevicesTitle, 24, Color("3bc9db"))
+	_comic(%Title, 30, RAGE)
+	_comic(wumms_label, 72, GOLD)
 	_comic(toast, 26, Color.WHITE)
-	wps_label.add_theme_font_size_override("font_size", 19)
-	marken_label.add_theme_color_override("font_color", Color("c2255c"))
-	%HelpLabel.add_theme_font_size_override("font_size", 14)
-	%HelpLabel.add_theme_color_override("font_color", Color(INK, 0.65))
+	for l in [%UpgradesTitle, %DevicesTitle]:
+		l.add_theme_font_size_override("font_size", 13)
+		l.add_theme_color_override("font_color", MUTED)
+	wps_label.add_theme_font_size_override("font_size", 16)
+	click_label.add_theme_font_size_override("font_size", 16)
+	click_label.add_theme_color_override("font_color", MUTED)
+	marken_label.add_theme_font_size_override("font_size", 14)
+	target_label.add_theme_font_override("font", heading_font())
+	target_label.add_theme_font_size_override("font_size", 16)
+	target_hits_label.add_theme_font_size_override("font_size", 13)
+	target_hits_label.add_theme_color_override("font_color", MUTED)
+	target_hits_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	no_upgrades_label.add_theme_color_override("font_color", MUTED)
+	ticker_label.add_theme_font_size_override("font_size", 14)
+	ticker_label.add_theme_color_override("font_color", Color("d6cff7"))
+	%HelpLabel.add_theme_font_size_override("font_size", 13)
+	%HelpLabel.add_theme_color_override("font_color", MUTED)
 	%HelpLabel.text = tr("Klick oder Leertaste: hauen\nR: Wutmodus entfesseln\n1–9: Gerät kaufen\nStrg+V: Bild einfügen\nBild ins Fenster ziehen: neues Opfer\nGoldene Schuhe anklicken!")
 
 
@@ -279,31 +410,48 @@ func _build_device_rows() -> void:
 		var d: Dictionary = GameState.device_defs[i]
 		var panel := PanelContainer.new()
 		panel.mouse_filter = Control.MOUSE_FILTER_PASS
-		panel.add_theme_stylebox_override("panel", _box(Color("fffdf7"), 12, 2, 8))
+		panel.add_theme_stylebox_override("panel", _box(ROW, 12, 0, 8))
+		panel.mouse_entered.connect(func() -> void: panel.add_theme_stylebox_override("panel", _box(ROW_HOVER, 12, 0, 8)))
+		panel.mouse_exited.connect(func() -> void: panel.add_theme_stylebox_override("panel", _box(ROW, 12, 0, 8)))
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 10)
+		row.add_theme_constant_override("separation", 12)
 		panel.add_child(row)
 
-		var badge := Label.new()
-		badge.text = str(i + 1) if i < 9 else "•"
-		badge.custom_minimum_size = Vector2(40, 40)
-		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		badge.add_theme_stylebox_override("normal", _box(Color(d.get("color", "#ffd43b")), 20, 2, 0))
-		badge.add_theme_font_size_override("font_size", 20)
-		row.add_child(badge)
+		# Symbol-Kachel in Gerätefarbe, Stückzahl als Plakette unten rechts
+		var tile := PanelContainer.new()
+		tile.custom_minimum_size = Vector2(52, 52)
+		tile.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tile.add_theme_stylebox_override("panel", _box(Color(d.get("color", "#ffd43b")), 12, 2, 4, LINE))
+		var icon := TextureRect.new()
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(38, 38)
+		if ResourceLoader.exists(String(d.get("icon", ""))):
+			icon.texture = load(d.icon)
+		tile.add_child(icon)
+		var count_label := Label.new()
+		count_label.add_theme_font_size_override("font_size", 11)
+		count_label.add_theme_stylebox_override("normal", _box(LINE, 9, 0, 1))
+		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		count_label.size_flags_horizontal = Control.SIZE_SHRINK_END
+		count_label.size_flags_vertical = Control.SIZE_SHRINK_END
+		tile.add_child(count_label)
+		row.add_child(tile)
 
 		var info_box := VBoxContainer.new()
 		info_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		info_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		info_box.add_theme_constant_override("separation", 0)
 		var name_label := Label.new()
 		name_label.text = d.name
-		name_label.add_theme_font_size_override("font_size", 17)
+		name_label.add_theme_font_override("font", heading_font())
+		name_label.add_theme_font_size_override("font_size", 16)
 		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		var info_label := Label.new()
-		info_label.add_theme_font_size_override("font_size", 13)
-		info_label.add_theme_color_override("font_color", Color(INK, 0.7))
+		info_label.add_theme_font_size_override("font_size", 12)
+		info_label.add_theme_color_override("font_color", MUTED)
+		info_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		info_box.add_child(name_label)
 		info_box.add_child(info_label)
 		row.add_child(info_box)
@@ -313,18 +461,44 @@ func _build_device_rows() -> void:
 		sell.tooltip_text = tr("Eins verkaufen (25 % zurück)")
 		sell.focus_mode = Control.FOCUS_NONE
 		sell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		sell.custom_minimum_size = Vector2(30, 30)
+		sell.add_theme_stylebox_override("normal", _box(Color(CARD, 0.0), 8, 0, 2))
+		sell.add_theme_stylebox_override("hover", _box(CARD, 8, 0, 2))
+		sell.add_theme_stylebox_override("disabled", _box(Color(CARD, 0.0), 8, 0, 2))
+		sell.add_theme_color_override("font_color", MUTED)
 		sell.pressed.connect(func() -> void: GameState.sell_device(d.id))
 		row.add_child(sell)
 
 		var buy := Button.new()
-		buy.custom_minimum_size = Vector2(118, 0)
+		buy.custom_minimum_size = Vector2(100, 46)
+		buy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		buy.focus_mode = Control.FOCUS_NONE
-		buy.add_theme_font_size_override("font_size", 15)
+		_style_buy_button(buy, 14)
 		buy.pressed.connect(func() -> void: _buy(d.id))
 		row.add_child(buy)
 
 		device_list.add_child(panel)
-		_device_rows[d.id] = {"panel": panel, "info": info_label, "buy": buy, "sell": sell, "index": i}
+		_device_rows[d.id] = {"panel": panel, "info": info_label, "count": count_label, "buy": buy, "sell": sell, "index": i}
+
+
+## Kaufen-Knopf: Gold heißt „leistbar“, alles andere tritt zurück.
+func _style_buy_button(b: Button, font_size: int) -> void:
+	var normal := _box(GOLD, 12, 2, 6, LINE)
+	normal.border_width_bottom = 5
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = GOLD_HOVER
+	var pressed := _box(Color("f0b400"), 12, 2, 6, LINE)
+	var disabled := _box(Color("3a2f73"), 12, 0, 6)
+	b.add_theme_stylebox_override("normal", normal)
+	b.add_theme_stylebox_override("hover", hover)
+	b.add_theme_stylebox_override("pressed", pressed)
+	b.add_theme_stylebox_override("disabled", disabled)
+	b.add_theme_color_override("font_color", LINE)
+	b.add_theme_color_override("font_hover_color", LINE)
+	b.add_theme_color_override("font_pressed_color", LINE)
+	b.add_theme_color_override("font_disabled_color", MUTED)
+	b.add_theme_font_override("font", heading_font())
+	b.add_theme_font_size_override("font_size", font_size)
 
 
 func _build_file_dialog() -> void:
@@ -371,49 +545,92 @@ func _fill_menu() -> void:
 	popup.add_item(tr("Alles löschen und neu anfangen …"), MENU_RESET)
 
 
-## Combo-, Wut- und Neuanfang-Anzeigen in der Statistik-Spalte.
+## Combo- und Wut-Leisten unter dem Opfer, Lorbeer-, Neuanfang- und Herausforderungs-Anzeigen oben links auf der Bühne.
 func _build_stats_extras() -> void:
-	var stats_box: VBoxContainer = buff_box.get_parent()
-	var insert_at := buff_box.get_index() + 1
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
-	stats_box.add_child(box)
-	stats_box.move_child(box, insert_at)
-
+	var progress_row: HBoxContainer = %ProgressRow
+	var combo_box := VBoxContainer.new()
+	combo_box.custom_minimum_size = Vector2(250, 0)
+	combo_box.add_theme_constant_override("separation", 4)
+	progress_row.add_child(combo_box)
+	var combo_head := HBoxContainer.new()
+	combo_box.add_child(combo_head)
 	_combo_label = Label.new()
-	_combo_label.add_theme_font_size_override("font_size", 14)
-	box.add_child(_combo_label)
-	_combo_bar = _bar(Color("ff922b"))
+	_combo_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_combo_label.add_theme_font_override("font", heading_font())
+	_combo_label.add_theme_font_size_override("font_size", 13)
+	combo_head.add_child(_combo_label)
+	_combo_mult_label = Label.new()
+	_combo_mult_label.add_theme_font_override("font", heading_font())
+	_combo_mult_label.add_theme_font_size_override("font_size", 13)
+	_combo_mult_label.add_theme_color_override("font_color", GOLD)
+	combo_head.add_child(_combo_mult_label)
+	_combo_bar = _bar(GOLD)
 	_combo_bar.max_value = GameState.COMBO_MAX
-	box.add_child(_combo_bar)
+	combo_box.add_child(_combo_bar)
 
-	var rage_row := HBoxContainer.new()
-	rage_row.add_theme_constant_override("separation", 6)
-	box.add_child(rage_row)
-	_rage_bar = _bar(Color("fa5252"))
+	var rage_box := VBoxContainer.new()
+	rage_box.custom_minimum_size = Vector2(250, 0)
+	rage_box.add_theme_constant_override("separation", 4)
+	progress_row.add_child(rage_box)
+	var rage_head := HBoxContainer.new()
+	rage_box.add_child(rage_head)
+	var rage_title := Label.new()
+	rage_title.text = tr("WUT")
+	rage_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rage_title.add_theme_font_override("font", heading_font())
+	rage_title.add_theme_font_size_override("font_size", 13)
+	rage_head.add_child(rage_title)
+	_rage_label = Label.new()
+	_rage_label.add_theme_font_override("font", heading_font())
+	_rage_label.add_theme_font_size_override("font_size", 13)
+	_rage_label.add_theme_color_override("font_color", Color("ff8fa3"))
+	rage_head.add_child(_rage_label)
+	_rage_bar = _bar(RAGE)
 	_rage_bar.max_value = GameState.RAGE_MAX
-	_rage_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_rage_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_rage_bar.mouse_filter = Control.MOUSE_FILTER_PASS
 	_rage_bar.tooltip_text = tr("Wut-Leiste: füllt sich mit jedem Treffer.\nVoll? Mit R oder dem Knopf 10 s Wutmodus entfesseln:\nalles ×3, aber keine Goldenen Schuhe.")
-	rage_row.add_child(_rage_bar)
+	rage_box.add_child(_rage_bar)
+
 	_rage_button = Button.new()
 	_rage_button.text = tr("WUT!")
 	_rage_button.focus_mode = Control.FOCUS_NONE
-	_rage_button.add_theme_font_size_override("font_size", 14)
-	_rage_button.add_theme_stylebox_override("normal", _box(Color("ff8787"), 8, 3, 4))
-	_rage_button.add_theme_stylebox_override("hover", _box(Color("ffa8a8"), 8, 3, 4))
+	_rage_button.custom_minimum_size = Vector2(104, 46)
+	_rage_button.size_flags_vertical = Control.SIZE_SHRINK_END
+	_rage_button.add_theme_font_override("font", heading_font())
+	_rage_button.add_theme_font_size_override("font_size", 20)
+	var rage_normal := _box(RAGE, 12, 2, 6, LINE)
+	rage_normal.border_width_bottom = 5
+	var rage_hover := rage_normal.duplicate() as StyleBoxFlat
+	rage_hover.bg_color = Color("ff6b85")
+	_rage_button.add_theme_stylebox_override("normal", rage_normal)
+	_rage_button.add_theme_stylebox_override("hover", rage_hover)
+	_rage_button.add_theme_stylebox_override("pressed", rage_normal)
+	_rage_button.add_theme_stylebox_override("disabled", _box(Color("3a2f73"), 12, 0, 6))
+	_rage_button.add_theme_color_override("font_color", Color.WHITE)
+	_rage_button.add_theme_color_override("font_hover_color", Color.WHITE)
+	_rage_button.add_theme_color_override("font_pressed_color", Color.WHITE)
+	_rage_button.add_theme_color_override("font_disabled_color", MUTED)
 	_rage_button.pressed.connect(_try_rage)
-	rage_row.add_child(_rage_button)
+	progress_row.add_child(_rage_button)
+
+	var stage_info: VBoxContainer = buff_box.get_parent()
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage_info.add_child(box)
+	stage_info.move_child(box, buff_box.get_index() + 1)
 
 	_laurel_label = Label.new()
-	_laurel_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_laurel_label.add_theme_color_override("font_color", Color("2f9e44"))
+	_laurel_label.add_theme_color_override("font_color", Color("63e6be"))
+	_laurel_label.add_theme_font_size_override("font_size", 14)
 	box.add_child(_laurel_label)
 
 	_prestige_button = Button.new()
 	_prestige_button.focus_mode = Control.FOCUS_NONE
-	_prestige_button.add_theme_stylebox_override("normal", _box(Color("b2f2bb"), 10, 3, 6))
-	_prestige_button.add_theme_stylebox_override("hover", _box(Color("d3f9d8"), 10, 3, 6))
+	_prestige_button.add_theme_stylebox_override("normal", _box(Color("63e6be"), 10, 2, 6, LINE))
+	_prestige_button.add_theme_stylebox_override("hover", _box(Color("96f2d7"), 10, 2, 6, LINE))
+	_prestige_button.add_theme_color_override("font_color", LINE)
+	_prestige_button.add_theme_color_override("font_hover_color", LINE)
 	_prestige_button.pressed.connect(_show_prestige)
 	box.add_child(_prestige_button)
 
@@ -423,7 +640,7 @@ func _build_stats_extras() -> void:
 	_challenge_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_challenge_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_challenge_label.add_theme_font_size_override("font_size", 14)
-	_challenge_label.add_theme_color_override("font_color", Color("c2255c"))
+	_challenge_label.add_theme_color_override("font_color", Color("ff8fa3"))
 	challenge_row.add_child(_challenge_label)
 	_challenge_abort = Button.new()
 	_challenge_abort.text = tr("Abbrechen")
@@ -443,7 +660,7 @@ func _bar(fill: Color) -> ProgressBar:
 	var bar := ProgressBar.new()
 	bar.show_percentage = false
 	bar.custom_minimum_size = Vector2(0, 14)
-	bar.add_theme_stylebox_override("fill", _box(fill, 6, 2, 0))
+	bar.add_theme_stylebox_override("fill", _box(fill, 7, 0, 0))
 	return bar
 
 
@@ -466,6 +683,13 @@ func _connect_ui() -> void:
 		GameState.add_stat("showers")
 		show_toast(tr("Frisch geduscht!")))
 	%AchievementsButton.pressed.connect(_show_achievements)
+	%DevicesTab.pressed.connect(func() -> void: _show_shop_page(false))
+	%UpgradesTab.pressed.connect(func() -> void: _show_shop_page(true))
+
+
+func _show_shop_page(upgrades: bool) -> void:
+	%DevicesPage.visible = not upgrades
+	%UpgradesPage.visible = upgrades
 
 
 # =====================================================================
@@ -478,12 +702,15 @@ func _refresh() -> void:
 	click_label.text = tr("pro Klick: %s") % Num.fmt(GameState.click_value())
 	if GameState.time_warp_active():
 		wps_label.text += tr(" (Zeitraffer ×2)")
-	marken_label.visible = GameState.beulen_marken > 0
+	wumms_label.tooltip_text = tr("Insgesamt erzeugt: %s Wumms") % Num.whole(GameState.total_wumms) \
+		+ "\n" + tr("Treffer gesamt: %s") % Num.whole(GameState.total_hits)
+	%MarkenChip.visible = GameState.beulen_marken > 0
 	marken_label.text = tr("Beulen-Marken: %d") % GameState.beulen_marken
-	target_label.text = tr("Opfer: %s") % GameState.target_name()
+	target_label.text = GameState.target_name()
 	target_hits_label.text = tr("Insgesamt verhauen: %s") % Num.whole(GameState.current_target_hits())
-	total_label.text = tr("Insgesamt erzeugt: %s Wumms") % Num.whole(GameState.total_wumms)
-	hits_label.text = tr("Treffer gesamt: %s") % Num.whole(GameState.total_hits)
+	# Die Tastenhilfe brauchen nur Neulinge.
+	%HelpLabel.visible = GameState.total_hits < 500
+	_sync_stage_floor()
 	%AchievementsButton.text = tr("Erfolge %d/%d") % [GameState.achievement_count(), GameState.achievement_defs.size()]
 	%LaurelButton.visible = GameState.laurel_tree_unlocked()
 	var claimable := GameState.claimable_quests()
@@ -495,17 +722,30 @@ func _refresh() -> void:
 	_refresh_upgrades()
 
 
+## Bühnenkante im Hintergrund auf Höhe des Podests unter dem Opfer halten.
+func _sync_stage_floor() -> void:
+	var bg: GameBackground = %Background
+	var local_y := target_area.floor_y()
+	var y := -1.0 if local_y < 0.0 else target_area.global_position.y - bg.global_position.y + local_y
+	if absf(y - bg.floor_y) > 0.5:
+		bg.floor_y = y
+		bg.refresh()
+
+
 func _refresh_progress_widgets() -> void:
 	_combo_bar.value = GameState.combo
-	_combo_label.text = tr("Combo %d · Klick ×%s") % [roundi(GameState.combo), Num.fmt(Balance.combo_multiplier(GameState.combo))]
+	_combo_label.text = tr("COMBO %d") % roundi(GameState.combo)
+	_combo_mult_label.text = tr("Klick ×%s") % Num.fmt(Balance.combo_multiplier(GameState.combo))
 	if GameState.rage_active():
 		_rage_bar.max_value = GameState.RAGE_DURATION
 		_rage_bar.value = GameState.rage_time
+		_rage_label.text = "%d s" % ceili(GameState.rage_time)
 		_rage_button.text = "%d s" % ceili(GameState.rage_time)
 		_rage_button.disabled = true
 	else:
 		_rage_bar.max_value = GameState.RAGE_MAX
 		_rage_bar.value = GameState.rage_meter
+		_rage_label.text = "%d %%" % roundi(float(GameState.rage_meter) / float(GameState.RAGE_MAX) * 100.0)
 		_rage_button.text = tr("WUT!")
 		_rage_button.disabled = not GameState.rage_ready()
 	_laurel_label.visible = GameState.laurels_total > 0
@@ -524,9 +764,8 @@ func _refresh_buffs() -> void:
 	var buffs: Array = GameState.buffs
 	while buff_box.get_child_count() < buffs.size():
 		var l := Label.new()
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		l.add_theme_stylebox_override("normal", _box(Color("fff3bf"), 8, 2, 4))
-		l.add_theme_font_size_override("font_size", 15)
+		l.add_theme_stylebox_override("normal", _box(CARD, 10, 2, 5, GOLD))
+		l.add_theme_font_size_override("font_size", 14)
 		buff_box.add_child(l)
 	while buff_box.get_child_count() > buffs.size():
 		var last := buff_box.get_child(buff_box.get_child_count() - 1)
@@ -542,7 +781,8 @@ func _refresh_buffs() -> void:
 		var label: Label = buff_box.get_child(i)
 		label.text = "%s · %s · %d s" % [b.name, effect, ceili(float(b.remaining))]
 		var bad := float(b.wps_mult) < 1.0
-		label.add_theme_color_override("font_color", Color("c92a2a") if bad else INK)
+		label.add_theme_color_override("font_color", Color("ff8fa3") if bad else TEXT)
+		label.add_theme_stylebox_override("normal", _box(CARD, 10, 2, 5, RAGE if bad else GOLD))
 
 
 func _refresh_devices() -> void:
@@ -560,9 +800,10 @@ func _refresh_devices() -> void:
 		var cost := GameState.device_cost(id, shown_amount)
 		var unit_wps := GameState.device_unit_wps(id)
 		var stars := "★".repeat(maxi(0, Balance.milestone_tier(owned) - 1))
-		row.info.text = tr("Besitz: %s · je %s WPS") % [Num.whole(owned), Num.fmt(unit_wps)] + ("  " + stars if stars != "" else "")
-		var label := tr("Kaufen") if _buy_mode == 1 else "×%s" % Num.whole(shown_amount)
-		row.buy.text = "%s\n%s" % [label, Num.whole(cost)]
+		row.info.text = tr("je %s WPS") % Num.fmt(unit_wps) + ("  " + stars if stars != "" else "")
+		row.count.text = Num.whole(owned)
+		row.count.visible = owned > 0
+		row.buy.text = Num.whole(cost) if _buy_mode == 1 else "×%s\n%s" % [Num.whole(shown_amount), Num.whole(cost)]
 		row.buy.disabled = amount <= 0 or GameState.wumms < cost
 		row.sell.disabled = owned <= 0
 		var share := 0.0 if total_wps <= 0.0 else GameState.device_total_wps(id) / total_wps * 100.0
@@ -570,6 +811,8 @@ func _refresh_devices() -> void:
 		row.panel.tooltip_text = tr("%s\n\n%s\nJedes Gerät: %s WPS (×%s durch Upgrades)\nAlle zusammen: %s WPS (%s %% deiner Produktion)\nAmortisation: %s") % [
 			d.name, d.description, Num.fmt(unit_wps), Num.fmt(GameState.device_multiplier(id)),
 			Num.fmt(GameState.device_total_wps(id)), Num.fmt(share), Num.duration(payback)]
+		if row.index < 9:
+			row.panel.tooltip_text += "\n" + tr("Taste %d") % (row.index + 1)
 
 
 func _refresh_upgrades() -> void:
@@ -580,47 +823,82 @@ func _refresh_upgrades() -> void:
 	if ids != _shown_upgrade_ids:
 		_rebuild_upgrades(visible_list)
 		_shown_upgrade_ids = ids
+	var affordable := 0
 	for id in _upgrade_buttons:
 		var u := GameState.upgrade_def(id)
 		_upgrade_buttons[id].disabled = GameState.wumms < float(u.cost)
+		if not _upgrade_buttons[id].disabled:
+			affordable += 1
 	no_upgrades_label.visible = ids.is_empty()
+	%UpgradesTab.text = tr("Upgrades (%d)") % affordable if affordable > 0 else tr("Upgrades")
 
 
+## Upgrades als Zeilen: Farbpunkt nach Art, Name, Wirkung, Kaufen-Knopf. Die Beschreibung steht im Tooltip.
 func _rebuild_upgrades(list: Array[Dictionary]) -> void:
 	for id in _upgrade_buttons:
-		_upgrade_buttons[id].queue_free()
+		_upgrade_buttons[id].get_meta("row").queue_free()
 	_upgrade_buttons.clear()
 	for u in list:
-		var b := Button.new()
-		b.text = "%s\n%s" % [u.name, Num.whole(float(u.cost))]
-		b.custom_minimum_size = Vector2(205, 0)
-		b.focus_mode = Control.FOCUS_NONE
-		b.clip_text = true
-		b.add_theme_font_size_override("font_size", 13)
-		var color := _upgrade_color(u)
-		b.add_theme_stylebox_override("normal", _box(color, 10, 3, 5))
-		b.add_theme_stylebox_override("hover", _box(color.lightened(0.3), 10, 3, 5))
-		b.tooltip_text = tr("%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms") % [
+		var panel := PanelContainer.new()
+		panel.mouse_filter = Control.MOUSE_FILTER_PASS
+		panel.add_theme_stylebox_override("panel", _box(ROW, 12, 0, 8))
+		panel.tooltip_text = tr("%s\n\n%s\n\nWirkung: %s\nPreis: %s Wumms") % [
 			u.name, u.description, GameState.upgrade_effect_text(u), Num.whole(float(u.cost))]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		panel.add_child(row)
+
+		var dot := Panel.new()
+		dot.custom_minimum_size = Vector2(16, 16)
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		dot.add_theme_stylebox_override("panel", _box(_upgrade_color(u), 8, 2, 0, LINE))
+		row.add_child(dot)
+
+		var info := VBoxContainer.new()
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		info.add_theme_constant_override("separation", 0)
+		var name_label := Label.new()
+		name_label.text = u.name
+		name_label.add_theme_font_override("font", heading_font())
+		name_label.add_theme_font_size_override("font_size", 15)
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var effect := Label.new()
+		effect.text = GameState.upgrade_effect_text(u)
+		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		effect.add_theme_font_size_override("font_size", 12)
+		effect.add_theme_color_override("font_color", GOLD)
+		info.add_child(name_label)
+		info.add_child(effect)
+		row.add_child(info)
+
+		var b := Button.new()
+		b.text = Num.whole(float(u.cost))
+		b.custom_minimum_size = Vector2(104, 42)
+		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		b.focus_mode = Control.FOCUS_NONE
+		_style_buy_button(b, 13)
+		b.set_meta("row", panel)
 		var id: String = u.id
 		b.pressed.connect(func() -> void:
 			if GameState.buy_upgrade(id):
 				show_toast(tr("Upgrade gekauft: %s") % u.name))
-		upgrade_flow.add_child(b)
+		row.add_child(b)
+		upgrade_list.add_child(panel)
 		_upgrade_buttons[id] = b
 
 
-## Farbe nach Upgrade-Art: Gerät = Gerätefarbe, Klick = Türkis, Global = Gold.
+## Farbe nach Upgrade-Art: Gerät = Gerätefarbe, Klick = Hellblau, Global = Gold.
 func _upgrade_color(u: Dictionary) -> Color:
 	var e: Dictionary = u.effect
 	match e.type:
 		"device_mult":
-			return Color(GameState.device_def(e.device).get("color", "#a5f3fc")).lightened(0.35)
+			return Color(GameState.device_def(e.device).get("color", "#74c0fc"))
 		"synergy":
-			return Color(GameState.device_def(e.target).get("color", "#a5f3fc")).lightened(0.15)
+			return Color(GameState.device_def(e.target).get("color", "#74c0fc"))
 		"click_mult", "click_wps", "crit", "autofire":
-			return Color("a5f3fc")
-	return Color("ffe8a3")
+			return Color("74c0fc")
+	return GOLD
 
 
 func _show_ticker() -> void:
@@ -810,17 +1088,17 @@ func _on_achievement_unlocked(id: String) -> void:
 		oldest.queue_free()
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_theme_stylebox_override("panel", _box(Color("fff3bf"), 12, 3, 10))
+	panel.add_theme_stylebox_override("panel", _box(CARD, 12, 3, 10, GOLD))
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 2)
 	panel.add_child(box)
 	var head := Label.new()
 	head.text = tr("Erfolg freigeschaltet!")
 	head.add_theme_font_size_override("font_size", 13)
-	head.add_theme_color_override("font_color", Color(INK, 0.65))
+	head.add_theme_color_override("font_color", MUTED)
 	var title := Label.new()
 	title.text = a.get("name", id)
-	_comic(title, 22, Color("ffd43b"))
+	_comic(title, 22, GOLD)
 	var desc := Label.new()
 	desc.text = a.get("description", "")
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

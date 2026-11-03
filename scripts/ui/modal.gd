@@ -18,8 +18,10 @@ static func open(parent: Node, title: String, content: Variant, buttons: Array =
 func _build(title: String, content: Variant, buttons: Array, min_width: float) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	# Dialoge sind helle Karten über der dunklen Bühne.
+	theme = load("res://scripts/ui/main.gd").paper_theme()
 	var dim := ColorRect.new()
-	dim.color = Color(0.17, 0.13, 0.09, 0.55)
+	dim.color = Color(0.03, 0.02, 0.09, 0.65)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
 

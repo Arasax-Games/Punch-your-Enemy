@@ -43,7 +43,7 @@ func _draw() -> void:
 	var font := get_theme_default_font()
 	if owned.is_empty():
 		var hint := tr("Hier tauchen deine Geräte auf, sobald du welche kaufst.")
-		draw_string(font, Vector2(0, size.y * 0.55), hint, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, Color(INK, 0.5))
+		draw_string(font, Vector2(0, size.y * 0.55), hint, HORIZONTAL_ALIGNMENT_CENTER, size.x, 15, Color("a99fdc"))
 		return
 	var scale_f := minf(1.0, size.x / (owned.size() * (CARD.x + GAP)))
 	var card := CARD * scale_f
@@ -64,7 +64,7 @@ func _draw_card(rect: Rect2, d: Dictionary, count: int, tier: int, index: int, a
 	if tier >= 7:
 		frame = Color.from_hsv(fmod(_time * 0.3 + index * 0.1, 1.0), 0.6, 1.0)
 	var panel := StyleBoxFlat.new()
-	panel.bg_color = Color("fffdf7")
+	panel.bg_color = Color("2a2156")
 	panel.set_corner_radius_all(int(10 * k))
 	panel.set_border_width_all(int(maxf(2.0, (2.0 + tier * 0.6) * k)))
 	panel.border_color = frame
@@ -91,9 +91,9 @@ func _draw_card(rect: Rect2, d: Dictionary, count: int, tier: int, index: int, a
 		_star(p, 4.5 * k, Color("fcc419"))
 	var label := Num.whole(count)
 	draw_string_outline(font, rect.position + Vector2(0, rect.size.y - 8 * k), label, HORIZONTAL_ALIGNMENT_CENTER,
-		rect.size.x, int(15 * k), 4, Color.WHITE)
+		rect.size.x, int(15 * k), 4, Color("0f0b24"))
 	draw_string(font, rect.position + Vector2(0, rect.size.y - 8 * k), label, HORIZONTAL_ALIGNMENT_CENTER,
-		rect.size.x, int(15 * k), INK)
+		rect.size.x, int(15 * k), Color.WHITE)
 
 
 func _star(center: Vector2, radius: float, fill: Color) -> void:

@@ -19,16 +19,27 @@ var _autofire_timer := 0.0
 var _shake_time := 0.0
 var _cursor_timer := 0.0
 var _squash_tween: Tween
+var _podium: Control
 
 
 func _ready() -> void:
 	_set_cursor(_cursor(0))
 	resized.connect(_update_pivot)
 	image.resized.connect(_update_pivot)
+	# Podest vor dem unteren Bildrand: Das Opfer steht im Scheinwerferkreis statt abgeschnitten zu enden.
+	_podium = Control.new()
+	_podium.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_podium.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_podium)
+	move_child(_podium, image.get_index() + 1)
+	_podium.draw.connect(_draw_podium)
+	resized.connect(_podium.queue_redraw)
 
 
 func set_texture(tex: Texture2D) -> void:
 	image.texture = tex
+	if _podium:
+		_podium.queue_redraw()
 	_alpha_image = null
 	if tex != null:
 		var img := tex.get_image()
@@ -48,6 +59,49 @@ func image_rect() -> Rect2:
 	var s := minf(image.size.x / tex_size.x, image.size.y / tex_size.y)
 	var drawn := tex_size * s
 	return Rect2(image.position + (image.size - drawn) * 0.5, drawn)
+
+
+## Wie image_rect(), aber ohne Wackeln (für Podest und Bühnenkante, die still stehen sollen).
+func _resting_image_rect() -> Rect2:
+	if image.texture == null:
+		return Rect2()
+	var inner := Rect2(Vector2(24, 24), size - Vector2(48, 48))
+	var tex_size := image.texture.get_size()
+	var s := minf(inner.size.x / tex_size.x, inner.size.y / tex_size.y)
+	var drawn := tex_size * s
+	return Rect2(inner.position + (inner.size - drawn) * 0.5, drawn)
+
+
+func _podium_height(r: Rect2) -> float:
+	return clampf(r.size.x * 0.1, 14.0, 40.0)
+
+
+## Bühnenkante hinter dem Opfer (lokale y-Koordinate), passend zum Podest.
+func floor_y() -> float:
+	var r := _resting_image_rect()
+	if r.size == Vector2.ZERO:
+		return -1.0
+	return r.end.y - _podium_height(r) * 0.2
+
+
+func _draw_podium() -> void:
+	var r := _resting_image_rect()
+	if r.size == Vector2.ZERO:
+		return
+	var h := _podium_height(r)
+	var rx := r.size.x * 0.48
+	var top := Vector2(r.get_center().x, r.end.y - h * 0.2)
+	var bottom := top + Vector2(0, h * 0.35)
+	_ellipse(bottom, rx, h * 0.5, Color("0f0b24"))
+	_podium.draw_rect(Rect2(top.x - rx, top.y, rx * 2.0, bottom.y - top.y), Color("0f0b24"))
+	_ellipse(top, rx, h * 0.5, Color("3b2f7a"))
+	_ellipse(top, rx * 0.62, h * 0.32, Color("4a3d94"))
+
+
+func _ellipse(center: Vector2, rx: float, ry: float, color: Color) -> void:
+	_podium.draw_set_transform(center, 0.0, Vector2(1.0, ry / rx))
+	_podium.draw_circle(Vector2.ZERO, rx, color)
+	_podium.draw_set_transform(Vector2.ZERO)
 
 
 func uv_to_local(uv: Vector2) -> Vector2:

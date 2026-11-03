@@ -55,11 +55,13 @@ func add_hit(uv: Vector2, value: float, crit: bool) -> void:
 
 	if not reduced:
 		_stars.append({"uv": uv, "age": 0.0, "life": 0.9, "phase": _rng.randf() * TAU})
+		# Aufprall-Ring: kurzer weißer Kreis, der aufploppt und verblasst
+		_marks.append({"kind": "ring", "uv": uv, "age": 0.0, "life": 0.22, "radius": 34.0 * size_mult})
 
 	var pos := area.uv_to_local(uv)
-	_popup("+" + Num.fmt(value), pos + Vector2(0, -10), 30 if not crit else 44, Color.WHITE, 0.9)
+	_popup("+" + Num.fmt(value), pos + Vector2(0, -10), 34 if not crit else 50, Color.WHITE, 0.9)
 	if crit:
-		_popup(tr("KRITISCH!"), pos + Vector2(0, -70), 64, Color("ff6fae"), 1.2, true)
+		_popup(tr("KRITISCH!"), pos + Vector2(0, -70), 64, Color("ff4d6d"), 1.2, true)
 	elif not reduced and _rng.randf() < 0.35:
 		var word := tr(HIT_WORDS[_rng.randi() % HIT_WORDS.size()])
 		_popup(word, pos + _jitter(40.0) + Vector2(0, -50), 40, WORD_COLORS[_rng.randi() % WORD_COLORS.size()], 0.8, true)
@@ -121,6 +123,8 @@ func _draw() -> void:
 				_draw_bump(pos, m, k)
 			"plaster":
 				_draw_plaster(pos, m, k)
+			"ring":
+				_draw_ring(pos, m, k)
 	for s in _stars:
 		_draw_stars(r.position + s.uv * r.size, s, k)
 
@@ -134,6 +138,13 @@ func _draw_splat(pos: Vector2, m: Dictionary, k: float) -> void:
 	draw_circle(pos, rad, col)
 	for b in m.blobs:
 		draw_circle(pos + b[0] * rad * 1.15, rad * b[1], col)
+
+
+func _draw_ring(pos: Vector2, m: Dictionary, k: float) -> void:
+	var t: float = m.age / m.life
+	var rad: float = m.radius * k * (0.4 + 0.8 * t)
+	draw_circle(pos, rad * 0.55, Color(1, 1, 1, 0.55 * (1.0 - t)))
+	draw_arc(pos, rad, 0.0, TAU, 32, Color(1, 1, 1, 0.9 * (1.0 - t)), 5.0 * k * (1.0 - t) + 1.0, true)
 
 
 func _draw_bump(pos: Vector2, m: Dictionary, k: float) -> void:
@@ -184,7 +195,7 @@ func _popup(text: String, pos: Vector2, font_size: int, color: Color, duration: 
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", INK)
-	label.add_theme_constant_override("outline_size", maxi(6, font_size / 5))
+	label.add_theme_constant_override("outline_size", maxi(8, font_size / 4))
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(label)
 	label.reset_size()

@@ -5,6 +5,8 @@ extends Control
 
 var _stars: Array = []
 var _time := 0.0
+## Höhe der Bühnenkante (lokale Koordinaten); setzt der Hauptbildschirm passend zum Podest unter dem Opfer.
+var floor_y := -1.0
 
 
 func _ready() -> void:
@@ -36,7 +38,24 @@ func _draw() -> void:
 		"wohnzimmer":
 			_draw_living_room()
 		_:
-			draw_rect(Rect2(Vector2.ZERO, size), Color(0.996, 0.925, 0.8))
+			_draw_night_arena()
+
+
+## Standard: Comic-Arena bei Nacht – dunkles Lila mit Rasterpunkten und einem Bühnenboden.
+func _draw_night_arena() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color("231a4a"))
+	var dot := Color(1, 1, 1, 0.06)
+	var step := 16.0
+	var y := step * 0.5
+	while y < size.y:
+		var x := step * 0.5
+		while x < size.x:
+			draw_circle(Vector2(x, y), 1.6, dot)
+			x += step
+		y += step
+	var fy := floor_y if floor_y > 0.0 else size.y * 0.74
+	draw_rect(Rect2(0, fy, size.x, size.y - fy), Color("1a1338"))
+	draw_line(Vector2(0, fy), Vector2(size.x, fy), Color("0f0b24"), 3.0)
 
 
 func _draw_circus() -> void:
