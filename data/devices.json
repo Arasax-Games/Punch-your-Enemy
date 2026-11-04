@@ -9,8 +9,8 @@
 		"icon": "res://assets/devices/faust.png"
 	},
 	{
-		"id": "Baseballschläger",
-		"name": "",
+		"id": "pantoffel",
+		"name": "Baseballschläger",
 		"base_cost": 100,
 		"base_wps": 1,
 		"color": "#f783ac",
