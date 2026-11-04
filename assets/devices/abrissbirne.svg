@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Geräte-Symbol: abrissbirne -->
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M32 4 L32 30" stroke="#868e96" stroke-width="4" stroke-dasharray="4 3"/>
-  <circle cx="32" cy="42" r="17" fill="#ff8787"/>
-  <path d="M24 34 C28 30 34 30 38 32" fill="none" stroke="#ffffff" stroke-width="3"/>
-  </g>
-</svg>
