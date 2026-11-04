@@ -1,0 +1,110 @@
+[
+	{
+		"id": "faust",
+		"name": "Faust",
+		"base_cost": 15,
+		"base_wps": 0.1,
+		"color": "#ffa94d",
+		"description": "Zerschlägt deine Gegner erbarmungslos.",
+		"icon": "res://assets/devices/faust.png"
+	},
+	{
+		"id": "Baseballschläger",
+		"name": "",
+		"base_cost": 100,
+		"base_wps": 1,
+		"color": "#f783ac",
+		"description": "Damit sich auch der letzte Zahn verabschiedet.",
+		"icon": "res://assets/devices/baseballschlaeger.png"
+	},
+	{
+		"id": "gummihammer",
+		"name": "Peitsche",
+		"base_cost": 1100,
+		"base_wps": 8,
+		"color": "#69db7c",
+		"description": "Lässt deine Gegner vor Schmerzen schreien.",
+		"icon": "res://assets/devices/peitsche.png"
+	},
+	{
+		"id": "katapult",
+		"name": "Machete",
+		"base_cost": 12000,
+		"base_wps": 47,
+		"color": "#4dabf7",
+		"description": "Zerschneidet deine Gegner wie Butter.",
+		"icon": "res://assets/devices/machete.png"
+	},
+	{
+		"id": "tortenkanone",
+		"name": "AK47",
+		"base_cost": 130000,
+		"base_wps": 260,
+		"color": "#da77f2",
+		"description": "Es wird zeit effizienter vorzugehen.",
+		"icon": "res://assets/devices/ak47.png"
+	},
+	{
+		"id": "abrissbirne",
+		"name": "Kreuzigung",
+		"base_cost": 1400000,
+		"base_wps": 1400,
+		"color": "#ff8787",
+		"description": "Alt bewährt sich gut.",
+		"icon": "res://assets/devices/kreuzigung.png"
+	},
+	{
+		"id": "fliessband",
+		"name": "Menschenforschung",
+		"base_cost": 20000000,
+		"base_wps": 7800,
+		"color": "#ffd43b",
+		"description": "Tief im Wald kann man einen zweiten Nutzen dadraus ziehen.",
+		"icon": "res://assets/devices/menschenforschung.png"
+	},
+	{
+		"id": "amboss",
+		"name": "Gaswagen",
+		"base_cost": 330000000,
+		"base_wps": 44000,
+		"color": "#adb5bd",
+		"description": "Eine mobile Art, um deine Feinde zu quälen.",
+		"icon": "res://assets/devices/gaswagen.png"
+	},
+	{
+		"id": "boxroboter",
+		"name": "Gulag",
+		"base_cost": 5100000000,
+		"base_wps": 260000,
+		"color": "#74c0fc",
+		"description": "Lass deine Feinde für dich arbeiten.",
+		"icon": "res://assets/devices/gulag.png"
+	},
+	{
+		"id": "mondkatapult",
+		"name": "Gasanlage",
+		"base_cost": 75000000000,
+		"base_wps": 1600000,
+		"color": "#e5dbff",
+		"description": "Ein Gaswagen nur größer.",
+		"icon": "res://assets/devices/gasanlage.png"
+	},
+	{
+		"id": "zeitreise",
+		"name": "Erschießungskommando",
+		"base_cost": 1000000000000,
+		"base_wps": 10000000,
+		"color": "#63e6be",
+		"description": "Effizienter kann man nicht vorgehen.",
+		"icon": "res://assets/devices/erschiessungskommando.png"
+	},
+	{
+		"id": "universell",
+		"name": "Verbrennungsanlage",
+		"base_cost": 14000000000000,
+		"base_wps": 65000000,
+		"color": "#9775fa",
+		"description": "Jetzt wirds kuschlig.",
+		"icon": "res://assets/devices/verbrennungsanlage.png"
+	}
+]
