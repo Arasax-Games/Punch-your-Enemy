@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Geräte-Symbol: fliessband -->
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-  <rect x="4" y="40" width="56" height="14" rx="7" fill="#495057"/>
-  <circle cx="12" cy="47" r="4" fill="#adb5bd"/><circle cx="32" cy="47" r="4" fill="#adb5bd"/><circle cx="52" cy="47" r="4" fill="#adb5bd"/>
-  <path d="M14 38 L14 24 C14 18 22 18 22 24 L22 38 Z M38 38 L38 20 C38 14 46 14 46 20 L46 38 Z" fill="#ffd43b"/>
-  </g>
-</svg>
