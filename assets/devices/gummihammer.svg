@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Geräte-Symbol: gummihammer -->
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-  <rect x="29" y="28" width="7" height="32" rx="3" fill="#c0895a"/>
-  <rect x="10" y="10" width="44" height="22" rx="10" fill="#69db7c"/>
-  <path d="M16 16 L22 16" stroke="#ffffff" stroke-width="3"/>
-  </g>
-</svg>
