@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Geräte-Symbol: pantoffel -->
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <g stroke="#2b2118" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M6 44 C6 34 18 30 30 29 L46 27 C56 26 60 34 60 40 C60 48 52 52 44 52 L14 52 C9 52 6 49 6 44 Z" fill="#f783ac"/>
-  <path d="M30 29 C34 18 52 16 56 30 C48 34 38 34 30 29 Z" fill="#ffd8e8"/>
-  <circle cx="44" cy="22" r="5" fill="#ffffff"/>
-  </g>
-</svg>
